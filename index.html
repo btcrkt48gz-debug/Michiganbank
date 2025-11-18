@@ -52,7 +52,6 @@
 </style>
 </head>
 <body>
-<!-- PART 1 END: Paste PART 2 below this line (do NOT remove this comment) -->
 <!-- LOGIN PAGE -->
 <div id="loginSection" class="section active">
   <div class="login-card text-center">
@@ -67,70 +66,184 @@
 
 <!-- DASHBOARD -->
 <div id="dashboardSection" class="section">
-
   <div class="navbar mb-3">
     <i class="bi bi-list icon" id="menuToggle"></i>
     <i class="bi bi-person-circle profile-icon" id="openProfile"></i>
   </div>
-
   <div class="balance-card text-center">
     <div id="greeting" style="font-size:18px;font-weight:600;"></div>
     <div class="small-muted" id="liveTime"></div>
     <h2 id="overallBalance" style="margin-top:15px;font-weight:700;"></h2>
     <div class="small-muted">Overall Balance</div>
   </div>
-
   <h5 style="font-weight:700;margin-top:18px;">Accounts</h5>
   <div class="card-custom" id="checkingCard">
     <h5>Checking Account</h5>
     <p id="checkingBalance"></p>
   </div>
-
   <div class="card-custom" id="savingsCard">
     <h5>Savings Account</h5>
     <p id="savingsBalance"></p>
   </div>
-
   <h5 style="font-weight:700;margin-top:18px;">More Options</h5>
-
   <div class="card-custom" id="cardsBtn">
     <h5><i class="bi bi-credit-card"></i> Cards</h5>
   </div>
-
   <div class="card-custom" id="creditScoreBtn">
     <h5><i class="bi bi-graph-up"></i> Credit Score</h5>
   </div>
-
   <div class="card-custom" id="payBillsBtn">
     <h5><i class="bi bi-receipt"></i> Pay Bills</h5>
   </div>
 </div>
 
-<!-- INTERNAL TRANSFER PAGE (CHECKING <-> SAVINGS) -->
-<div id="internalTransferSection" class="section"></div>
-
-<!-- SEND TO OTHER BANK PAGE -->
-<div id="sendSection" class="section"></div>
-
-<!-- TOP-UP / WITHDRAW SECTION -->
-<div id="topupWithdrawSection" class="section"></div>
-
-<!-- SUCCESS RECEIPT -->
-<div id="successSection" class="section text-center"></div>
-
-<!-- LOADING SCREEN -->
-<div id="loadingSection" class="section text-center">
-  <div class="spinner"><div class="dot"></div></div>
+<!-- INTERNAL TRANSFER -->
+<div id="internalTransferSection" class="section">
+  <h3 style="font-weight:700;">Transfer Between Accounts</h3>
+  <label class="mt-3">From</label>
+  <select id="itFrom">
+    <option value="checking">Checking</option>
+    <option value="savings">Savings</option>
+  </select>
+  <label class="mt-3">To</label>
+  <select id="itTo">
+    <option value="savings">Savings</option>
+    <option value="checking">Checking</option>
+  </select>
+  <label class="mt-3">Amount</label>
+  <input type="number" id="itAmount" placeholder="0.00">
+  <div class="mt-4 text-center">
+    <button class="btn btn-primary w-100" id="itSubmit">Transfer</button>
+  </div>
+  <div class="mt-4 text-center">
+    <span class="link-like" id="itBack">← Back to Dashboard</span>
+  </div>
 </div>
 
-<!-- CREDIT SCORE PAGE -->
-<div id="creditScoreSection" class="section text-center"></div>
+<!-- SEND -->
+<div id="sendSection" class="section">
+  <h3 style="font-weight:700;">Send Money</h3>
+  <label class="mt-3">Recipient Bank</label>
+  <input id="sendBank" placeholder="Bank Name">
+  <label class="mt-3">Recipient Name</label>
+  <input id="sendName" placeholder="Full Name">
+  <label class="mt-3">Recipient Account Number</label>
+  <input id="sendAcc" placeholder="Account Number">
+  <label class="mt-3">Amount</label>
+  <input type="number" id="sendAmount" placeholder="0.00">
+  <div class="mt-4 text-center">
+    <button class="btn btn-primary w-100" id="sendSubmit">Send</button>
+  </div>
+  <div class="mt-4 text-center">
+    <span class="link-like" id="sendBack">← Back to Dashboard</span>
+  </div>
+</div>
 
-<!-- PAY BILLS PAGE -->
-<div id="payBillsSection" class="section text-center"></div>
+<!-- TOP-UP / WITHDRAW -->
+<div id="topupWithdrawSection" class="section">
+  <h3 style="font-weight:700;">Top Up</h3>
+  <div id="cardList" class="mt-3"></div>
+  <button class="btn btn-primary w-100 mt-3" id="addCardBtn"><i class="bi bi-plus-lg"></i> Add Card</button>
+  <div id="topupAmountBox" style="display:none;" class="mt-4">
+    <label>Amount</label>
+    <input type="number" id="topupAmount">
+    <p class="mt-2 small-muted">Fee: <span id="topupFee">0.00</span></p>
+    <button class="btn btn-success w-100 mt-3" id="topupSubmit">Top Up</button>
+  </div>
+  <hr class="mt-5 mb-4">
+  <h3 style="font-weight:700;">Withdraw</h3>
+  <label class="mt-3">Withdraw To</label>
+  <select id="withdrawTo">
+    <option value="card">Linked Card</option>
+    <option value="bank">Linked Bank Account</option>
+  </select>
+  <label class="mt-3">Amount</label>
+  <input type="number" id="withdrawAmount">
+  <p class="mt-2 small-muted">Fee: <span id="withdrawFee">0.00</span></p>
+  <button class="btn btn-danger w-100 mt-3" id="withdrawSubmit">Withdraw</button>
+  <div class="mt-4 text-center">
+    <span class="link-like" id="twBack">← Back to Dashboard</span>
+  </div>
+</div>
+
+<!-- WIRE TRANSFER -->
+<div id="wireSection" class="section">
+  <h3 style="font-weight:700;">Wire Transfer</h3>
+  <label class="mt-3">Recipient Bank</label>
+  <input id="wireBank" placeholder="Bank Name">
+  <label class="mt-3">Country</label>
+  <select id="wireCountry">
+    <option value="USA">USA</option>
+    <option value="UK">United Kingdom</option>
+    <option value="EU">European Union</option>
+    <option value="CA">Canada</option>
+    <option value="AU">Australia</option>
+  </select>
+  <label class="mt-3">Routing / Swift Code</label>
+  <input id="wireCode" placeholder="Will auto-change">
+  <label class="mt-3">Recipient Address</label>
+  <input id="wireRecipientAddress" placeholder="Recipient Address">
+  <label class="mt-3">Recipient Bank Address</label>
+  <input id="wireBankAddress" placeholder="Bank Address">
+  <label class="mt-3">Recipient Name</label>
+  <input id="wireName" placeholder="Full Name">
+  <label class="mt-3">Recipient Account Number</label>
+  <input id="wireAcc" placeholder="Account Number">
+  <label class="mt-3">Amount</label>
+  <input type="number" id="wireAmount">
+  <p class="mt-2 small-muted">Fee: <span id="wireFee">0.00</span></p>
+  <button class="btn btn-primary w-100 mt-3" id="wireSubmit">Send Wire</button>
+  <div class="mt-4 text-center">
+    <span class="link-like" id="wireBack">← Back to Dashboard</span>
+  </div>
+</div>
+
+<!-- SUCCESS SCREEN -->
+<div id="successScreen" style="display:none; padding:25px;">
+    <div style="text-align:center; font-size:32px; margin-bottom:20px;">✅</div>
+    <h2 style="text-align:center; margin-bottom:10px;">Transaction Successful</h2>
+    <div id="successDetails" style="background:#fff; padding:20px; border-radius:12px; box-shadow:0 4px 20px rgba(0,0,0,0.12); font-size:16px; line-height:26px;">
+    </div>
+    <button onclick="returnToDashboard()" style="width:100%; margin-top:25px; padding:15px; border:none; border-radius:10px; background:#4b6bfb; color:#fff; font-size:18px;">
+        Back to Dashboard
+    </button>
+</div>
+
+<!-- LOADING SCREEN -->
+<div id="loadingScreen" style="display:none; text-align:center; padding:50px;">
+    <div class="spinner" style="margin:auto; width:60px; height:60px; border:6px solid #ddd; border-top-color:#4b6bfb; border-radius:50%; animation:spin 1s linear infinite;"></div>
+    <h3 style="margin-top:20px;">Processing Transaction...</h3>
+</div>
+
+<style>
+@keyframes spin { 
+    from { transform:rotate(0deg); }
+    to   { transform:rotate(360deg); }
+}
+</style>
 
 <!-- PROFILE PAGE -->
-<div id="profileSection" class="section text-center"></div>
+<div id="profileSection" class="section text-center">
+  <h3 style="font-weight:700;">Profile</h3>
+  <div style="text-align:center; margin-bottom:20px;">
+    <img src="" id="profilePic" class="profile-pic" alt="Profile Picture">
+    <div class="mt-2">
+      <input type="file" id="uploadProfilePic">
+    </div>
+  </div>
+  <label>Name</label>
+  <input type="text" id="profileName">
+  <label>Email</label>
+  <input type="email" id="profileEmail" disabled>
+  <label>Phone Number</label>
+  <input type="text" id="profilePhone">
+  <label>Account Number</label>
+  <input type="text" id="profileAccount" disabled>
+  <button class="btn btn-primary w-100 mt-3" id="saveProfileBtn">Save Profile</button>
+  <div class="mt-4 text-center">
+    <span class="link-like" id="profileBack">← Back to Dashboard</span>
+  </div>
+</div>
 
 <!-- HAMBURGER MENU -->
 <div class="menu" id="sideMenu">
@@ -151,563 +264,18 @@
   <button id="navWithdraw"><i class="bi bi-wallet2"></i></button>
 </div>
 
-<!-- PART 2 END — WAIT FOR PART 3 -->
-<!-- INTERNAL TRANSFER PAGE -->
-<div id="internalTransferSection" class="section">
-  <h3 style="font-weight:700;">Transfer Between Accounts</h3>
-
-  <label class="mt-3">From</label>
-  <select id="itFrom">
-    <option value="checking">Checking</option>
-    <option value="savings">Savings</option>
-  </select>
-
-  <label class="mt-3">To</label>
-  <select id="itTo">
-    <option value="savings">Savings</option>
-    <option value="checking">Checking</option>
-  </select>
-
-  <label class="mt-3">Amount</label>
-  <input type="number" id="itAmount" placeholder="0.00">
-
-  <div class="mt-4 text-center">
-    <button class="btn btn-primary w-100" id="itSubmit">Transfer</button>
-  </div>
-
-  <div class="mt-4 text-center">
-    <span class="link-like" id="itBack">← Back to Dashboard</span>
-  </div>
-</div>
-
-<!-- SEND TO OTHER BANK -->
-<div id="sendSection" class="section">
-  <h3 style="font-weight:700;">Send Money</h3>
-
-  <label class="mt-3">Recipient Bank</label>
-  <input id="sendBank" placeholder="Bank Name">
-
-  <label class="mt-3">Recipient Name</label>
-  <input id="sendName" placeholder="Full Name">
-
-  <label class="mt-3">Recipient Account Number</label>
-  <input id="sendAcc" placeholder="Account Number">
-
-  <label class="mt-3">Amount</label>
-  <input type="number" id="sendAmount" placeholder="0.00">
-
-  <div class="mt-4 text-center">
-    <button class="btn btn-primary w-100" id="sendSubmit">Send</button>
-  </div>
-
-  <div class="mt-4 text-center">
-    <span class="link-like" id="sendBack">← Back to Dashboard</span>
-  </div>
-</div>
-
-<!-- TOP-UP & WITHDRAW MAIN PAGE -->
-<div id="topupWithdrawSection" class="section">
-  <h3 style="font-weight:700;">Top Up</h3>
-
-  <div id="cardList" class="mt-3"></div>
-
-  <button class="btn btn-primary w-100 mt-3" id="addCardBtn">
-    <i class="bi bi-plus-lg"></i> Add Card
-  </button>
-
-  <div id="topupAmountBox" style="display:none;" class="mt-4">
-    <label>Amount</label>
-    <input type="number" id="topupAmount">
-
-    <p class="mt-2 small-muted">Fee: <span id="topupFee">0.00</span></p>
-
-    <button class="btn btn-success w-100 mt-3" id="topupSubmit">Top Up</button>
-  </div>
-
-  <hr class="mt-5 mb-4">
-
-  <h3 style="font-weight:700;">Withdraw</h3>
-
-  <label class="mt-3">Withdraw To</label>
-  <select id="withdrawTo">
-    <option value="card">Linked Card</option>
-    <option value="bank">Linked Bank Account</option>
-  </select>
-
-  <label class="mt-3">Amount</label>
-  <input type="number" id="withdrawAmount">
-
-  <p class="mt-2 small-muted">Fee: <span id="withdrawFee">0.00</span></p>
-
-  <button class="btn btn-danger w-100 mt-3" id="withdrawSubmit">Withdraw</button>
-
-  <div class="mt-4 text-center">
-    <span class="link-like" id="twBack">← Back to Dashboard</span>
-  </div>
-</div>
-
-<!-- WIRE TRANSFER PAGE -->
-<div id="wireSection" class="section">
-  <h3 style="font-weight:700;">Wire Transfer</h3>
-
-  <label class="mt-3">Recipient Bank</label>
-  <input id="wireBank" placeholder="Bank Name">
-
-  <label class="mt-3">Country</label>
-  <select id="wireCountry">
-    <option value="USA">USA</option>
-    <option value="UK">United Kingdom</option>
-    <option value="EU">European Union</option>
-    <option value="CA">Canada</option>
-    <option value="AU">Australia</option>
-  </select>
-
-  <label class="mt-3">Routing / Swift Code</label>
-  <input id="wireCode" placeholder="Will auto-change">
-
-  <label class="mt-3">Recipient Address</label>
-  <input id="wireRecipientAddress" placeholder="Recipient Address">
-
-  <label class="mt-3">Recipient Bank Address</label>
-  <input id="wireBankAddress" placeholder="Bank Address">
-
-  <label class="mt-3">Recipient Name</label>
-  <input id="wireName" placeholder="Full Name">
-
-  <label class="mt-3">Recipient Account Number</label>
-  <input id="wireAcc" placeholder="Account Number">
-
-  <label class="mt-3">Amount</label>
-  <input type="number" id="wireAmount">
-
-  <p class="mt-2 small-muted">Fee: <span id="wireFee">0.00</span></p>
-
-  <button class="btn btn-primary w-100 mt-3" id="wireSubmit">Send Wire</button>
-
-  <div class="mt-4 text-center">
-    <span class="link-like" id="wireBack">← Back to Dashboard</span>
-  </div>
-</div>
-<!-- SUCCESS / RECEIPT SCREEN -->
-<div id="successScreen" style="display:none; padding:25px;">
-    <div style="text-align:center; font-size:32px; margin-bottom:20px;">✅</div>
-    <h2 style="text-align:center; margin-bottom:10px;">Transaction Successful</h2>
-    <div id="successDetails" style="background:#fff; padding:20px; border-radius:12px; box-shadow:0 4px 20px rgba(0,0,0,0.12); font-size:16px; line-height:26px;">
-    </div>
-    <button onclick="returnToDashboard()" style="width:100%; margin-top:25px; padding:15px; border:none; border-radius:10px; background:#4b6bfb; color:#fff; font-size:18px;">
-        Back to Dashboard
-    </button>
-</div>
-
-
-<!-- LOADING SCREEN -->
-<div id="loadingScreen" style="display:none; text-align:center; padding:50px;">
-    <div class="spinner" style="margin:auto; width:60px; height:60px; border:6px solid #ddd; border-top-color:#4b6bfb; border-radius:50%; animation:spin 1s linear infinite;"></div>
-    <h3 style="margin-top:20px;">Processing Transaction...</h3>
-</div>
-
-<style>
-@keyframes spin { 
-    from { transform:rotate(0deg); }
-    to   { transform:rotate(360deg); }
-}
-</style>
-
-
 <script>
-// SHOW LOADING → SUCCESS RECEIPT
-function showLoadingThenSuccess(receiptHTML) {
-    // Hide all sections
-    document.querySelectorAll(".section").forEach(s => s.classList.remove("active"));
-    // Show loading
-    document.getElementById("loadingScreen").style.display = "block";
-
-    setTimeout(() => {
-        document.getElementById("loadingScreen").style.display = "none";
-        document.getElementById("successDetails").innerHTML = receiptHTML;
-        document.getElementById("successScreen").style.display = "block";
-    }, 1500);
-}
-
-function returnToDashboard() {
-    document.getElementById("successScreen").style.display = "none";
-    showSection("dashboardSection");
-}
-
-
-// CREATE BANK RECEIPT
-function createReceipt(title, amount, fee, total, fromAcc, toAcc, extraInfo = "") {
-    let id = "TX-" + Math.floor(Math.random() * 999999999);
-    let date = new Date().toLocaleString();
-
-    return `
-        <h3>${title}</h3>
-        <p><strong>Transaction ID:</strong> ${id}</p>
-        <p><strong>Date:</strong> ${date}</p>
-        <p><strong>Amount:</strong> $${amount}</p>
-        <p><strong>Fee (5%):</strong> $${fee}</p>
-        <p><strong>Total Deducted:</strong> $${total}</p>
-        <p><strong>From:</strong> ${fromAcc}</p>
-        <p><strong>To:</strong> ${toAcc}</p>
-        ${extraInfo}
-    `;
-}
-
-
-
-// HANDLE INTERNAL TRANSFER
-function completeInternalTransfer() {
-    let amount = parseFloat(document.getElementById("internalTransferAmount").value);
-    if (!amount || amount <= 0) return alert("Enter a valid amount");
-
-    let fee = amount * 0.05;
-    let total = amount + fee;
-
-    let fromAcc = document.getElementById("internalFrom").value;
-    let toAcc = document.getElementById("internalTo").value;
-
-    let receipt = createReceipt("Internal Transfer", amount, fee, total, fromAcc, toAcc);
-
-    showLoadingThenSuccess(receipt);
-}
-
-
-
-// HANDLE TOP-UP
-function completeTopUp() {
-    let amount = parseFloat(document.getElementById("topupAmount").value);
-    if (!amount || amount <= 0) return alert("Enter a valid amount");
-
-    let fee = amount * 0.05;
-    let total = amount + fee;
-
-    let fromCard = document.getElementById("selectedTopupCard").innerText;
-
-    let receipt = createReceipt(
-        "Balance Top-Up",
-        amount,
-        fee,
-        total,
-        fromCard,
-        "Checking"
-    );
-
-    showLoadingThenSuccess(receipt);
-}
-
-
-
-// HANDLE WITHDRAW
-function completeWithdraw() {
-    let amount = parseFloat(document.getElementById("withdrawAmount").value);
-    if (!amount || amount <= 0) return alert("Enter a valid amount");
-
-    let fee = amount * 0.05;
-    let total = amount + fee;
-
-    let receipt = createReceipt(
-        "Withdrawal",
-        amount,
-        fee,
-        total,
-        "Checking",
-        "Linked Bank/Card"
-    );
-
-    showLoadingThenSuccess(receipt);
-}
-
-
-
-// HANDLE WIRE TRANSFER
-function completeWireTransfer() {
-    let amount = parseFloat(document.getElementById("wireAmount").value);
-    if (!amount || amount <= 0) return alert("Enter a valid amount");
-
-    let fee = amount * 0.05;
-    let total = amount + fee;
-
-    let bank = document.getElementById("wireBank").value;
-    let name = document.getElementById("wireName").value;
-    let addr = document.getElementById("wireAddress").value;
-    let bankaddr = document.getElementById("wireBankAddress").value;
-    let swift = document.getElementById("wireSwift").value;
-
-    let extra = `
-        <p><strong>Recipient Name:</strong> ${name}</p>
-        <p><strong>Recipient Address:</strong> ${addr}</p>
-        <p><strong>Bank Name:</strong> ${bank}</p>
-        <p><strong>Bank Address:</strong> ${bankaddr}</p>
-        <p><strong>SWIFT/Routing:</strong> ${swift}</p>
-    `;
-
-    let receipt = createReceipt(
-        "Wire Transfer",
-        amount,
-        fee,
-        total,
-        "Checking",
-        name,
-        extra
-    );
-
-    showLoadingThenSuccess(receipt);
-}
-</script>
-<!-- PROFILE PAGE -->
-<div id="profileSection" class="section">
-  <h3 style="font-weight:700;">Profile</h3>
-  <div style="text-align:center; margin-bottom:20px;">
-    <img src="" id="profilePic" class="profile-pic" alt="Profile Picture">
-    <div class="mt-2">
-      <input type="file" id="uploadProfilePic">
-    </div>
-  </div>
-
-  <label>Name</label>
-  <input type="text" id="profileName">
-
-  <label>Email</label>
-  <input type="email" id="profileEmail" disabled>
-
-  <label>Phone Number</label>
-  <input type="text" id="profilePhone">
-
-  <label>Account Number</label>
-  <input type="text" id="profileAccount" disabled>
-
-  <button class="btn btn-primary w-100 mt-3" id="saveProfileBtn">Save Profile</button>
-
-  <div class="mt-4 text-center">
-    <span class="link-like" id="profileBack">← Back to Dashboard</span>
-  </div>
-</div>
-
-<script>
-// =========================
-// LOGIN CREDENTIALS
-// =========================
+// ==================
+// LOGIN & DASHBOARD
+// ==================
 const LOGIN_EMAIL = "Michiganbank@gmail.com";
 const LOGIN_PASSWORD = "Bank1&$";
+
+let checkingBalance = 5000;
+let savingsBalance = 3000;
 
 const loginSection = document.getElementById("loginSection");
 const dashboardSection = document.getElementById("dashboardSection");
 
 document.getElementById("loginBtn").addEventListener("click", ()=>{
-  const email = document.getElementById("loginEmail").value;
-  const pass = document.getElementById("loginPassword").value;
-
-  if(email === LOGIN_EMAIL && pass === LOGIN_PASSWORD){
-    loginSection.classList.remove("active");
-    dashboardSection.classList.add("active");
-    initDashboard();
-  } else {
-    document.getElementById("loginError").style.display="block";
-  }
-});
-
-// =========================
-// DASHBOARD LOGIC
-// =========================
-let checkingBalance = 5000;
-let savingsBalance = 3000;
-
-function initDashboard(){
-  updateBalances();
-  setGreeting();
-  setInterval(setGreeting,60000);
-}
-
-function updateBalances(){
-  document.getElementById("checkingBalance").innerText = "$"+checkingBalance.toFixed(2);
-  document.getElementById("savingsBalance").innerText = "$"+savingsBalance.toFixed(2);
-  document.getElementById("overallBalance").innerText = "$"+(checkingBalance+savingsBalance).toFixed(2);
-}
-
-function setGreeting(){
-  const hour = new Date().getHours();
-  let greet = "Hello";
-  if(hour<12) greet="Good Morning";
-  else if(hour<18) greet="Good Afternoon";
-  else greet="Good Evening";
-  document.getElementById("greeting").innerText = greet + " David";
-  document.getElementById("liveTime").innerText = new Date().toLocaleTimeString();
-}
-
-// =========================
-// HAMBURGER MENU
-// =========================
-const menu = document.getElementById("sideMenu");
-document.getElementById("menuToggle").addEventListener("click",()=>menu.classList.toggle("show"));
-document.getElementById("menuHome").addEventListener("click",()=>showSection("dashboardSection"));
-document.getElementById("menuProfile").addEventListener("click",()=>showSection("profileSection"));
-document.getElementById("menuLogout").addEventListener("click",()=>{
-  location.reload();
-});
-
-// =========================
-// NAVIGATION
-// =========================
-function showSection(id){
-  let sections = document.querySelectorAll(".section");
-  sections.forEach(s=>s.classList.remove("active"));
-  document.getElementById(id).classList.add("active");
-  menu.classList.remove("show");
-}
-
-document.getElementById("checkingCard").addEventListener("click",()=>showSection("internalTransferSection"));
-document.getElementById("savingsCard").addEventListener("click",()=>showSection("internalTransferSection"));
-document.getElementById("creditScoreBtn").addEventListener("click",()=>showSection("creditScoreSection"));
-document.getElementById("payBillsBtn").addEventListener("click",()=>showSection("payBillsSection"));
-
-// BOTTOM NAV
-document.getElementById("navSend").addEventListener("click",()=>showSection("sendSection"));
-document.getElementById("navTopup").addEventListener("click",()=>showSection("topupWithdrawSection"));
-document.getElementById("navWithdraw").addEventListener("click",()=>showSection("topupWithdrawSection"));
-
-// BACK BUTTONS
-document.getElementById("itBack")?.addEventListener("click",()=>showSection("dashboardSection"));
-document.getElementById("sendBack")?.addEventListener("click",()=>showSection("dashboardSection"));
-document.getElementById("twBack")?.addEventListener("click",()=>showSection("dashboardSection"));
-document.getElementById("profileBack")?.addEventListener("click",()=>showSection("dashboardSection"));
-document.getElementById("wireBack")?.addEventListener("click",()=>showSection("dashboardSection"));
-
-// =========================
-// INTERNAL TRANSFER BUTTON
-// =========================
-document.getElementById("itSubmit")?.addEventListener("click",()=>{
-  let fromAcc = document.getElementById("itFrom").value;
-  let toAcc = document.getElementById("itTo").value;
-  let amount = parseFloat(document.getElementById("itAmount").value);
-  if(!amount || amount<=0){alert("Enter valid amount"); return;}
-  if(fromAcc===toAcc){alert("Select different accounts"); return;}
-  let fee = amount*0.05;
-  let total = amount + fee;
-  if(fromAcc==="checking" && checkingBalance<total){alert("Insufficient funds"); return;}
-  if(fromAcc==="savings" && savingsBalance<total){alert("Insufficient funds"); return;}
-  if(fromAcc==="checking"){checkingBalance-=total; savingsBalance+=amount;}
-  else{savingsBalance-=total; checkingBalance+=amount;}
-  updateBalances();
-  let receipt=createReceipt("Internal Transfer", amount, fee, total, fromAcc, toAcc);
-  showLoadingThenSuccess(receipt);
-});
-
-// =========================
-// TOP-UP / WITHDRAW / WIRE / SEND BUTTONS
-// =========================
-
-// Top-Up
-document.getElementById("topupSubmit")?.addEventListener("click", completeTopUp);
-
-// Withdraw
-document.getElementById("withdrawSubmit")?.addEventListener("click", completeWithdraw);
-
-// Wire Transfer
-document.getElementById("wireSubmit")?.addEventListener("click", completeWireTransfer);
-
-// Send to Other Bank
-document.getElementById("sendSubmit")?.addEventListener("click", ()=>{
-    let amount = parseFloat(document.getElementById("sendAmount").value);
-    if(!amount || amount<=0){alert("Enter valid amount"); return;}
-    let fee = amount * 0.05;
-    let total = amount + fee;
-    let bank = document.getElementById("sendBank").value;
-    let name = document.getElementById("sendName").value;
-    let acc = document.getElementById("sendAcc").value;
-    if(!bank || !name || !acc){alert("Fill all fields"); return;}
-    let receipt = createReceipt("Send Money", amount, fee, total, "Checking", name, `<p><strong>Bank:</strong> ${bank}</p><p><strong>Account #:</strong> ${acc}</p>`);
-    checkingBalance -= total;
-    updateBalances();
-    showLoadingThenSuccess(receipt);
-});
-
-// =========================
-// PROFILE SAVE & IMAGE
-// =========================
-const profilePic = document.getElementById("profilePic");
-const uploadPic = document.getElementById("uploadProfilePic");
-uploadPic?.addEventListener("change",(e)=>{
-  const reader=new FileReader();
-  reader.onload=function(){profilePic.src=reader.result;}
-  reader.readAsDataURL(e.target.files[0]);
-});
-
-document.getElementById("saveProfileBtn")?.addEventListener("click",()=>{
-  localStorage.setItem("profileName", document.getElementById("profileName").value);
-  localStorage.setItem("profilePhone", document.getElementById("profilePhone").value);
-  if(profilePic.src) localStorage.setItem("profilePic", profilePic.src);
-  alert("Profile saved");
-});
-
-window.addEventListener("DOMContentLoaded", () => {
-
-  // Top-Up
-  document.getElementById("topupSubmit").addEventListener("click", completeTopUp);
-
-  // Withdraw
-  document.getElementById("withdrawSubmit").addEventListener("click", completeWithdraw);
-
-  // Wire Transfer
-  document.getElementById("wireSubmit").addEventListener("click", completeWireTransfer);
-
-  // Send to Other Bank
-  document.getElementById("sendSubmit").addEventListener("click", () => {
-      let amount = parseFloat(document.getElementById("sendAmount").value);
-      if(!amount || amount <= 0) { alert("Enter valid amount"); return; }
-
-      let fee = amount * 0.05;
-      let total = amount + fee;
-
-      let bank = document.getElementById("sendBank").value;
-      let name = document.getElementById("sendName").value;
-      let acc = document.getElementById("sendAcc").value;
-      if(!bank || !name || !acc){ alert("Fill all fields"); return; }
-
-      let receipt = createReceipt(
-        "Send Money", 
-        amount, 
-        fee, 
-        total, 
-        "Checking", 
-        name, 
-        `<p><strong>Bank:</strong> ${bank}</p><p><strong>Account #:</strong> ${acc}</p>`
-      );
-
-      checkingBalance -= total;
-      updateBalances();
-      showLoadingThenSuccess(receipt);
-  });
-
-  // Fix wire transfer function to match HTML IDs
-  function completeWireTransfer() {
-      let amount = parseFloat(document.getElementById("wireAmount").value);
-      if(!amount || amount <= 0){ alert("Enter valid amount"); return; }
-
-      let fee = amount * 0.05;
-      let total = amount + fee;
-
-      let bank = document.getElementById("wireBank").value;
-      let name = document.getElementById("wireName").value;
-      let addr = document.getElementById("wireRecipientAddress").value;
-      let bankaddr = document.getElementById("wireBankAddress").value;
-      let swift = document.getElementById("wireCode").value; // Corrected ID
-
-      let extra = `
-        <p><strong>Recipient Name:</strong> ${name}</p>
-        <p><strong>Recipient Address:</strong> ${addr}</p>
-        <p><strong>Bank Name:</strong> ${bank}</p>
-        <p><strong>Bank Address:</strong> ${bankaddr}</p>
-        <p><strong>SWIFT/Routing:</strong> ${swift}</p>
-      `;
-
-      let receipt = createReceipt("Wire Transfer", amount, fee, total, "Checking", name, extra);
-      checkingBalance -= total;
-      updateBalances();
-      showLoadingThenSuccess(receipt);
-  }
-
-});
-</script>
-
-</body>
-</html>
+  const email = document.getElementById("loginEmail").
