@@ -387,10 +387,20 @@
       });
       html += '</ul>';
     }
-    html += `<button class="btn btn-secondary mt-3" onclick="showSection('mainApp'); renderDashboard();">Back to Dashboard</button>`;
-    document.getElementById('internalTransferSection').innerHTML = html;
-    showSection('internalTransferSection');
+    html += <button class="btn btn-secondary sticky-back" 
+        onclick="showSection('mainApp'); renderDashboard();">
+  Back to Dashboard
+</button>
+
+<style>
+  .sticky-back {
+    position: sticky; /* makes the button stay visible when scrolling */
+    top: 10px;        /* distance from the top of the viewport */
+    z-index: 10;      /* stay above other content */
+    margin-bottom: 10px;
+    width: 100%;      /* optional: stretch full width */
   }
+</style>
 
   function showInternalTransferForm(from, to) {
     document.getElementById('internalTransferSection').innerHTML = `
