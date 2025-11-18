@@ -24,9 +24,6 @@ h2,h3,h4 { font-weight:600; }
 .bottom-nav{position:fixed;bottom:0;width:100%;display:flex;justify-content:space-around;background:#fff;padding:10px 0;box-shadow:0 -4px 15px rgba(0,0,0,.2);}
 .bottom-nav button{border:none;border-radius:50%;width:60px;height:60px;display:flex;justify-content:center;align-items:center;font-size:24px;box-shadow:0 4px 10px rgba(0,0,0,.2);}
 .bottom-nav button:hover{transform:scale(1.1);}
-.spinner{display:flex;justify-content:center;align-items:center;height:150px;}
-.spinner div{width:50px;height:50px;margin:10px;border:5px solid #007bff;border-top:5px solid transparent;border-radius:50%;animation:spin 1s linear infinite;}
-@keyframes spin{0%{transform:rotate(0deg);}100%{transform:rotate(360deg);}}
 .navbar{background:#fff;box-shadow:0 4px 10px rgba(0,0,0,.2);display:flex;justify-content:space-between;align-items:center;padding:0 10px;height:50px;}
 .profile-icon{font-size:28px;color:#4e54c8;cursor:pointer;}
 .form-control,.form-select{border-radius:10px;box-shadow:inset 0 1px 3px rgba(0,0,0,.1);}
@@ -38,157 +35,334 @@ h2,h3,h4 { font-weight:600; }
 .menu a i{margin-right:10px;font-size:22px;}
 .menu.show{left:0;}
 .profile-pic{width:80px;height:80px;border-radius:50%;object-fit:cover;border:2px solid #764ba2;margin-bottom:15px;}
+.spinner{display:flex;justify-content:center;align-items:center;height:150px;}
+.spinner div{width:50px;height:50px;margin:10px;border:5px solid #007bff;border-top:5px solid transparent;border-radius:50%;animation:spin 1s linear infinite;}
+@keyframes spin{0%{transform:rotate(0deg);}100%{transform:rotate(360deg);}}
 </style>
 </head>
 <body>
 
 <!-- LOGIN PAGE -->
 <div id="loginPage" class="section active">
-  <div class="login-card mt-5">
-    <h2 class="text-center mb-4">OlaCreditUnion Bank</h2>
-    <form id="loginForm">
-      <div class="mb-3"><label>Email</label><input type="email" id="loginEmail" class="form-control" required></div>
-      <div class="mb-3"><label>Password</label><input type="password" id="loginPassword" class="form-control" required></div>
-      <button type="submit" class="btn btn-primary w-100">Login</button>
-    </form>
-    <div id="loginError" class="text-danger mt-2 text-center"></div>
-    <div id="loginLoading" class="spinner" style="display:none;"><div></div></div>
-  </div>
+<div class="login-card mt-5">
+<h2 class="text-center mb-4">OlaCreditUnion Bank</h2>
+<form id="loginForm">
+<div class="mb-3"><label>Email</label><input type="email" id="loginEmail" class="form-control" required></div>
+<div class="mb-3"><label>Password</label><input type="password" id="loginPassword" class="form-control" required></div>
+<button type="submit" class="btn btn-primary w-100">Login</button>
+</form>
+<div id="loginError" class="text-danger mt-2 text-center"></div>
+<div id="loginLoading" class="spinner" style="display:none;"><div></div></div>
+</div>
 </div>
 
 <!-- MENU -->
 <div id="sideMenu" class="menu">
-  <a href="#" onclick="goTo('mainApp')"><i class="bi bi-house-door-fill"></i> Dashboard</a>
-  <a href="#" onclick="internalTransferPage()"><i class="bi bi-bank"></i> Internal Transfer</a>
-  <a href="#" onclick="sendPage()"><i class="bi bi-cash-stack"></i> Send</a>
-  <a href="#" onclick="wirePage()"><i class="bi bi-arrow-right-square"></i> Wire</a>
-  <a href="#" onclick="topupPage()"><i class="bi bi-plus-lg"></i> Top-up</a>
-  <a href="#" onclick="withdrawPage()"><i class="bi bi-wallet2"></i> Withdraw</a>
-  <a href="#" onclick="profilePage()"><i class="bi bi-person-circle"></i> Profile</a>
-  <a href="#" onclick="logout()"><i class="bi bi-box-arrow-right"></i> Logout</a>
+<a href="#" onclick="showSection('mainApp')"><i class="bi bi-house-door-fill"></i> Dashboard</a>
+<a href="#" onclick="internalTransferPage()"><i class="bi bi-bank"></i> Internal Transfer</a>
+<a href="#" onclick="sendPage()"><i class="bi bi-cash-stack"></i> Send</a>
+<a href="#" onclick="wirePage()"><i class="bi bi-arrow-right-square"></i> Wire</a>
+<a href="#" onclick="topupPage()"><i class="bi bi-plus-lg"></i> Top-up</a>
+<a href="#" onclick="withdrawPage()"><i class="bi bi-wallet2"></i> Withdraw</a>
+<a href="#" onclick="profilePage()"><i class="bi bi-person-circle"></i> Profile</a>
+<a href="#" onclick="logout()"><i class="bi bi-box-arrow-right"></i> Logout</a>
 </div>
 
 <!-- DASHBOARD -->
 <div id="mainApp" class="section">
-  <nav class="navbar">
-    <span class="bi bi-list fs-3" onclick="toggleMenu()"></span>
-    <span class="profile-icon bi bi-person-circle" onclick="profilePage()"></span>
-  </nav>
-  <div class="balance-card text-center">
-    <h4 id="greeting"></h4>
-    <p id="currentDate"></p>
-    <p>Available Balance: $<span id="availableBalance">0.00</span></p>
-    <p>Current Balance: $<span id="currentBalance">0.00</span></p>
-  </div>
-  <div class="row" id="accountsRow"></div>
-  <div class="bottom-nav">
-    <button class="btn btn-primary" title="Send" onclick="sendPage()"><i class="bi bi-cash-stack"></i></button>
-    <button class="btn btn-success" title="Top-up" onclick="topupPage()"><i class="bi bi-plus-lg"></i></button>
-    <button class="btn btn-danger" title="Withdraw" onclick="withdrawPage()"><i class="bi bi-wallet2"></i></button>
-  </div>
+<nav class="navbar">
+<span class="bi bi-list fs-3" onclick="toggleMenu()"></span>
+<span class="profile-icon bi bi-person-circle" onclick="profilePage()"></span>
+</nav>
+<div class="balance-card text-center">
+<h4 id="greeting"></h4>
+<p id="currentDate"></p>
+<p>Available Balance: $<span id="availableBalance">0.00</span></p>
+<p>Current Balance: $<span id="currentBalance">0.00</span></p>
+</div>
+<div class="row" id="accountsRow"></div>
+<div class="bottom-nav">
+<button class="btn btn-primary" title="Send" onclick="sendPage()"><i class="bi bi-cash-stack"></i></button>
+<button class="btn btn-success" title="Top-up" onclick="topupPage()"><i class="bi bi-plus-lg"></i></button>
+<button class="btn btn-danger" title="Withdraw" onclick="withdrawPage()"><i class="bi bi-wallet2"></i></button>
+</div>
 </div>
 
-<!-- INTERNAL TRANSFER -->
+<!-- INTERNAL TRANSFER SECTION -->
 <div id="internalTransferSection" class="section">
-  <h3>Internal Transfer</h3>
-  <form id="transferForm">
-    <div class="mb-3"><label>From:</label><select id="transferFrom" class="form-select"></select></div>
-    <div class="mb-3"><label>To:</label><select id="transferTo" class="form-select"></select></div>
-    <div class="mb-3"><label>Amount</label><input type="number" step="0.01" id="transferAmount" class="form-control" required></div>
-    <div class="mb-3"><p>Fee: <span id="transferFee">0.00</span></p></div>
-    <button type="submit" class="btn btn-primary">Transfer</button>
-    <button type="button" class="btn btn-secondary" onclick="goTo('mainApp')">Cancel</button>
-  </form>
+<h3>Internal Transfer</h3>
+<form id="transferForm">
+<div class="mb-2">
+<label>From</label>
+<select id="transferFrom" class="form-select"></select>
+</div>
+<div class="mb-2">
+<label>To</label>
+<select id="transferTo" class="form-select"></select>
+</div>
+<div class="mb-2">
+<label>Amount</label>
+<input type="number" id="transferAmount" class="form-control">
+</div>
+<p>Fee: $<span id="transferFee">0.00</span></p>
+<button type="submit" class="btn btn-primary">Transfer</button>
+</form>
 </div>
 
-<!-- SEND PAGE -->
+<!-- SEND MONEY SECTION -->
 <div id="sendSection" class="section">
-  <h3>Send Money</h3>
-  <form id="sendForm">
-    <div class="mb-3"><label>Recipient Name</label><input type="text" id="sendName" class="form-control" required/></div>
-    <div class="mb-3"><label>Bank</label><input type="text" id="sendBank" class="form-control" required/></div>
-    <div class="mb-3"><label>Amount</label><input type="number" step="0.01" id="sendAmount" class="form-control" required/></div>
-    <div class="mb-3"><p>Fee: <span id="sendFee">0.00</span></p></div>
-    <button type="submit" class="btn btn-primary">Send</button>
-    <button type="button" class="btn btn-secondary" onclick="goTo('mainApp')">Cancel</button>
-  </form>
+<h3>Send Money</h3>
+<form id="sendForm">
+<div class="mb-2"><label>Recipient Name</label><input id="sendName" class="form-control" required></div>
+<div class="mb-2"><label>Bank Name</label><input id="sendBank" class="form-control" required></div>
+<div class="mb-2"><label>Amount</label><input id="sendAmount" type="number" class="form-control"></div>
+<p>Fee: $<span id="sendFee">0.00</span></p>
+<button type="submit" class="btn btn-primary">Send</button>
+</form>
 </div>
 
-<!-- TOP-UP PAGE -->
+<!-- TOP-UP SECTION -->
 <div id="topupSection" class="section">
-  <h3>Top-up</h3>
-  <form id="topupForm">
-    <div class="mb-3"><label>Card</label><select id="topupCard" class="form-select"></select></div>
-    <div class="mb-3"><button type="button" class="btn btn-light" onclick="addCard()">+ Add Card</button></div>
-    <div class="mb-3"><label>Amount</label><input type="number" step="0.01" id="topupAmount" class="form-control" required/></div>
-    <div class="mb-3"><p>Fee: <span id="topupFee">0.00</span></p></div>
-    <button type="submit" class="btn btn-success">Top-up</button>
-    <button type="button" class="btn btn-secondary" onclick="goTo('mainApp')">Cancel</button>
-  </form>
+<h3>Top-up</h3>
+<form id="topupForm">
+<div class="mb-2"><label>Choose Card</label><select id="topupCard" class="form-select"></select></div>
+<div class="mb-2"><label>Amount</label><input id="topupAmount" type="number" class="form-control"></div>
+<p>Fee: $<span id="topupFee">0.00</span></p>
+<button type="submit" class="btn btn-success">Top-up</button>
+</form>
 </div>
 
-<!-- WITHDRAW PAGE -->
+<!-- WITHDRAW SECTION -->
 <div id="withdrawSection" class="section">
-  <h3>Withdraw</h3>
-  <form id="withdrawForm">
-    <div class="mb-3"><label>Amount</label><input type="number" step="0.01" id="withdrawAmount" class="form-control" required/></div>
-    <div class="mb-3"><p>Fee: <span id="withdrawFee">0.00</span></p></div>
-    <button type="submit" class="btn btn-danger">Withdraw</button>
-    <button type="button" class="btn btn-secondary" onclick="goTo('mainApp')">Cancel</button>
-  </form>
+<h3>Withdraw</h3>
+<form id="withdrawForm">
+<div class="mb-2"><label>Amount</label><input id="withdrawAmount" type="number" class="form-control"></div>
+<p>Fee: $<span id="withdrawFee">0.00</span></p>
+<button type="submit" class="btn btn-danger">Withdraw</button>
+</form>
 </div>
 
-<!-- WIRE PAGE -->
+<!-- WIRE TRANSFER SECTION -->
 <div id="wireSection" class="section">
-  <h3>Wire Transfer</h3>
-  <form id="wireForm">
-    <div class="mb-3"><label>Recipient Bank</label><input type="text" id="wireBank" class="form-control" required/></div>
-    <div class="mb-3"><label>Country</label>
-      <select id="wireCountry" class="form-select" required>
-        <option value="">Select country</option>
-        <option value="USA">USA</option>
-        <option value="UK">UK</option>
-        <option value="Germany">Germany</option>
-        <option value="Nigeria">Nigeria</option>
-      </select>
-    </div>
-    <div class="mb-3"><label>Account Number</label><input type="text" id="wireAccount" class="form-control" required/></div>
-    <div class="mb-3"><label id="codeLabel">Routing / SWIFT</label><input type="text" id="wireCode" class="form-control" required/></div>
-    <div class="mb-3"><label>Recipient Address</label><input type="text" id="wireRecipientAddress" class="form-control" required/></div>
-    <div class="mb-3"><label>Your Address</label><input type="text" id="wireSenderAddress" class="form-control" required/></div>
-    <div class="mb-3"><label>Amount</label><input type="number" step="0.01" id="wireAmount" class="form-control" required/></div>
-    <div class="mb-3"><p>Fee: <span id="wireFee">0.00</span></p></div>
-    <button type="submit" class="btn btn-primary">Wire Transfer</button>
-    <button type="button" class="btn btn-secondary" onclick="goTo('mainApp')">Cancel</button>
-  </form>
+<h3>Wire Transfer</h3>
+<form id="wireForm">
+<div class="mb-2"><label>Bank Name</label><input id="wireBank" class="form-control"></div>
+<div class="mb-2"><label>Country</label><input id="wireCountry" class="form-control"></div>
+<div class="mb-2"><label>Account Number</label><input id="wireAccount" class="form-control"></div>
+<div class="mb-2"><label>Routing/Swift Code</label><input id="wireCode" class="form-control"></div>
+<div class="mb-2"><label>Sender Address</label><input id="wireSenderAddress" class="form-control"></div>
+<div class="mb-2"><label>Recipient Address</label><input id="wireRecipientAddress" class="form-control"></div>
+<div class="mb-2"><label>Amount</label><input id="wireAmount" type="number" class="form-control"></div>
+<p>Fee: $<span id="wireFee">0.00</span></p>
+<button type="submit" class="btn btn-primary">Wire Transfer</button>
+</form>
 </div>
 
-<!-- PROFILE PAGE -->
-<div id="profileSection" class="section">
-  <h3>Your Profile</h3>
-  <div class="text-center">
-    <img id="profilePic" class="profile-pic" src="" alt="Profile Picture"/>
-    <div><input type="file" id="picInput" accept="image/*"/></div>
-  </div>
-  <form id="profileForm" class="mt-3">
-    <div class="mb-3"><label>Name</label><input type="text" id="profileName" class="form-control" /></div>
-    <div class="mb-3"><label>Email</label><input type="email" id="profileEmail" class="form-control" /></div>
-    <div class="mb-3"><label>Phone Number</label><input type="text" id="profilePhone" class="form-control" /></div>
-    <div class="mb-3"><label>Account Number</label><input type="text" id="profileAccount" class="form-control" /></div>
-    <button type="submit" class="btn btn-primary">Save</button>
-    <button type="button" class="btn btn-secondary" onclick="goTo('mainApp')">Back</button>
-  </form>
-</div>
-
-<!-- RECEIPT / SUCCESS PAGE -->
+<!-- SUCCESS / RECEIPT SECTION -->
 <div id="successSection" class="section text-center"></div>
 
-<!-- LOADING PAGE -->
-<div id="loadingSection" class="section text-center"><div class="spinner"><div></div></div></div>
+<!-- PROFILE SECTION -->
+<div id="profileSection" class="section">
+<h3>Profile</h3>
+<img src="" id="profilePic" class="profile-pic"><br>
+<form id="profileForm">
+<div class="mb-2"><label>Name</label><input id="profileName" class="form-control"></div>
+<div class="mb-2"><label>Email</label><input id="profileEmail" class="form-control"></div>
+<div class="mb-2"><label>Phone</label><input id="profilePhone" class="form-control"></div>
+<div class="mb-2"><label>Account Number</label><input id="profileAccount" class="form-control"></div>
+<div class="mb-2"><label>Upload Picture</label><input type="file" id="picInput" class="form-control"></div>
+<button type="submit" class="btn btn-primary">Save Profile</button>
+</form>
+</div>
 
 <script>
-// (JavaScript logic: accounts, fee, loading, receipt, profile, forms … — you can paste your full JS here)
-</script>
+// --- DATA ---
+const validEmail = "Michiganbank@gmail.com";
+const validPassword = "Bank1&$";
+let accounts = JSON.parse(localStorage.getItem("accounts")) || {Checking: 5000, Savings: 3000};
+let transactions = JSON.parse(localStorage.getItem("transactions")) || [];
+let profile = JSON.parse(localStorage.getItem("profile")) || {name:"David",email:validEmail,phone:"1234567890",accountNumber:"000123456789",pic:""};
 
+// --- UTILITIES ---
+function saveData(){ localStorage.setItem("accounts", JSON.stringify(accounts)); localStorage.setItem("transactions", JSON.stringify(transactions)); localStorage.setItem("profile", JSON.stringify(profile)); }
+function generateTxID(){ return "TX"+Math.floor(Math.random()*1000000); }
+function calculateFee(amount){ return parseFloat((amount*0.05).toFixed(2)); }
+function showSection(id){ document.querySelectorAll(".section").forEach(s=>s.classList.remove("active")); document.getElementById(id).classList.add("active"); toggleMenu(false);}
+function toggleMenu(forceClose=null){ const menu=document.getElementById("sideMenu"); if(forceClose===true)menu.classList.remove("show"); else if(forceClose===false)menu.classList.add("show"); else menu.classList.toggle("show"); }
+
+// --- DASHBOARD ---
+function renderDashboard(){
+    const now = new Date();
+    let hour=now.getHours();
+    let greet = "Good Morning";
+    if(hour>=12 && hour<18) greet="Good Afternoon";
+    else if(hour>=18) greet="Good Evening";
+    document.getElementById("greeting").innerText=greet+" "+profile.name;
+    document.getElementById("currentDate").innerText=now.toLocaleString();
+    document.getElementById("availableBalance").innerText=accounts.Checking.toFixed(2);
+    document.getElementById("currentBalance").innerText=(accounts.Checking+accounts.Savings).toFixed(2);
+    let row = document.getElementById("accountsRow"); row.innerHTML="";
+    for(let acc in accounts){
+        row.innerHTML+=`<div class="col-6"><div class="card-custom" onclick="internalTransferPage('${acc}')">${acc} <br> $${accounts[acc].toFixed(2)}</div></div>`;
+    }
+}
+
+// --- LOGIN ---
+document.getElementById("loginForm").addEventListener("submit", function(e){
+    e.preventDefault();
+    const email=document.getElementById("loginEmail").value;
+    const password=document.getElementById("loginPassword").value;
+    const errorDiv=document.getElementById("loginError");
+    const spinner=document.getElementById("loginLoading");
+    errorDiv.innerText="";
+    spinner.style.display="flex";
+    setTimeout(()=>{
+        spinner.style.display="none";
+        if(email===validEmail && password===validPassword){
+            showSection("mainApp");
+            renderDashboard();
+        } else errorDiv.innerText="Invalid email or password.";
+    },2000);
+});
+
+// --- PROFILE ---
+function profilePage(){
+    showSection("profileSection");
+    document.getElementById("profileName").value=profile.name;
+    document.getElementById("profileEmail").value=profile.email;
+    document.getElementById("profilePhone").value=profile.phone;
+    document.getElementById("profileAccount").value=profile.accountNumber;
+    document.getElementById("profilePic").src=profile.pic||"https://via.placeholder.com/80";
+}
+
+document.getElementById("profileForm").addEventListener("submit", function(e){
+    e.preventDefault();
+    profile.name=document.getElementById("profileName").value;
+    profile.email=document.getElementById("profileEmail").value;
+    profile.phone=document.getElementById("profilePhone").value;
+    profile.accountNumber=document.getElementById("profileAccount").value;
+    saveData();
+    renderDashboard();
+    showSection("mainApp");
+});
+
+document.getElementById("picInput").addEventListener("change", function(e){
+    const file = e.target.files[0];
+    if(file){
+        const reader = new FileReader();
+        reader.onload=function(){ profile.pic=reader.result; document.getElementById("profilePic").src=profile.pic; saveData(); }
+        reader.readAsDataURL(file);
+    }
+});
+
+// --- INTERNAL TRANSFER ---
+function internalTransferPage(fromAcc=null){
+    showSection("internalTransferSection");
+    const fromSelect=document.getElementById("transferFrom");
+    const toSelect=document.getElementById("transferTo");
+    fromSelect.innerHTML=""; toSelect.innerHTML="";
+    for(let acc in accounts){
+        fromSelect.innerHTML+=`<option value="${acc}" ${fromAcc===acc?'selected':''}>${acc}</option>`;
+        toSelect.innerHTML+=`<option value="${acc}" ${fromAcc===acc?'':acc}>${acc}</option>`;
+    }
+    document.getElementById("transferAmount").value="";
+    document.getElementById("transferFee").innerText="0.00";
+}
+
+document.getElementById("transferAmount").addEventListener("input", function(){
+    let amt=parseFloat(this.value)||0;
+    document.getElementById("transferFee").innerText=calculateFee(amt).toFixed(2);
+});
+
+document.getElementById("transferForm").addEventListener("submit", function(e){
+    e.preventDefault();
+    let from=document.getElementById("transferFrom").value;
+    let to=document.getElementById("transferTo").value;
+    let amt=parseFloat(document.getElementById("transferAmount").value);
+    let fee=calculateFee(amt);
+    if(from===to){ alert("Cannot transfer to same account"); return; }
+    if(amt+fee>accounts[from]){ alert("Insufficient funds"); return; }
+    accounts[from]-=(amt+fee); accounts[to]+=amt;
+    let tx={type:"Internal Transfer", from, to, amount:amt, fee, date:new Date().toLocaleString(), txid:generateTxID()};
+    transactions.push(tx); saveData();
+    showReceipt(tx);
+});
+
+// --- SEND MONEY ---
+function sendPage(){ showSection("sendSection"); document.getElementById("sendForm").reset(); document.getElementById("sendFee").innerText="0.00";}
+document.getElementById("sendAmount").addEventListener("input", function(){ document.getElementById("sendFee").innerText=calculateFee(parseFloat(this.value)||0).toFixed(2);});
+document.getElementById("sendForm").addEventListener("submit", function(e){
+    e.preventDefault();
+    let name=document.getElementById("sendName").value;
+    let bank=document.getElementById("sendBank").value;
+    let amt=parseFloat(document.getElementById("sendAmount").value);
+    let fee=calculateFee(amt);
+    if(amt+fee>accounts.Checking){ alert("Insufficient funds"); return; }
+    accounts.Checking-=(amt+fee);
+    let tx={type:"Send Money", toName:name, toBank:bank, amount:amt, fee, date:new Date().toLocaleString(), txid:generateTxID()};
+    transactions.push(tx); saveData(); showReceipt(tx);
+});
+
+// --- TOP-UP ---
+function topupPage(){ showSection("topupSection"); document.getElementById("topupForm").reset();
+let cardSelect=document.getElementById("topupCard"); cardSelect.innerHTML=""; cardSelect.innerHTML="<option>OlaCreditUnion Bank - 1234</option>";
+document.getElementById("topupFee").innerText="0.00";}
+document.getElementById("topupAmount").addEventListener("input", function(){ document.getElementById("topupFee").innerText=calculateFee(parseFloat(this.value)||0).toFixed(2);});
+document.getElementById("topupForm").addEventListener("submit", function(e){
+    e.preventDefault();
+    let amt=parseFloat(document.getElementById("topupAmount").value);
+    let fee=calculateFee(amt);
+    accounts.Checking+=amt;
+    let tx={type:"Top-up", card:"OlaCreditUnion Bank - 1234", amount:amt, fee, date:new Date().toLocaleString(), txid:generateTxID()};
+    transactions.push(tx); saveData(); showReceipt(tx);
+});
+
+// --- WITHDRAW ---
+function withdrawPage(){ showSection("withdrawSection"); document.getElementById("withdrawForm").reset(); document.getElementById("withdrawFee").innerText="0.00";}
+document.getElementById("withdrawAmount").addEventListener("input", function(){ document.getElementById("withdrawFee").innerText=calculateFee(parseFloat(this.value)||0).toFixed(2);});
+document.getElementById("withdrawForm").addEventListener("submit", function(e){
+    e.preventDefault();
+    let amt=parseFloat(document.getElementById("withdrawAmount").value);
+    let fee=calculateFee(amt);
+    if(amt+fee>accounts.Checking){ alert("Insufficient funds"); return; }
+    accounts.Checking-=(amt+fee);
+    let tx={type:"Withdraw", amount:amt, fee, date:new Date().toLocaleString(), txid:generateTxID()};
+    transactions.push(tx); saveData(); showReceipt(tx);
+});
+
+// --- WIRE TRANSFER ---
+function wirePage(){ showSection("wireSection"); document.getElementById("wireForm").reset(); document.getElementById("wireFee").innerText="0.00";}
+document.getElementById("wireAmount").addEventListener("input", function(){ document.getElementById("wireFee").innerText=calculateFee(parseFloat(this.value)||0).toFixed(2);});
+document.getElementById("wireForm").addEventListener("submit", function(e){
+    e.preventDefault();
+    let bank=document.getElementById("wireBank").value;
+    let country=document.getElementById("wireCountry").value;
+    let accNum=document.getElementById("wireAccount").value;
+    let code=document.getElementById("wireCode").value;
+    let senderAddr=document.getElementById("wireSenderAddress").value;
+    let recAddr=document.getElementById("wireRecipientAddress").value;
+    let amt=parseFloat(document.getElementById("wireAmount").value);
+    let fee=calculateFee(amt);
+    if(amt+fee>accounts.Checking){ alert("Insufficient funds"); return; }
+    accounts.Checking-=(amt+fee);
+    let tx={type:"Wire Transfer", toBank:bank, country, accNum, code, senderAddr, recAddr, amount:amt, fee, date:new Date().toLocaleString(), txid:generateTxID()};
+    transactions.push(tx); saveData(); showReceipt(tx);
+});
+
+// --- RECEIPT ---
+function showReceipt(tx){
+    showSection("successSection");
+    let html=`<div class="success-card"><h4>${tx.type} ✅</h4>`;
+    for(let key in tx){
+        if(key!=="type") html+=`<div class="receipt-row"><span>${key}</span><span>${tx[key]}</span></div>`;
+    }
+    html+=`<button class="btn btn-primary mt-3" onclick="renderDashboard();showSection('mainApp')">Back to Dashboard</button></div>`;
+    document.getElementById("successSection").innerHTML=html;
+    renderDashboard();
+}
+
+// --- LOGOUT ---
+function logout(){ showSection("loginPage"); }
+</script>
 </body>
 </html>
