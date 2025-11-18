@@ -109,15 +109,17 @@ h2,h3,h4{ font-weight:600; }
 <div id="payBillsSection" class="section text-center"></div>
 
 <script>
-// DEMO DATA & UTILS
+// ----------------- DATA -----------------
 const demoEmail='Michiganbank@gmail.com';
 const demoPassword='Bank1&$';
 const FEE_RATE=0.05;
 const predefinedBanks=['OlaCreditUnion Bank','DemoBank','SampleBank'];
 const predefinedCards=['1111 2222 3333 4444','5555 6666 7777 8888'];
-const sampleBills=[{name:'Electricity',amount:120},{name:'Internet',amount:60},{name:'Water',amount:30}];
 
-if(!localStorage.getItem('accounts')) localStorage.setItem('accounts',JSON.stringify([{name:'Checking',balance:5000,tx:[]},{name:'Savings',balance:2000,tx:[]}]));
+if(!localStorage.getItem('accounts')) localStorage.setItem('accounts',JSON.stringify([
+  {name:'Checking',balance:5000,tx:[]},
+  {name:'Savings',balance:2000,tx:[]}
+]));
 
 function getAccounts(){ return JSON.parse(localStorage.getItem('accounts')); }
 function saveAccounts(a){ localStorage.setItem('accounts',JSON.stringify(a)); }
@@ -125,13 +127,25 @@ function formatDate(){ return new Date().toLocaleString(); }
 function generateTxID(){ return 'TX-'+Date.now(); }
 function showSection(id){ document.querySelectorAll('.section').forEach(s=>s.classList.remove('active')); document.getElementById(id).classList.add('active'); closeMenu(); }
 function updateGreeting(){ const h=new Date().getHours(); const greet=h<12?'Good Morning':'Good Evening'; document.getElementById('greeting').textContent=`${greet} David`; document.getElementById('currentDate').textContent=formatDate(); }
-function renderDashboard(){ const row=document.getElementById('accountsRow'); row.innerHTML=''; const accounts=getAccounts(); let total=0; accounts.forEach(a=>total+=a.balance); document.getElementById('availableBalance').textContent=accounts[0].balance.toFixed(2); document.getElementById('currentBalance').textContent=total.toFixed(2); accounts.forEach(a=>{ const col=document.createElement('div'); col.className='col-md-6'; col.innerHTML=`<div class="card-custom" onclick="internalTransfer('${a.name}')"><h4>${a.name}</h4><p>Balance: $${a.balance.toFixed(2)}</p><p>${formatDate()}</p></div>`; row.appendChild(col); }); }
+function renderDashboard(){
+  const row=document.getElementById('accountsRow'); row.innerHTML=''; 
+  const accounts=getAccounts(); 
+  let total=0; 
+  accounts.forEach(a=>total+=a.balance); 
+  document.getElementById('availableBalance').textContent=accounts[0].balance.toFixed(2); 
+  document.getElementById('currentBalance').textContent=total.toFixed(2); 
+  accounts.forEach(a=>{
+    const col=document.createElement('div'); col.className='col-md-6'; 
+    col.innerHTML=`<div class="card-custom" onclick="internalTransfer('${a.name}')"><h4>${a.name}</h4><p>Balance: $${a.balance.toFixed(2)}</p><p>${formatDate()}</p></div>`; 
+    row.appendChild(col); 
+  });
+}
 function logout(){ showSection('loginPage'); }
 function toggleMenu(){ document.getElementById('sideMenu').classList.toggle('show'); }
 function closeMenu(){ document.getElementById('sideMenu').classList.remove('show'); }
 function goTo(section){ showSection(section); }
 
-// LOGIN
+// ----------------- LOGIN -----------------
 document.getElementById('loginForm').addEventListener('submit',e=>{
   e.preventDefault(); 
   const email=document.getElementById('loginEmail').value; 
@@ -148,7 +162,12 @@ document.getElementById('loginForm').addEventListener('submit',e=>{
   },2000); 
 });
 
-// SUCCESS RECEIPT
+// ----------------- UTIL FUNCTIONS -----------------
+async function showLoading(seconds=1500){
+  showSection('loadingSection');
+  return new Promise(resolve=>setTimeout(resolve,seconds));
+}
+
 function performTransaction(tx){
   const successHTML = `
     <div class="success-card">
@@ -167,6 +186,92 @@ function performTransaction(tx){
   document.getElementById('successSection').innerHTML = successHTML;
   showSection('successSection');
 }
+
+// ----------------- TRANSACTIONS -----------------
+async function internalTransfer(accountName){
+  const accounts=getAccounts();
+  const fromAcc=accounts.find(a=>a.name===accountName);
+  const toAcc=accounts.find(a=>a.name!==accountName);
+  const amount=prompt(`Enter amount to transfer from ${fromAcc.name} to ${toAcc.name}:`);
+  const amt=parseFloat(amount);
+  if(isNaN(amt)||amt<=0||amt>fromAcc.balance){ alert('Invalid amount'); return; }
+  const fee=amt*FEE_RATE;
+  fromAcc.balance-=amt+fee;
+  toAcc.balance+=amt;
+  const tx={txID:generateTxID(),type:'Internal Transfer',amount:amt,fee:fee,date:formatDate(),from:fromAcc.name,to:toAcc.name};
+  fromAcc.tx.push(tx); toAcc.tx.push(tx);
+  saveAccounts(accounts);
+  await showLoading();
+  performTransaction(tx);
+}
+
+async function startSend(){
+  const amount=prompt('Enter amount to send:');
+  const bank=prompt('Enter recipient bank:');
+  const name=prompt('Enter recipient name:');
+  const amt=parseFloat(amount);
+  if(isNaN(amt)||amt<=0){ alert('Invalid amount'); return; }
+  const accounts=getAccounts();
+  if(amt>accounts[0].balance){ alert('Insufficient balance'); return; }
+  const fee=amt*FEE_RATE;
+  accounts[0].balance-=amt+fee;
+  const tx={txID:generateTxID(),type:'Send',amount:amt,fee:fee,date:formatDate(),from:'Checking',to:`${name} - ${bank}`};
+  accounts[0].tx.push(tx); saveAccounts(accounts);
+  await showLoading();
+  performTransaction(tx);
+}
+
+async function startTopup(){
+  const card=prompt(`Choose card:\n${predefinedCards.join('\n')}`);
+  const amount=prompt('Enter top-up amount:');
+  const amt=parseFloat(amount);
+  if(isNaN(amt)||amt<=0){ alert('Invalid amount'); return; }
+  const fee=amt*FEE_RATE;
+  const accounts=getAccounts();
+  accounts[0].balance+=amt-fee;
+  const tx={txID:generateTxID(),type:'Top-up',amount:amt,fee:fee,date:formatDate(),from:card,to:'Checking'};
+  accounts[0].tx.push(tx); saveAccounts(accounts);
+  await showLoading();
+  performTransaction(tx);
+}
+
+async function startWithdraw(){
+  const amount=prompt('Enter withdraw amount:');
+  const amt=parseFloat(amount);
+  if(isNaN(amt)||amt<=0){ alert('Invalid amount'); return; }
+  const fee=amt*FEE_RATE;
+  const accounts=getAccounts();
+  if(amt+fee>accounts[0].balance){ alert('Insufficient balance'); return; }
+  accounts[0].balance-=amt+fee;
+  const tx={txID:generateTxID(),type:'Withdraw',amount:amt,fee:fee,date:formatDate(),from:'Checking',to:'Cash'};
+  accounts[0].tx.push(tx); saveAccounts(accounts);
+  await showLoading();
+  performTransaction(tx);
+}
+
+async function startWire(){
+  const bank=prompt('Enter bank name:');
+  const country=prompt('Enter country:');
+  const accountNumber=prompt('Enter account number:');
+  const code=prompt(country.toLowerCase().includes('america')?'Enter routing number':'Enter SWIFT code');
+  const recipientAddress=prompt('Enter recipient address');
+  const senderAddress=prompt('Enter your address');
+  const amount=prompt('Enter amount:');
+  const amt=parseFloat(amount);
+  if(isNaN(amt)||amt<=0){ alert('Invalid amount'); return; }
+  const fee=amt*FEE_RATE;
+  const accounts=getAccounts();
+  if(amt+fee>accounts[0].balance){ alert('Insufficient balance'); return; }
+  accounts[0].balance-=amt+fee;
+  const tx={txID:generateTxID(),type:'Wire',amount:amt,fee:fee,date:formatDate(),from:'Checking',to:`${bank} - ${accountNumber}`,bankCode:code,recipientAddress,senderAddress};
+  accounts[0].tx.push(tx); saveAccounts(accounts);
+  await showLoading();
+  performTransaction(tx);
+}
+
+// ----------------- PLACEHOLDER SECTIONS -----------------
+function showCreditScore(){ alert('Credit Score page placeholder'); }
+function showPayBills(){ alert('Pay Bills page placeholder'); }
 </script>
 </body>
 </html>
