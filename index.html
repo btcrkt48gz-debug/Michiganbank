@@ -14,7 +14,7 @@
       --accent-3: #667eea;
       --accent-4: #764ba2;
     }
-    html, body { height:100%; margin:0; font-family: Inter, Arial, sans-serif; }
+    html, body { height: 100%; margin: 0; font-family: Inter, Arial, sans-serif; }
     body { background: linear-gradient(135deg, var(--accent-1), var(--accent-2)); color: #222; -webkit-font-smoothing: antialiased; }
     .section { display: none; padding: 18px 18px 90px; }
     .section.active { display: block; }
@@ -22,23 +22,17 @@
     .btn-primary { background: linear-gradient(135deg, var(--accent-1), var(--accent-2)); border: 0; color: #fff; box-shadow: 0 8px 30px rgba(0,0,0,.18); border-radius: 10px; padding: 10px 14px; }
     .btn-success { background: linear-gradient(135deg, #43e97b, #38f9d7); border: 0; color: #fff; border-radius: 10px; padding: 10px 14px; }
     .btn-danger { background: linear-gradient(135deg, #f5576c, #f093fb); border: 0; color: #fff; border-radius: 10px; padding: 10px 14px; }
-    .navbar { height:58px; background:#fff; border-radius:8px; display:flex; align-items:center; justify-content:space-between; padding:0 12px; box-shadow:0 6px 18px rgba(0,0,0,.12); }
-    .icon { font-size:22px; color: var(--accent-4); cursor: pointer; }
-    .profile-icon { font-size:26px; color: var(--accent-4); cursor: pointer; }
-    .balance-card { background: linear-gradient(135deg, var(--accent-3), var(--accent-4)); color:#fff; border-radius:14px; padding:18px; margin:14px 0; box-shadow:0 12px 40px rgba(0,0,0,.22); text-align:center; }
-    .card-custom { background:#fff; border-radius:12px; padding:14px; box-shadow:0 8px 28px rgba(0,0,0,.12); cursor:pointer; margin:8px; }
-    .card-custom h5 { margin:0; font-size:15px; font-weight:600; }
-    .card-custom p { margin:6px 0 0; color:#666; }
-    .bottom-nav { position: fixed; left:0; right:0; bottom:14px; margin:auto; display:flex; gap:18px; justify-content:center; pointer-events:auto; }
-    .bottom-nav button { width:64px; height:64px; border-radius:32px; border:0; box-shadow:0 10px 30px rgba(0,0,0,.18); display:flex; align-items:center; justify-content:center; font-size:20px; cursor:pointer; background:#fff; }
-    .menu { position:fixed; left:-290px; top:0; height:100%; width:270px; background:#fff; box-shadow:4px 0 30px rgba(0,0,0,.2); padding-top:64px; transition:left .22s; }
-    .menu.show { left:0; }
-    .menu a { display:flex; align-items:center; padding:12px 16px; color:#333; text-decoration:none; border-bottom:1px solid #f2f2f2; }
-    .menu a i { font-size:18px; margin-right:12px; color: var(--accent-4); }
-    .small-muted { font-size:13px; color:#666; }
-    input,select,textarea { border-radius:10px; padding:10px; border:1px solid #e6e6e6; box-shadow: inset 0 1px 2px rgba(0,0,0,.03); width:100%; }
-    label { font-weight:600; font-size:14px; color:#333; }
+    .navbar { height: 58px; background: #fff; border-radius: 8px; display: flex; align-items: center; justify-content: space-between; padding: 0 12px; box-shadow: 0 6px 18px rgba(0,0,0,.12); }
+    .icon { font-size: 22px; color: var(--accent-4); cursor: pointer; }
+    .profile-icon { font-size: 26px; color: var(--accent-4); cursor: pointer; }
+    .balance-card { background: linear-gradient(135deg, var(--accent-3), var(--accent-4)); color: #fff; border-radius: 14px; padding: 18px; margin: 14px 0; box-shadow: 0 12px 40px rgba(0,0,0,.22); text-align: center; }
+    .card-custom { background: #fff; border-radius: 12px; padding: 14px; box-shadow: 0 8px 28px rgba(0,0,0,.12); cursor: pointer; margin: 8px; }
+    .bottom-nav { position: fixed; left: 0; right: 0; bottom: 14px; margin: auto; display: flex; gap: 18px; justify-content: center; pointer-events: auto; }
+    .bottom-nav button { width: 64px; height: 64px; border-radius: 32px; border: 0; box-shadow: 0 10px 30px rgba(0,0,0,.18); display: flex; align-items: center; justify-content: center; font-size: 20px; cursor: pointer; background: #fff; }
+    input, select, textarea { border-radius: 10px; padding: 10px; border: 1px solid #e6e6e6; box-shadow: inset 0 1px 2px rgba(0,0,0,.03); width: 100%; }
+    label { font-weight: 600; font-size: 14px; color: #333; }
     .link-like { color: var(--accent-4); cursor: pointer; }
+    .small-muted { font-size: 13px; color: #666; }
     canvas { width: 100% !important; height: 200px !important; }
   </style>
 </head>
@@ -62,24 +56,15 @@
       <i class="bi bi-list icon" id="menuToggle"></i>
       <i class="bi bi-person-circle profile-icon" id="openProfile"></i>
     </div>
-
     <div class="balance-card">
       <div id="greeting" style="font-size:18px;font-weight:600;"></div>
       <div class="small-muted" id="liveTime"></div>
       <h2 id="overallBalance" style="margin-top:15px;font-weight:700;"></h2>
       <div class="small-muted">Overall Balance</div>
     </div>
-
     <h5 style="font-weight:700;margin-top:18px;">Accounts</h5>
-    <div class="card-custom" id="checkingCard">
-      <h5>Checking Account</h5>
-      <p id="checkingBalance"></p>
-    </div>
-    <div class="card-custom" id="savingsCard">
-      <h5>Savings Account</h5>
-      <p id="savingsBalance"></p>
-    </div>
-
+    <div class="card-custom" id="checkingCard"><h5>Checking Account</h5><p id="checkingBalance"></p></div>
+    <div class="card-custom" id="savingsCard"><h5>Savings Account</h5><p id="savingsBalance"></p></div>
     <h5 style="font-weight:700;margin-top:18px;">More Options</h5>
     <div class="card-custom" id="cardsBtn"><h5><i class="bi bi-credit-card"></i> Cards</h5></div>
     <div class="card-custom" id="creditScoreBtn"><h5><i class="bi bi-graph-up"></i> Credit Score</h5></div>
@@ -98,24 +83,21 @@
   <!-- ADD CARD -->
   <div id="addCardSection" class="section">
     <h3>Add Card</h3>
-    <label>Card Number</label>
-    <input type="text" id="newCardNumber" placeholder="XXXX XXXX XXXX XXXX">
-    <label class="mt-2">Expiration Date</label>
-    <input type="text" id="newCardExpiry" placeholder="MM/YY">
-    <label class="mt-2">CVV</label>
-    <input type="text" id="newCardCVV" placeholder="XXX">
+    <label>Card Number</label><input type="text" id="newCardNumber" placeholder="XXXX XXXX XXXX XXXX">
+    <label class="mt-2">Expiration Date</label><input type="text" id="newCardExpiry" placeholder="MM/YY">
+    <label class="mt-2">CVV</label><input type="text" id="newCardCVV" placeholder="XXX">
     <button class="btn btn-success w-100 mt-3" id="confirmAddCard">Confirm</button>
     <div class="mt-4 text-center"><span class="link-like" id="addCardBack">← Back to Cards</span></div>
   </div>
 
-  <!-- CREDIT SCORE PAGE -->
+  <!-- CREDIT SCORE -->
   <div id="creditScoreSection" class="section text-center">
     <h3>Credit Score</h3>
     <p>Your current credit score is <strong>750</strong></p>
     <div class="mt-4 text-center"><span class="link-like" id="creditScoreBack">← Back to Dashboard</span></div>
   </div>
 
-  <!-- PAY BILLS PAGE -->
+  <!-- PAY BILLS -->
   <div id="payBillsSection" class="section text-center">
     <h3>Pay Bills</h3>
     <div class="card-custom billBtn" data-bill="Water Bill">Water Bill</div>
@@ -126,7 +108,7 @@
     <div class="mt-4 text-center"><span class="link-like" id="payBillsBack">← Back to Dashboard</span></div>
   </div>
 
-  <!-- BILL PAYMENT PAGE -->
+  <!-- BILL PAYMENT -->
   <div id="billPaySection" class="section">
     <h3 id="billTitle"></h3>
     <label>Account Number / Customer ID</label><input type="text" id="billAccount">
@@ -135,14 +117,14 @@
     <div class="mt-4 text-center"><span class="link-like" id="billBack">← Back to Bills</span></div>
   </div>
 
-  <!-- CRYPTO LIST PAGE -->
+  <!-- CRYPTO LIST -->
   <div id="cryptoSection" class="section text-center">
-    <h3>Crypto Dashboard</h3>
+    <h3 style="font-weight:700;">Crypto Dashboard</h3>
     <div id="cryptoList" class="mt-3"></div>
     <div class="mt-4 text-center"><span class="link-like" id="cryptoBack">← Back to Dashboard</span></div>
   </div>
 
-  <!-- CRYPTO DETAIL PAGE -->
+  <!-- CRYPTO DETAIL -->
   <div id="cryptoDetailSection" class="section text-center">
     <h3 id="cryptoTitle"></h3>
     <div id="cryptoPrice" style="font-size:24px; font-weight:600;"></div>
@@ -157,57 +139,56 @@
   </div>
 
 <script>
-  // ========== State & Data ==========
+  // ========== State ==========
   const LOGIN_EMAIL = "Michiganbank@gmail.com";
   const LOGIN_PASSWORD = "Bank1&$";
   let checkingBalance = 5000;
   let savingsBalance = 3000;
 
   const cryptos = [
-    { name: "Bitcoin", symbol: "BTC", price: 30000, history: [], balance: 0 },
-    { name: "Ethereum", symbol: "ETH", price: 2000, history: [], balance: 0 },
-    { name: "Litecoin", symbol: "LTC", price: 150, history: [], balance: 0 }
+    { id: "bitcoin", name: "Bitcoin", symbol: "BTC", price: 0, change24h: 0, history: [], balance: 0 },
+    { id: "ethereum", name: "Ethereum", symbol: "ETH", price: 0, change24h: 0, history: [], balance: 0 },
+    { id: "litecoin", name: "Litecoin", symbol: "LTC", price: 0, change24h: 0, history: [], balance: 0 }
   ];
   let selectedCrypto = null;
   let cryptoChart = null;
 
-  // ========== Utility Functions ==========
+  // ========== Helpers ==========
   function showSection(id) {
     document.querySelectorAll(".section").forEach(s => s.classList.remove("active"));
     document.getElementById(id).classList.add("active");
   }
-
   function updateBalances() {
     document.getElementById("checkingBalance").innerText = "$" + checkingBalance.toFixed(2);
     document.getElementById("savingsBalance").innerText = "$" + savingsBalance.toFixed(2);
     document.getElementById("overallBalance").innerText = "$" + (checkingBalance + savingsBalance).toFixed(2);
   }
-
   function setGreeting() {
-    const hour = new Date().getHours();
-    let greet = "Hello";
-    if (hour < 12) greet = "Good Morning";
-    else if (hour < 18) greet = "Good Afternoon";
-    else greet = "Good Evening";
-    document.getElementById("greeting").innerText = greet + " David";
+    const h = new Date().getHours();
+    let g = "Hello";
+    if (h < 12) g = "Good Morning";
+    else if (h < 18) g = "Good Afternoon";
+    else g = "Good Evening";
+    document.getElementById("greeting").innerText = g + " David";
     document.getElementById("liveTime").innerText = new Date().toLocaleTimeString();
   }
 
-  // ========== Login Logic ==========
+  // ========== Login ==========
   document.getElementById("loginBtn").addEventListener("click", () => {
     const email = document.getElementById("loginEmail").value;
-    const pass = document.getElementById("loginPassword").value;
-    if (email === LOGIN_EMAIL && pass === LOGIN_PASSWORD) {
+    const pwd = document.getElementById("loginPassword").value;
+    if (email === LOGIN_EMAIL && pwd === LOGIN_PASSWORD) {
       showSection("dashboardSection");
       setGreeting();
       updateBalances();
       setInterval(setGreeting, 60000);
+      fetchCryptoPrices(); // start crypto fetch
     } else {
       document.getElementById("loginError").style.display = "block";
     }
   });
 
-  // ========== Cards Module ==========
+  // ========== Cards ==========
   function loadCards() {
     const cards = JSON.parse(localStorage.getItem("userCards") || "[]");
     const container = document.getElementById("userCardsList");
@@ -228,10 +209,10 @@
     const exp = document.getElementById("newCardExpiry").value;
     const cvv = document.getElementById("newCardCVV").value;
     if (!num || !exp || !cvv) { alert("Fill all fields"); return; }
-    const cards = JSON.parse(localStorage.getItem("userCards")||"[]");
-    cards.push({ number: num, expiry: exp, cvv });
-    localStorage.setItem("userCards", JSON.stringify(cards));
-    alert("Card added!");
+    const arr = JSON.parse(localStorage.getItem("userCards") || "[]");
+    arr.push({ number: num, expiry: exp, cvv });
+    localStorage.setItem("userCards", JSON.stringify(arr));
+    alert("Card added");
     document.getElementById("newCardNumber").value = "";
     document.getElementById("newCardExpiry").value = "";
     document.getElementById("newCardCVV").value = "";
@@ -239,7 +220,7 @@
     showSection("cardsSection");
   });
 
-  // ========== Pay Bills Logic ==========
+  // ========== Pay Bills ==========
   document.querySelectorAll(".billBtn").forEach(b => {
     b.addEventListener("click", () => {
       document.getElementById("billTitle").innerText = b.dataset.bill;
@@ -252,7 +233,7 @@
     const bill = document.getElementById("billTitle").innerText;
     const acc = document.getElementById("billAccount").value;
     const amt = parseFloat(document.getElementById("billAmount").value);
-    if (!acc || !amt || amt <= 0) { alert("Enter valid info"); return; }
+    if (!acc || !amt || amt <= 0) { alert("Enter valid details"); return; }
     if (checkingBalance < amt) { alert("Insufficient funds"); return; }
     checkingBalance -= amt;
     updateBalances();
@@ -262,89 +243,75 @@
     showSection("payBillsSection");
   });
 
-  // ========== Crypto Module ==========
-  function initCryptoHistory() {
-    cryptos.forEach(c => {
-      c.history = [];
-      for (let i = 0; i < 20; i++) {
-        c.history.push(c.price + (Math.random()-0.5) * c.price * 0.05);
-      }
-    });
+  // ========== Crypto / CoinGecko Integration ==========
+  const cryptoListEl = document.getElementById("cryptoList");
+
+  async function fetchCryptoPrices() {
+    const ids = cryptos.map(c => c.id).join(",");
+    const url = `https://api.coingecko.com/api/v3/simple/price?ids=${ids}&vs_currencies=usd&include_24hr_change=true`;
+    try {
+      const res = await fetch(url);
+      const data = await res.json();
+      cryptos.forEach(c => {
+        c.price = data[c.id].usd;
+        c.change24h = data[c.id].usd_24h_change;
+        c.history.push(c.price);
+        if (c.history.length > 20) c.history.shift();
+      });
+      renderCryptoList();
+      if (selectedCrypto) updateCryptoDetail();
+    } catch (err) {
+      console.error("Failed to fetch crypto prices:", err);
+    }
   }
 
   function renderCryptoList() {
-    cryptoListDiv.innerHTML = "";
+    cryptoListEl.innerHTML = "";
     cryptos.forEach(c => {
       const div = document.createElement("div");
       div.className = "card-custom mt-2 d-flex justify-content-between align-items-center";
-      const changePct = ((c.price - c.history[c.history.length - 2]) / c.history[c.history.length - 2] * 100).toFixed(2);
-      const color = changePct >= 0 ? "green" : "red";
+      const pct = c.change24h.toFixed(2);
+      const color = c.change24h >= 0 ? "green" : "red";
       div.innerHTML = `
         <div><strong>${c.name} (${c.symbol})</strong><br>$${c.price.toFixed(2)}</div>
-        <div style="color:${color};">${changePct}%</div>
+        <div style="color:${color}">${pct}%</div>
       `;
-      div.addEventListener("click", () => openCryptoDetail(c.symbol));
-      cryptoListDiv.appendChild(div);
+      div.addEventListener("click", () => openCryptoDetail(c.id));
+      cryptoListEl.appendChild(div);
     });
   }
 
-  function openCryptoDetail(symbol) {
-    selectedCrypto = cryptos.find(c => c.symbol === symbol);
+  function openCryptoDetail(id) {
+    selectedCrypto = cryptos.find(c => c.id === id);
     document.getElementById("cryptoTitle").innerText = `${selectedCrypto.name} (${selectedCrypto.symbol})`;
     showSection("cryptoDetailSection");
-    updateCryptoDetail();
     const ctx = document.getElementById("cryptoChart").getContext("2d");
     if (cryptoChart) cryptoChart.destroy();
     cryptoChart = new Chart(ctx, {
       type: "line",
-      data: {
-        labels: selectedCrypto.history.map((_, i) => i),
-        datasets: [{
-          label: selectedCrypto.symbol + " Price",
-          data: selectedCrypto.history,
-          borderColor: varColor = var(--accent-4),
-          backgroundColor: "rgba(116,117,250,0.2)",
-          tension: 0.3
-        }]
-      },
+      data: { labels: selectedCrypto.history.map((_, i) => i), datasets: [{ label: selectedCrypto.symbol, data: selectedCrypto.history, borderColor: var(--accent-4), backgroundColor: "rgba(118,75,162,0.2)", tension: .3 }] },
       options: { responsive: true, plugins: { legend: { display: false } } }
     });
+    updateCryptoDetail();
   }
 
   function updateCryptoDetail() {
-    if (!selectedCrypto) return;
     const c = selectedCrypto;
     document.getElementById("cryptoPrice").innerText = "$" + c.price.toFixed(2);
-    const prev = c.history[c.history.length - 2];
-    const changePct = ((c.price - prev) / prev * 100).toFixed(2);
-    const changeElem = document.getElementById("cryptoChange");
-    changeElem.innerText = changePct + "%";
-    changeElem.style.color = changePct >= 0 ? "green" : "red";
-
-    // Update history & chart:
-    c.history.push(c.price);
-    if (c.history.length > 20) c.history.shift();
+    const pct = c.change24h.toFixed(2);
+    const chElem = document.getElementById("cryptoChange");
+    chElem.innerText = pct + "%";
+    chElem.style.color = c.change24h >= 0 ? "green" : "red";
     if (cryptoChart) {
       cryptoChart.data.datasets[0].data = c.history;
       cryptoChart.update();
     }
   }
 
-  // Simulate live price update:
-  setInterval(() => {
-    cryptos.forEach(c => {
-      const delta = (Math.random() - 0.5) * c.price * 0.02;
-      c.price = Math.max(0, c.price + delta);
-    });
-    if (selectedCrypto) updateCryptoDetail();
-    renderCryptoList();
-  }, 3000);
-
-  // Crypto Actions:
   document.getElementById("cryptoBuyBtn").addEventListener("click", () => {
     const amt = parseFloat(prompt("Enter USD amount to buy:"));
-    if (!amt || amt <= 0) return alert("Invalid amount");
-    if (checkingBalance < amt) return alert("Not enough checking balance");
+    if (!amt || amt <= 0) { alert("Invalid amount"); return; }
+    if (amt > checkingBalance) { alert("Not enough checking balance"); return; }
     checkingBalance -= amt;
     const cryptoAmt = amt / selectedCrypto.price;
     selectedCrypto.balance += cryptoAmt;
@@ -354,9 +321,9 @@
 
   document.getElementById("cryptoSellBtn").addEventListener("click", () => {
     const amt = parseFloat(prompt("Enter USD amount to sell:"));
-    if (!amt || amt <= 0) return alert("Invalid amount");
+    if (!amt || amt <= 0) { alert("Invalid amount"); return; }
     const cryptoAmt = amt / selectedCrypto.price;
-    if (cryptoAmt > selectedCrypto.balance) return alert("Not enough crypto balance");
+    if (cryptoAmt > selectedCrypto.balance) { alert("Not enough crypto balance"); return; }
     selectedCrypto.balance -= cryptoAmt;
     checkingBalance += amt;
     updateBalances();
@@ -364,22 +331,25 @@
   });
 
   document.getElementById("cryptoTopupBtn").addEventListener("click", () => {
-    const amt = parseFloat(prompt("Enter USD to top-up into crypto wallet:"));
-    if (!amt || amt <= 0) return alert("Invalid amount");
-    if (checkingBalance < amt) return alert("Not enough checking balance");
+    const amt = parseFloat(prompt("Enter USD to top-up:"));
+    if (!amt || amt <= 0) { alert("Invalid amount"); return; }
+    if (amt > checkingBalance) { alert("Not enough checking balance"); return; }
     checkingBalance -= amt;
-    selectedCrypto.balance += amt / selectedCrypto.price;
+    const cryptoAmt = amt / selectedCrypto.price;
+    selectedCrypto.balance += cryptoAmt;
     updateBalances();
-    alert(`Topped-up $${amt.toFixed(2)} into ${selectedCrypto.symbol}`);
+    alert(`Topped-up ${cryptoAmt.toFixed(6)} ${selectedCrypto.symbol}`);
   });
 
   document.getElementById("cryptoBack").addEventListener("click", () => showSection("dashboardSection"));
   document.getElementById("cryptoDetailBack").addEventListener("click", () => showSection("cryptoSection"));
 
-  // ========== Init ==========
-  initCryptoHistory();
-  updateBalances();
-  setGreeting();
+  // ========== Start Crypto Price Fetch Loop ==========
+  const cryptoListEl2 = document.getElementById("cryptoList");
+  fetchCryptoPrices();
+  setInterval(fetchCryptoPrices, 30000); // every 30 seconds
+
 </script>
+
 </body>
 </html>
