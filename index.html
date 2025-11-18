@@ -14,42 +14,21 @@
     --accent-4: #764ba2;
   }
   html,body{height:100%;margin:0;font-family:Inter, 'Segoe UI', system-ui, Roboto, "Helvetica Neue", Arial;}
-  body{
-    background: linear-gradient(135deg,var(--accent-1),var(--accent-2));
-    color:#222; -webkit-font-smoothing:antialiased;
-  }
+  body{background: linear-gradient(135deg,var(--accent-1),var(--accent-2)); color:#222; -webkit-font-smoothing:antialiased;}
   .section{display:none;padding:18px 18px 90px;}
   .section.active{display:block;}
   .login-card{max-width:420px;margin:64px auto;background:#fff;border-radius:14px;padding:28px;box-shadow:0 18px 50px rgba(0,0,0,.25);}
   .btn-primary{background:linear-gradient(135deg,var(--accent-1),var(--accent-2));border:0;color:#fff;box-shadow:0 8px 30px rgba(0,0,0,.18);border-radius:10px;padding:10px 14px;}
   .btn-success{background:linear-gradient(135deg,#43e97b,#38f9d7);border:0;color:#fff;border-radius:10px;padding:10px 14px;}
-  .btn-danger{background:linear-gradient(135deg,#f5576c,#f093fb);border:0;color:#fff;border-radius:10px;padding:10px 14px;}
-  .navbar{height:58px;background:#fff;border-radius:8px;display:flex;align-items:center;justify-content:space-between;padding:0 12px;box-shadow:0 6px 18px rgba(0,0,0,.12);}
-  .navbar .icon{font-size:22px;color:var(--accent-4);cursor:pointer}
-  .profile-icon{font-size:26px;color:var(--accent-4);cursor:pointer}
   .balance-card{background:linear-gradient(135deg,var(--accent-3),var(--accent-4));color:#fff;border-radius:14px;padding:18px;margin:14px 0;box-shadow:0 12px 40px rgba(0,0,0,.22)}
+  .small-muted{font-size:13px;color:#fff}
   .card-custom{background:#fff;border-radius:12px;padding:14px;box-shadow:0 8px 28px rgba(0,0,0,.12);cursor:pointer;margin:8px}
-  .card-custom h5{margin:0;font-size:15px;font-weight:600}
-  .card-custom p{margin:6px 0 0;color:#666}
   .bottom-nav{position:fixed;left:0;right:0;bottom:14px;margin:auto;display:flex;gap:18px;justify-content:center;pointer-events:auto;z-index:99;}
   .bottom-nav button{width:64px;height:64px;border-radius:32px;border:0;box-shadow:0 10px 30px rgba(0,0,0,.18);display:flex;align-items:center;justify-content:center;font-size:20px;cursor:pointer;background:#fff;}
   .menu{position:fixed;left:-290px;top:0;height:100%;width:270px;background:#fff;box-shadow:4px 0 30px rgba(0,0,0,.2);padding-top:64px;transition:left .22s;z-index:100;}
   .menu.show{left:0}
   .menu a{display:flex;align-items:center;padding:12px 16px;color:#333;text-decoration:none;border-bottom:1px solid #f2f2f2}
   .menu a i{font-size:18px;margin-right:12px;color:var(--accent-4)}
-  .profile-pic{width:78px;height:78px;border-radius:50%;object-fit:cover;border:3px solid #fff;box-shadow:0 6px 22px rgba(0,0,0,.18)}
-  .success-card{background:#fff;border-radius:12px;padding:16px;box-shadow:0 12px 34px rgba(0,0,0,.14);max-width:560px;margin:18px auto;color:#222}
-  .receipt-table{width:100%;border-collapse:collapse;margin-top:16px;}
-  .receipt-table th, .receipt-table td{border:1px solid #ddd;padding:8px;text-align:left;}
-  .small-muted{font-size:13px;color:#666}
-  .spinner{display:flex;justify-content:center;align-items:center;padding:40px}
-  .spinner .dot{width:48px;height:48px;border-radius:50%;border:6px solid rgba(255,255,255,.18);border-top-color:#fff;animation:spin 1s linear infinite}
-  @keyframes spin{to{transform:rotate(360deg)}}
-  input,select,textarea{border-radius:10px;padding:10px;border:1px solid #e6e6e6;box-shadow:inset 0 1px 2px rgba(0,0,0,.03);width:100%}
-  label{font-weight:600;font-size:14px;color:#333}
-  .link-like{color:var(--accent-4);cursor:pointer}
-  .muted{color:#777;font-size:13px}
-  @media (min-width:900px){.section{max-width:980px;margin:0 auto}}
 </style>
 </head>
 <body>
@@ -58,44 +37,27 @@
 <div id="loginSection" class="section active">
   <div class="login-card text-center">
     <h3 class="mb-3" style="font-weight:700;">OlaCreditUnion</h3>
-    <p class="muted mb-4">Secure Login</p>
-    <input type="email" id="loginEmail" placeholder="Email" class="mb-3">
-    <input type="password" id="loginPassword" placeholder="Password" class="mb-3">
-    <button class="btn btn-primary w-100" id="loginBtn">Login</button>
+    <p class="small-muted mb-4">Secure Login</p>
+    <input type="email" id="loginEmail" placeholder="Email" class="mb-3" autocomplete="off">
+    <input type="password" id="loginPassword" placeholder="Password" class="mb-3" autocomplete="off">
+    <button type="button" class="btn btn-primary w-100" id="loginBtn">Login</button>
     <div id="loginError" class="text-danger mt-3" style="display:none;">Invalid email or password</div>
   </div>
 </div>
 
 <!-- DASHBOARD -->
 <div id="dashboardSection" class="section">
-  <div class="navbar mb-3">
-    <i class="bi bi-list icon" id="menuToggle"></i>
-    <i class="bi bi-person-circle profile-icon" id="openProfile"></i>
-  </div>
-
   <div class="balance-card text-center">
     <div id="greeting" style="font-size:18px;font-weight:600;"></div>
     <div class="small-muted" id="liveTime"></div>
     <h2 id="overallBalance" style="margin-top:15px;font-weight:700;"></h2>
     <div class="small-muted">Overall Balance</div>
   </div>
-
   <h5 style="font-weight:700;margin-top:18px;">Accounts & Options</h5>
-  <div class="card-custom" id="cardsBtn">
-    <h5><i class="bi bi-credit-card"></i> Cards</h5>
-  </div>
-
-  <div class="card-custom" id="creditScoreBtn">
-    <h5><i class="bi bi-graph-up"></i> Credit Score</h5>
-  </div>
-
-  <div class="card-custom" id="payBillsBtn">
-    <h5><i class="bi bi-receipt"></i> Pay Bills</h5>
-  </div>
-
-  <div class="card-custom" id="cryptoBtn">
-    <h5><i class="bi bi-currency-bitcoin"></i> Crypto</h5>
-  </div>
+  <div class="card-custom" id="cardsBtn"><h5><i class="bi bi-credit-card"></i> Cards</h5></div>
+  <div class="card-custom" id="creditScoreBtn"><h5><i class="bi bi-graph-up"></i> Credit Score</h5></div>
+  <div class="card-custom" id="payBillsBtn"><h5><i class="bi bi-receipt"></i> Pay Bills</h5></div>
+  <div class="card-custom" id="cryptoBtn"><h5><i class="bi bi-currency-bitcoin"></i> Crypto</h5></div>
 </div>
 
 <!-- CARDS PAGE -->
@@ -103,33 +65,24 @@
   <h3 style="font-weight:700;">Your Cards</h3>
   <div id="userCardsList"></div>
   <button class="btn btn-primary w-100 mt-3" id="addCardBtnPage">+ Add Card</button>
-  <div class="mt-4 text-center">
-    <span class="link-like" id="cardsBack">← Back to Dashboard</span>
-  </div>
+  <div class="mt-4 text-center"><span class="link-like" id="cardsBack">← Back to Dashboard</span></div>
 </div>
 
 <!-- ADD CARD PAGE -->
 <div id="addCardSection" class="section">
   <h3 style="font-weight:700;">Add Card</h3>
-  <label>Card Number</label>
-  <input type="text" id="newCardNumber" placeholder="XXXX XXXX XXXX XXXX">
-  <label>Expiration Date</label>
-  <input type="text" id="newCardExpiry" placeholder="MM/YY">
-  <label>CVV</label>
-  <input type="text" id="newCardCVV" placeholder="XXX">
+  <label>Card Number</label><input type="text" id="newCardNumber" placeholder="XXXX XXXX XXXX XXXX">
+  <label>Expiration Date</label><input type="text" id="newCardExpiry" placeholder="MM/YY">
+  <label>CVV</label><input type="text" id="newCardCVV" placeholder="XXX">
   <button class="btn btn-success w-100 mt-3" id="confirmAddCard">Confirm</button>
-  <div class="mt-4 text-center">
-    <span class="link-like" id="addCardBack">← Back to Cards</span>
-  </div>
+  <div class="mt-4 text-center"><span class="link-like" id="addCardBack">← Back to Cards</span></div>
 </div>
 
 <!-- CREDIT SCORE PAGE -->
 <div id="creditScoreSection" class="section text-center">
   <h3 style="font-weight:700;">Credit Score</h3>
   <p>Your current credit score is <strong>750</strong></p>
-  <div class="mt-4 text-center">
-    <span class="link-like" id="creditScoreBack">← Back to Dashboard</span>
-  </div>
+  <div class="mt-4 text-center"><span class="link-like" id="creditScoreBack">← Back to Dashboard</span></div>
 </div>
 
 <!-- PAY BILLS PAGE -->
@@ -140,31 +93,23 @@
   <div class="card-custom billBtn" data-bill="Internet Bill">Internet Bill</div>
   <div class="card-custom billBtn" data-bill="Gas Bill">Gas Bill</div>
   <div class="card-custom billBtn" data-bill="Phone Bill">Phone Bill</div>
-  <div class="mt-4 text-center">
-    <span class="link-like" id="payBillsBack">← Back to Dashboard</span>
-  </div>
+  <div class="mt-4 text-center"><span class="link-like" id="payBillsBack">← Back to Dashboard</span></div>
 </div>
 
 <!-- INDIVIDUAL BILL PAYMENT PAGE -->
 <div id="billPaySection" class="section">
   <h3 style="font-weight:700;" id="billTitle"></h3>
-  <label>Account Number / Customer ID</label>
-  <input type="text" id="billAccount">
-  <label>Amount</label>
-  <input type="number" id="billAmount" placeholder="0.00">
+  <label>Account Number / Customer ID</label><input type="text" id="billAccount">
+  <label>Amount</label><input type="number" id="billAmount" placeholder="0.00">
   <button class="btn btn-success w-100 mt-3" id="payBillBtn">Pay Bill</button>
-  <div class="mt-4 text-center">
-    <span class="link-like" id="billBack">← Back to Bills</span>
-  </div>
+  <div class="mt-4 text-center"><span class="link-like" id="billBack">← Back to Bills</span></div>
 </div>
 
 <!-- CRYPTO PAGE -->
 <div id="cryptoSection" class="section text-center">
   <h3 style="font-weight:700;">Crypto</h3>
   <p>Buy, Sell, and Track Cryptocurrencies here.</p>
-  <div class="mt-4 text-center">
-    <span class="link-like" id="cryptoBack">← Back to Dashboard</span>
-  </div>
+  <div class="mt-4 text-center"><span class="link-like" id="cryptoBack">← Back to Dashboard</span></div>
 </div>
 
 <!-- HAMBURGER MENU -->
@@ -177,168 +122,133 @@
   <a id="menuLogout"><i class="bi bi-box-arrow-right"></i> Logout</a>
 </div>
 
-<!-- BOTTOM NAVIGATION -->
-<div class="bottom-nav">
-  <button id="navSend"><i class="bi bi-send"></i></button>
-  <button id="navTopup"><i class="bi bi-plus-lg"></i></button>
-  <button id="navWithdraw"><i class="bi bi-wallet2"></i></button>
-</div>
-
-<!-- LOADING SCREEN -->
-<div id="loadingScreen" class="section text-center" style="display:none;">
-    <div class="spinner"><div class="dot"></div></div>
-    <h3 style="margin-top:20px;">Processing Transaction...</h3>
-</div>
-
-<!-- SUCCESS SCREEN -->
-<div id="successScreen" class="section text-center" style="display:none; padding:25px;">
-    <div style="text-align:center; font-size:32px; margin-bottom:20px;">✅</div>
-    <h2 style="text-align:center; margin-bottom:10px;">Transaction Successful</h2>
-    <div id="successDetails" style="background:#fff; padding:20px; border-radius:12px; box-shadow:0 4px 20px rgba(0,0,0,0.12); font-size:16px; line-height:26px;">
-    </div>
-    <button onclick="returnToDashboard()" style="width:100%; margin-top:25px; padding:15px; border:none; border-radius:10px; background:#4b6bfb; color:#fff; font-size:18px;">
-        Back to Dashboard
-    </button>
-</div>
-
 <script>
-/*--------------------
-LOGIN & DASHBOARD
---------------------*/
-const LOGIN_EMAIL = "Michiganbank@gmail.com";
-const LOGIN_PASSWORD = "Bank1&$";
+document.addEventListener("DOMContentLoaded", ()=>{
 
-const loginSection = document.getElementById("loginSection");
-const dashboardSection = document.getElementById("dashboardSection");
+  // LOGIN
+  const LOGIN_EMAIL = "Michiganbank@gmail.com";
+  const LOGIN_PASSWORD = "Bank1&$";
 
-document.getElementById("loginBtn").addEventListener("click", ()=>{
-  const email = document.getElementById("loginEmail").value;
-  const pass = document.getElementById("loginPassword").value;
-  if(email===LOGIN_EMAIL && pass===LOGIN_PASSWORD){
-    loginSection.classList.remove("active");
-    dashboardSection.classList.add("active");
-    initDashboard();
+  const loginSection = document.getElementById("loginSection");
+  const dashboardSection = document.getElementById("dashboardSection");
+
+  let checkingBalance = 5000;
+  let savingsBalance = 3000;
+
+  function updateBalances(){
+    document.getElementById("overallBalance").innerText = "$" + (checkingBalance + savingsBalance).toFixed(2);
+  }
+
+  function setGreeting(){
+    const hour = new Date().getHours();
+    let greet = "Hello";
+    if(hour < 12) greet = "Good Morning";
+    else if(hour < 18) greet = "Good Afternoon";
+    else greet = "Good Evening";
+    document.getElementById("greeting").innerText = greet + " David";
+    document.getElementById("liveTime").innerText = new Date().toLocaleTimeString();
+  }
+
+  function initDashboard(){
+    updateBalances();
+    setGreeting();
+    setInterval(setGreeting, 60000);
+  }
+
+  document.getElementById("loginBtn").addEventListener("click", ()=>{
+    const email = document.getElementById("loginEmail").value.trim().toLowerCase();
+    const pass = document.getElementById("loginPassword").value.trim();
+    if(email === LOGIN_EMAIL.toLowerCase() && pass === LOGIN_PASSWORD){
+      document.getElementById("loginError").style.display = "none";
+      loginSection.classList.remove("active");
+      dashboardSection.classList.add("active");
+      initDashboard();
+    } else {
+      document.getElementById("loginError").style.display = "block";
+    }
+  });
+
+  // SECTION NAVIGATION
+  function showSection(id){
+    document.querySelectorAll(".section").forEach(s=>s.classList.remove("active"));
+    document.getElementById(id).classList.add("active");
+    document.getElementById("sideMenu").classList.remove("show");
+  }
+
+  // DASHBOARD BUTTONS
+  document.getElementById("cardsBtn").addEventListener("click", ()=>showSection("cardsSection"));
+  document.getElementById("creditScoreBtn").addEventListener("click", ()=>showSection("creditScoreSection"));
+  document.getElementById("payBillsBtn").addEventListener("click", ()=>showSection("payBillsSection"));
+  document.getElementById("cryptoBtn").addEventListener("click", ()=>showSection("cryptoSection"));
+
+  // CARDS LOGIC
+  function loadCards(){
+    let cards = JSON.parse(localStorage.getItem("userCards")||"[]");
+    const container=document.getElementById("userCardsList");
+    container.innerHTML="";
+    cards.forEach(c=>{
+      const div=document.createElement("div");
+      div.className="card-custom mt-2";
+      div.innerText=c.number+" | "+c.expiry;
+      container.appendChild(div);
+    });
+  }
+
+  document.getElementById("addCardBtnPage").addEventListener("click", ()=>showSection("addCardSection"));
+  document.getElementById("cardsBack").addEventListener("click", ()=>showSection("dashboardSection"));
+  document.getElementById("addCardBack").addEventListener("click", ()=>showSection("cardsSection"));
+  document.getElementById("confirmAddCard").addEventListener("click", ()=>{
+    const number=document.getElementById("newCardNumber").value;
+    const expiry=document.getElementById("newCardExpiry").value;
+    const cvv=document.getElementById("newCardCVV").value;
+    if(!number||!expiry||!cvv){alert("Fill all fields"); return;}
+    let cards=JSON.parse(localStorage.getItem("userCards")||"[]");
+    cards.push({number,expiry,cvv});
+    localStorage.setItem("userCards",JSON.stringify(cards));
+    alert("Card added successfully");
+    document.getElementById("newCardNumber").value="";
+    document.getElementById("newCardExpiry").value="";
+    document.getElementById("newCardCVV").value="";
+    showSection("cardsSection");
     loadCards();
-  } else { document.getElementById("loginError").style.display="block"; }
-});
-
-let checkingBalance = 5000;
-let savingsBalance = 3000;
-
-function initDashboard(){
-  updateBalances();
-  setGreeting();
-  setInterval(setGreeting,60000);
-}
-
-function updateBalances(){
-  document.getElementById("checkingBalance")?.innerText="$"+checkingBalance.toFixed(2);
-  document.getElementById("savingsBalance")?.innerText="$"+savingsBalance.toFixed(2);
-  document.getElementById("overallBalance")?.innerText="$"+(checkingBalance+savingsBalance).toFixed(2);
-}
-
-function setGreeting(){
-  const hour=new Date().getHours();
-  let greet="Hello";
-  if(hour<12) greet="Good Morning";
-  else if(hour<18) greet="Good Afternoon";
-  else greet="Good Evening";
-  document.getElementById("greeting")?.innerText=greet+" David";
-  document.getElementById("liveTime")?.innerText=new Date().toLocaleTimeString();
-}
-
-/*--------------------
-SECTION NAVIGATION
---------------------*/
-function showSection(id){
-  document.querySelectorAll(".section").forEach(s=>s.classList.remove("active"));
-  document.getElementById(id).classList.add("active");
-  document.getElementById("sideMenu").classList.remove("show");
-}
-
-/*--------------------
-HAMBURGER MENU
---------------------*/
-const menu=document.getElementById("sideMenu");
-document.getElementById("menuToggle").addEventListener("click",()=>menu.classList.toggle("show"));
-document.getElementById("menuHome").addEventListener("click",()=>showSection("dashboardSection"));
-document.getElementById("menuCards").addEventListener("click",()=>showSection("cardsSection"));
-document.getElementById("menuCreditScore").addEventListener("click",()=>showSection("creditScoreSection"));
-document.getElementById("menuPayBills").addEventListener("click",()=>showSection("payBillsSection"));
-document.getElementById("menuCrypto").addEventListener("click",()=>showSection("cryptoSection"));
-document.getElementById("menuLogout").addEventListener("click",()=>location.reload());
-
-/*--------------------
-BOTTOM NAVIGATION
---------------------*/
-document.getElementById("navSend").addEventListener("click",()=>alert("Send Money page not yet implemented"));
-document.getElementById("navTopup").addEventListener("click",()=>alert("Top-Up page not yet implemented"));
-document.getElementById("navWithdraw").addEventListener("click",()=>alert("Withdraw page not yet implemented"));
-
-/*--------------------
-CARDS LOGIC
---------------------*/
-function loadCards(){
-  let cards = JSON.parse(localStorage.getItem("userCards")||"[]");
-  const container=document.getElementById("userCardsList");
-  container.innerHTML="";
-  cards.forEach((c,i)=>{
-    const div=document.createElement("div");
-    div.className="card-custom mt-2";
-    div.innerText=c.number+" | "+c.expiry;
-    container.appendChild(div);
   });
-}
 
-document.getElementById("addCardBtnPage").addEventListener("click",()=>showSection("addCardSection"));
-document.getElementById("cardsBack").addEventListener("click",()=>showSection("dashboardSection"));
-document.getElementById("addCardBack").addEventListener("click",()=>showSection("cardsSection"));
-document.getElementById("confirmAddCard").addEventListener("click",()=>{
-  const number=document.getElementById("newCardNumber").value;
-  const expiry=document.getElementById("newCardExpiry").value;
-  const cvv=document.getElementById("newCardCVV").value;
-  if(!number||!expiry||!cvv){alert("Fill all fields"); return;}
-  let cards=JSON.parse(localStorage.getItem("userCards")||"[]");
-  cards.push({number,expiry,cvv});
-  localStorage.setItem("userCards",JSON.stringify(cards));
-  alert("Card added successfully");
-  document.getElementById("newCardNumber").value="";
-  document.getElementById("newCardExpiry").value="";
-  document.getElementById("newCardCVV").value="";
-  showSection("cardsSection");
-  loadCards();
-});
+  // CREDIT SCORE NAV
+  document.getElementById("creditScoreBack").addEventListener("click", ()=>showSection("dashboardSection"));
 
-/*--------------------
-CREDIT SCORE & PAY BILLS NAV
---------------------*/
-document.getElementById("creditScoreBtn").addEventListener("click",()=>showSection("creditScoreSection"));
-document.getElementById("payBillsBtn").addEventListener("click",()=>showSection("payBillsSection"));
-document.getElementById("cryptoBtn").addEventListener("click",()=>showSection("cryptoSection"));
-
-document.getElementById("creditScoreBack").addEventListener("click",()=>showSection("dashboardSection"));
-document.getElementById("payBillsBack").addEventListener("click",()=>showSection("dashboardSection"));
-document.getElementById("cryptoBack").addEventListener("click",()=>showSection("dashboardSection"));
-
-/*--------------------
-BILL PAYMENT LOGIC
---------------------*/
-document.querySelectorAll(".billBtn").forEach(b=>{
-  b.addEventListener("click",()=>{
-    document.getElementById("billTitle").innerText=b.dataset.bill;
-    showSection("billPaySection");
+  // PAY BILLS LOGIC
+  document.querySelectorAll(".billBtn").forEach(b=>{
+    b.addEventListener("click", ()=>{
+      document.getElementById("billTitle").innerText = b.dataset.bill;
+      showSection("billPaySection");
+    });
   });
-});
-document.getElementById("billBack").addEventListener("click",()=>showSection("payBillsSection"));
-document.getElementById("payBillBtn").addEventListener("click",()=>{
-  const bill=document.getElementById("billTitle").innerText;
-  const acc=document.getElementById("billAccount").value;
-  const amount=document.getElementById("billAmount").value;
-  if(!acc||!amount){alert("Fill all fields"); return;}
-  alert(bill+" of $"+amount+" paid successfully for account "+acc);
-  document.getElementById("billAccount").value="";
-  document.getElementById("billAmount").value="";
-  showSection("payBillsSection");
+  document.getElementById("payBillsBack").addEventListener("click", ()=>showSection("dashboardSection"));
+  document.getElementById("billBack").addEventListener("click", ()=>showSection("payBillsSection"));
+  document.getElementById("payBillBtn").addEventListener("click", ()=>{
+    const bill=document.getElementById("billTitle").innerText;
+    const acc=document.getElementById("billAccount").value;
+    const amount=document.getElementById("billAmount").value;
+    if(!acc||!amount){alert("Fill all fields"); return;}
+    alert(bill+" of $"+amount+" paid successfully for account "+acc);
+    document.getElementById("billAccount").value="";
+    document.getElementById("billAmount").value="";
+    showSection("payBillsSection");
+  });
+
+  // CRYPTO NAV
+  document.getElementById("cryptoBack").addEventListener("click", ()=>showSection("dashboardSection"));
+
+  // HAMBURGER MENU
+  const menu = document.getElementById("sideMenu");
+  document.getElementById("menuToggle")?.addEventListener("click", ()=>menu.classList.toggle("show"));
+  document.getElementById("menuHome")?.addEventListener("click", ()=>showSection("dashboardSection"));
+  document.getElementById("menuCards")?.addEventListener("click", ()=>showSection("cardsSection"));
+  document.getElementById("menuCreditScore")?.addEventListener("click", ()=>showSection("creditScoreSection"));
+  document.getElementById("menuPayBills")?.addEventListener("click", ()=>showSection("payBillsSection"));
+  document.getElementById("menuCrypto")?.addEventListener("click", ()=>showSection("cryptoSection"));
+  document.getElementById("menuLogout")?.addEventListener("click", ()=>location.reload());
+
 });
 </script>
 
