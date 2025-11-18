@@ -317,24 +317,21 @@
 <script>
 // SHOW LOADING → SUCCESS RECEIPT
 function showLoadingThenSuccess(receiptHTML) {
-    document.getElementById("dashboard").style.display = "none";
-    document.getElementById("transferPage").style.display = "none";
-    document.getElementById("withdrawPage").style.display = "none";
-    document.getElementById("topupPage").style.display = "none";
-    document.getElementById("wirePage").style.display = "none";
-
+    // Hide all sections
+    document.querySelectorAll(".section").forEach(s => s.classList.remove("active"));
+    // Show loading
     document.getElementById("loadingScreen").style.display = "block";
 
     setTimeout(() => {
         document.getElementById("loadingScreen").style.display = "none";
         document.getElementById("successDetails").innerHTML = receiptHTML;
         document.getElementById("successScreen").style.display = "block";
-    }, 2000);
+    }, 1500);
 }
 
 function returnToDashboard() {
     document.getElementById("successScreen").style.display = "none";
-    document.getElementById("dashboard").style.display = "block";
+    showSection("dashboardSection");
 }
 
 
@@ -593,6 +590,35 @@ document.getElementById("itSubmit")?.addEventListener("click",()=>{
   updateBalances();
   let receipt=createReceipt("Internal Transfer", amount, fee, total, fromAcc, toAcc);
   showLoadingThenSuccess(receipt);
+});
+
+// =========================
+// TOP-UP / WITHDRAW / WIRE / SEND BUTTONS
+// =========================
+
+// Top-Up
+document.getElementById("topupSubmit")?.addEventListener("click", completeTopUp);
+
+// Withdraw
+document.getElementById("withdrawSubmit")?.addEventListener("click", completeWithdraw);
+
+// Wire Transfer
+document.getElementById("wireSubmit")?.addEventListener("click", completeWireTransfer);
+
+// Send to Other Bank
+document.getElementById("sendSubmit")?.addEventListener("click", ()=>{
+    let amount = parseFloat(document.getElementById("sendAmount").value);
+    if(!amount || amount<=0){alert("Enter valid amount"); return;}
+    let fee = amount * 0.05;
+    let total = amount + fee;
+    let bank = document.getElementById("sendBank").value;
+    let name = document.getElementById("sendName").value;
+    let acc = document.getElementById("sendAcc").value;
+    if(!bank || !name || !acc){alert("Fill all fields"); return;}
+    let receipt = createReceipt("Send Money", amount, fee, total, "Checking", name, `<p><strong>Bank:</strong> ${bank}</p><p><strong>Account #:</strong> ${acc}</p>`);
+    checkingBalance -= total;
+    updateBalances();
+    showLoadingThenSuccess(receipt);
 });
 
 // =========================
