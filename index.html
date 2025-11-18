@@ -141,6 +141,22 @@ label{font-weight:600;font-size:14px;color:#333}
   <h3>Processing Transaction...</h3>
 </div>
 
+<!-- PROFILE -->
+<div id="profileSection" class="section text-center">
+  <h3>Profile</h3>
+  <div style="margin-bottom:20px;">
+    <img src="" id="profilePic" class="profile-pic" alt="Profile Picture">
+    <div class="mt-2">
+      <input type="file" id="uploadProfilePic">
+    </div>
+  </div>
+  <label>Name</label><input type="text" id="profileName">
+  <label>Email</label><input type="email" id="profileEmail" disabled value="Michiganbank@gmail.com">
+  <label>Phone</label><input type="text" id="profilePhone">
+  <button class="btn btn-primary w-100 mt-3" id="saveProfileBtn">Save Profile</button>
+  <div class="mt-3 text-center"><span class="link-like" id="profileBack">← Back to Dashboard</span></div>
+</div>
+
 <!-- MENU -->
 <div class="menu" id="sideMenu">
   <a id="menuHome"><i class="bi bi-house"></i> Home</a>
@@ -165,8 +181,9 @@ label{font-weight:600;font-size:14px;color:#333}
 const LOGIN_EMAIL="Michiganbank@gmail.com";
 const LOGIN_PASSWORD="Bank1&$";
 let checkingBalance=5000, savingsBalance=3000;
+const sideMenu=document.getElementById("sideMenu");
 
-// ======= UTILITY FUNCTIONS =======
+// ======= UTILITIES =======
 function showSection(id){
   document.querySelectorAll(".section").forEach(s=>s.classList.remove("active"));
   document.getElementById(id).classList.add("active");
@@ -188,7 +205,7 @@ function setGreeting(){
   document.getElementById("liveTime").innerText=new Date().toLocaleTimeString();
 }
 
-function createReceipt(title, amount, fee, total, fromAcc, toAcc, extra=""){
+function createReceipt(title,amount,fee,total,fromAcc,toAcc,extra=""){
   return `<h3>${title}</h3><p><strong>Amount:</strong> $${amount}</p><p><strong>Fee:</strong> $${fee}</p><p><strong>Total:</strong> $${total}</p><p><strong>From:</strong> ${fromAcc}</p><p><strong>To:</strong> ${toAcc}</p>${extra}`;
 }
 
@@ -208,13 +225,11 @@ function returnToDashboard(){ showSection("dashboardSection"); updateBalances();
 document.getElementById("loginBtn").addEventListener("click",()=>{
   const email=document.getElementById("loginEmail").value;
   const pass=document.getElementById("loginPassword").value;
-  if(email===LOGIN_EMAIL && pass===LOGIN_PASSWORD){
-    showSection("dashboardSection"); updateBalances(); setGreeting(); setInterval(setGreeting,60000);
-  } else { document.getElementById("loginError").style.display="block"; }
+  if(email===LOGIN_EMAIL && pass===LOGIN_PASSWORD){ showSection("dashboardSection"); updateBalances(); setGreeting(); setInterval(setGreeting,60000); }
+  else { document.getElementById("loginError").style.display="block"; }
 });
 
-// ======= MENU =======
-const sideMenu=document.getElementById("sideMenu");
+// ======= MENU & NAV =======
 document.getElementById("menuToggle").addEventListener("click",()=>sideMenu.classList.toggle("show"));
 document.getElementById("menuHome").addEventListener("click",()=>showSection("dashboardSection"));
 document.getElementById("menuProfile").addEventListener("click",()=>showSection("profileSection"));
@@ -224,23 +239,21 @@ document.getElementById("menuSend").addEventListener("click",()=>showSection("se
 document.getElementById("menuTopup").addEventListener("click",()=>showSection("topupWithdrawSection"));
 document.getElementById("menuWithdraw").addEventListener("click",()=>showSection("topupWithdrawSection"));
 document.getElementById("menuWire").addEventListener("click",()=>showSection("wireSection"));
-
-// ======= BOTTOM NAV =======
 document.getElementById("navSend").addEventListener("click",()=>showSection("sendSection"));
 document.getElementById("navTopup").addEventListener("click",()=>showSection("topupWithdrawSection"));
 document.getElementById("navWithdraw").addEventListener("click",()=>showSection("topupWithdrawSection"));
 
 // ======= BACK BUTTONS =======
-document.getElementById("itBack").addEventListener("click",()=>showSection("dashboardSection"));
-document.getElementById("sendBack").addEventListener("click",()=>showSection("dashboardSection"));
-document.getElementById("twBack").addEventListener("click",()=>showSection("dashboardSection"));
-document.getElementById("wireBack").addEventListener("click",()=>showSection("dashboardSection"));
+["itBack","sendBack","twBack","wireBack","profileBack"].forEach(id=>{
+  document.getElementById(id).addEventListener("click",()=>showSection("dashboardSection"));
+});
 
 // ======= DASHBOARD CARDS =======
 document.getElementById("checkingCard").addEventListener("click",()=>showSection("internalTransferSection"));
 document.getElementById("savingsCard").addEventListener("click",()=>showSection("internalTransferSection"));
 document.getElementById("creditScoreBtn").addEventListener("click",()=>alert("Credit Score Page"));
 document.getElementById("payBillsBtn").addEventListener("click",()=>alert("Pay Bills Page"));
+document.getElementById("openProfile").addEventListener("click",()=>showSection("profileSection"));
 
 // ======= TRANSACTIONS =======
 document.getElementById("itSubmit").addEventListener("click",()=>{
@@ -248,11 +261,12 @@ document.getElementById("itSubmit").addEventListener("click",()=>{
   let to=document.getElementById("itTo").value;
   let amount=parseFloat(document.getElementById("itAmount").value);
   if(!amount||amount<=0){alert("Enter valid amount");return;}
-  if(from===to){alert("Select different accounts");return;}
+  if(from===to){alert("Choose different accounts");return;}
   let fee=amount*0.05,total=amount+fee;
   if(from==="checking" && checkingBalance<total){alert("Insufficient funds");return;}
   if(from==="savings" && savingsBalance<total){alert("Insufficient funds");return;}
-  if(from==="checking"){checkingBalance-=total; savingsBalance+=amount;} else{ savingsBalance-=total; checkingBalance+=amount;}
+  if(from==="checking"){checkingBalance-=total; savingsBalance+=amount;}
+  else{savingsBalance-=total; checkingBalance+=amount;}
   updateBalances();
   showLoadingThenSuccess(createReceipt("Internal Transfer",amount,fee,total,from,to));
 });
@@ -291,6 +305,27 @@ document.getElementById("wireSubmit").addEventListener("click",()=>{
   let bankaddr=document.getElementById("wireBankAddress").value;
   let swift=document.getElementById("wireCode").value;
   showLoadingThenSuccess(createReceipt("Wire Transfer",amount,fee,total,"Checking",name,`<p>Name:${name}</p><p>Bank:${bank}</p><p>Addr:${addr}</p><p>Bank Addr:${bankaddr}</p><p>SWIFT:${swift}</p>`));
+});
+
+// ======= PROFILE =======
+const profilePic=document.getElementById("profilePic");
+document.getElementById("uploadProfilePic").addEventListener("change",(e)=>{
+  const reader=new FileReader();
+  reader.onload=function(){profilePic.src=reader.result;}
+  reader.readAsDataURL(e.target.files[0]);
+});
+document.getElementById("saveProfileBtn").addEventListener("click",()=>{
+  localStorage.setItem("profileName",document.getElementById("profileName").value);
+  localStorage.setItem("profilePhone",document.getElementById("profilePhone").value);
+  if(profilePic.src) localStorage.setItem("profilePic",profilePic.src);
+  alert("Profile saved");
+});
+
+// Load saved profile
+window.addEventListener("DOMContentLoaded",()=>{
+  if(localStorage.getItem("profileName")) document.getElementById("profileName").value=localStorage.getItem("profileName");
+  if(localStorage.getItem("profilePhone")) document.getElementById("profilePhone").value=localStorage.getItem("profilePhone");
+  if(localStorage.getItem("profilePic")) profilePic.src=localStorage.getItem("profilePic");
 });
 </script>
 
