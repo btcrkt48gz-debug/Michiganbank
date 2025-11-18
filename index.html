@@ -32,8 +32,6 @@ h2,h3,h4{ font-weight:600; }
 .form-control,.form-select{ border-radius:10px; box-shadow: inset 0 1px 3px rgba(0,0,0,.1);}
 .success-card{ background:#fff; border-radius:15px; padding:20px; margin-top:20px; box-shadow:0 6px 20px rgba(0,0,0,.25); color:#333; max-width:500px; margin-left:auto; margin-right:auto; }
 .receipt-row{ display:flex; justify-content:space-between; padding:5px 0; border-bottom:1px solid #ddd; }
-.receipt-title{text-align:center; margin-bottom:15px; font-size:18px; font-weight:600;}
-.sticky-back{ position:sticky; top:10px; z-index:10; margin-bottom:10px; width:100%; }
 .menu { position:fixed; left:-250px; top:0; width:250px; height:100%; background:#fff; box-shadow:2px 0 10px rgba(0,0,0,.3); transition:0.3s; z-index:1000; padding-top:60px; }
 .menu a{ display:flex; align-items:center; padding:15px; font-size:18px; color:#333; text-decoration:none; }
 .menu a:hover{ background:#f0f0f0; }
@@ -111,17 +109,14 @@ h2,h3,h4{ font-weight:600; }
 <div id="payBillsSection" class="section text-center"></div>
 
 <script>
-// ------------- DEMO DATA & UTILS -------------
+// DEMO DATA & UTILS
 const demoEmail='Michiganbank@gmail.com';
 const demoPassword='Bank1&$';
 const FEE_RATE=0.05;
 const predefinedBanks=['OlaCreditUnion Bank','DemoBank','SampleBank'];
 const predefinedCards=['1111 2222 3333 4444','5555 6666 7777 8888'];
-const sampleBills=[
-  {name:'Electricity',amount:120},
-  {name:'Internet',amount:60},
-  {name:'Water',amount:30},
-];
+const sampleBills=[{name:'Electricity',amount:120},{name:'Internet',amount:60},{name:'Water',amount:30}];
+
 if(!localStorage.getItem('accounts')) localStorage.setItem('accounts',JSON.stringify([{name:'Checking',balance:5000,tx:[]},{name:'Savings',balance:2000,tx:[]}]));
 
 function getAccounts(){ return JSON.parse(localStorage.getItem('accounts')); }
@@ -136,11 +131,42 @@ function toggleMenu(){ document.getElementById('sideMenu').classList.toggle('sho
 function closeMenu(){ document.getElementById('sideMenu').classList.remove('show'); }
 function goTo(section){ showSection(section); }
 
-// ------------- LOGIN -------------
-document.getElementById('loginForm').addEventListener('submit',e=>{ e.preventDefault(); const email=document.getElementById('loginEmail').value; const pwd=document.getElementById('loginPassword').value; document.getElementById('loginError').textContent=''; document.getElementById('loginLoading').style.display='flex'; setTimeout(()=>{ document.getElementById('loginLoading').style.display='none'; if(email===demoEmail && pwd===demoPassword){ showSection('mainApp'); updateGreeting(); renderDashboard(); } else { document.getElementById('loginError').textContent='Invalid email or password'; } },2000); });
+// LOGIN
+document.getElementById('loginForm').addEventListener('submit',e=>{
+  e.preventDefault(); 
+  const email=document.getElementById('loginEmail').value; 
+  const pwd=document.getElementById('loginPassword').value; 
+  document.getElementById('loginError').textContent=''; 
+  document.getElementById('loginLoading').style.display='flex'; 
+  setTimeout(()=>{
+    document.getElementById('loginLoading').style.display='none'; 
+    if(email===demoEmail && pwd===demoPassword){
+      showSection('mainApp'); 
+      updateGreeting(); 
+      renderDashboard(); 
+    } else { document.getElementById('loginError').textContent='Invalid email or password'; } 
+  },2000); 
+});
 
-// --------- You can now integrate all previous transaction, send, wire, top-up, withdraw, credit score, pay bills functions here ---------
-
+// SUCCESS RECEIPT
+function performTransaction(tx){
+  const successHTML = `
+    <div class="success-card">
+      <h2>Transaction Receipt</h2>
+      <div class="receipt-row"><span>Transaction ID:</span><span>${tx.txID}</span></div>
+      <div class="receipt-row"><span>Type:</span><span>${tx.type}</span></div>
+      <div class="receipt-row"><span>Amount:</span><span>$${tx.amount.toFixed(2)}</span></div>
+      <div class="receipt-row"><span>Fee:</span><span>$${tx.fee.toFixed(2)}</span></div>
+      <div class="receipt-row"><span>Date & Time:</span><span>${tx.date}</span></div>
+      <div class="receipt-row"><span>From:</span><span>${tx.from||'-'}</span></div>
+      <div class="receipt-row"><span>To:</span><span>${tx.to||'-'}</span></div>
+      <div style="margin-top:20px; font-size:24px; color:green; font-weight:700;">✅ Successful</div>
+      <button class="btn btn-primary mt-3" onclick="showSection('mainApp'); renderDashboard();">Back to Dashboard</button>
+    </div>
+  `;
+  document.getElementById('successSection').innerHTML = successHTML;
+  showSection('successSection');
+}
 </script>
 </body>
 </html>
