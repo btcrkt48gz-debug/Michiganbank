@@ -2,159 +2,109 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Michigan Bank Demo</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Michigan Bank Demo</title>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
 <style>
-body{font-family:'Segoe UI',sans-serif;background:#f4f6f8;margin:0;}
-.navbar-brand{font-weight:bold;}
-.section{display:none; padding:20px;}
+body{margin:0;font-family:'Segoe UI',sans-serif;background:linear-gradient(135deg,#4e54c8,#8f94fb);color:#333;}
+.section{display:none;padding:20px;}
 .section.active{display:block;}
-.card:hover{cursor:pointer; transform:scale(1.02); transition:0.2s;}
-.account-card{background:#fff; border-radius:10px; padding:20px; margin:10px; box-shadow:0 4px 6px rgba(0,0,0,0.1);}
-.action-btn{margin:5px;}
-.success-banner{background:#d4edda;color:#155724;padding:15px;margin:15px 0;border-radius:5px;border:1px solid #c3e6cb;}
+.login-card{max-width:400px;margin:auto;background:#fff;border-radius:15px;padding:30px;box-shadow:0 8px 25px rgba(0,0,0,0.3);}
+h2,h3,h4{font-weight:600;}
+.btn-primary{background:linear-gradient(135deg,#4e54c8,#8f94fb);border:none;box-shadow:0 4px 10px rgba(0,0,0,0.2);}
+.btn-primary:hover{opacity:0.9;}
+.card-custom{background:#fff;border-radius:15px;padding:20px;margin:10px;box-shadow:0 6px 20px rgba(0,0,0,0.25);transition:0.3s;cursor:pointer;}
+.card-custom:hover{transform:scale(1.02);}
+.balance-card{background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;border-radius:15px;padding:20px;margin-bottom:20px;box-shadow:0 8px 25px rgba(0,0,0,0.3);}
+.bottom-nav{position:fixed;bottom:0;width:100%;display:flex;justify-content:space-around;background:#fff;padding:10px 0;box-shadow:0 -4px 15px rgba(0,0,0,0.2);}
+.bottom-nav button{border:none;border-radius:50%;width:60px;height:60px;display:flex;justify-content:center;align-items:center;font-size:24px;box-shadow:0 4px 10px rgba(0,0,0,0.2);}
+.bottom-nav button:hover{transform:scale(1.1);}
 .spinner{display:flex;justify-content:center;align-items:center;height:150px;}
 .spinner div{width:50px;height:50px;margin:10px;border:5px solid #007bff;border-top:5px solid transparent;border-radius:50%;animation:spin 1s linear infinite;}
 @keyframes spin{0%{transform:rotate(0deg);}100%{transform:rotate(360deg);}}
+.navbar{background:#fff;box-shadow:0 4px 10px rgba(0,0,0,0.2);}
+.navbar-brand{font-weight:bold;color:#4e54c8;}
+.profile-icon{font-size:28px;color:#4e54c8;cursor:pointer;}
+.form-control, .form-select{border-radius:10px;box-shadow:inset 0 1px 3px rgba(0,0,0,0.1);}
+.btn-success{background:linear-gradient(135deg,#43e97b,#38f9d7);border:none;box-shadow:0 4px 10px rgba(0,0,0,0.2);}
+.btn-success:hover{opacity:0.9;}
+.btn-danger{background:linear-gradient(135deg,#f5576c,#f093fb);border:none;box-shadow:0 4px 10px rgba(0,0,0,0.2);}
+.btn-danger:hover{opacity:0.9;}
+.success-card{background:#d4edda;color:#155724;padding:20px;border-radius:15px;margin-top:20px;box-shadow:0 6px 15px rgba(0,0,0,0.2);}
 </style>
 </head>
 <body>
 
-<!-- Navbar / Hamburger -->
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
-<div class="container-fluid">
-  <a class="navbar-brand" href="#">Michigan Bank</a>
-  <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menuNav">
-    <span class="navbar-toggler-icon"></span>
-  </button>
-  <div class="collapse navbar-collapse" id="menuNav">
-    <ul class="navbar-nav ms-auto">
-      <li class="nav-item"><a class="nav-link" href="#" onclick="showSection('dashboard')">Dashboard</a></li>
-      <li class="nav-item"><a class="nav-link" href="#" onclick="showSection('checkingTransactions')">Checking</a></li>
-      <li class="nav-item"><a class="nav-link" href="#" onclick="showSection('savingsTransactions')">Savings</a></li>
-      <li class="nav-item"><a class="nav-link" href="#" onclick="logout()">Logout</a></li>
-    </ul>
-  </div>
-</div>
-</nav>
-
 <!-- Login Page -->
 <div id="loginPage" class="section active">
-<h2 class="text-center mt-5">Welcome to Michigan Bank</h2>
-<div class="row justify-content-center mt-4">
-<div class="col-md-4">
-<form id="loginForm">
-<div class="mb-3"><label>Email</label><input type="email" id="loginEmail" class="form-control" required></div>
-<div class="mb-3"><label>Password</label><input type="password" id="loginPassword" class="form-control" required></div>
-<button type="submit" class="btn btn-primary w-100">Login</button>
-</form>
-<div id="loginError" class="text-danger mt-2"></div>
-<div id="loginLoading" class="spinner" style="display:none;"><div></div></div>
-</div>
-</div>
+  <div class="login-card mt-5">
+    <h2 class="text-center mb-4">Michigan Bank</h2>
+    <form id="loginForm">
+      <div class="mb-3"><label>Email</label><input type="email" id="loginEmail" class="form-control" required></div>
+      <div class="mb-3"><label>Password</label><input type="password" id="loginPassword" class="form-control" required></div>
+      <button type="submit" class="btn btn-primary w-100">Login</button>
+    </form>
+    <div id="loginError" class="text-danger mt-2 text-center"></div>
+    <div id="loginLoading" class="spinner" style="display:none;"><div></div></div>
+  </div>
 </div>
 
-<!-- Dashboard -->
-<div id="dashboard" class="section">
-<h2 id="greeting"></h2>
-<p id="currentDate"></p>
-<div class="row" id="accountsRow"></div>
+<!-- Main Dashboard -->
+<div id="mainApp" class="section">
+
+  <nav class="navbar d-flex justify-content-between px-3">
+    <span class="bi bi-list fs-3" onclick="toggleMenu()"></span>
+    <span class="profile-icon bi bi-person-circle" onclick="logout()"></span>
+  </nav>
+
+  <div class="balance-card text-center">
+    <h4 id="greeting"></h4>
+    <p id="currentDate"></p>
+    <p>Available Balance: $<span id="availableBalance">0.00</span></p>
+    <p>Current Balance: $<span id="currentBalance">0.00</span></p>
+  </div>
+
+  <div class="row" id="accountsRow"></div>
+
+  <div class="d-flex justify-content-around mt-3">
+    <button class="btn btn-light card-custom">Cards</button>
+    <button class="btn btn-light card-custom">Credit Score</button>
+    <button class="btn btn-light card-custom">Pay Bills</button>
+  </div>
+
+  <div class="bottom-nav">
+    <button class="btn btn-primary" title="Send" onclick="startSend()"><i class="bi bi-cash-stack"></i></button>
+    <button class="btn btn-success" title="Top-up" onclick="startTopup()"><i class="bi bi-plus-lg"></i></button>
+    <button class="btn btn-danger" title="Withdraw" onclick="startWithdraw()"><i class="bi bi-wallet2"></i></button>
+  </div>
+
 </div>
 
-<!-- Checking Transactions -->
-<div id="checkingTransactions" class="section">
-<h3>Checking Account Transactions</h3>
-<p>Balance: $<span id="checkingBalance"></span></p>
-<button class="btn btn-primary action-btn" onclick="goToTransfer('Checking')"><i class="bi bi-arrow-left-right"></i> Transfer</button>
-<button class="btn btn-warning action-btn" onclick="goToWithdraw('Checking')"><i class="bi bi-wallet2"></i> Withdraw</button>
-<button class="btn btn-info action-btn" onclick="goToWire('Checking')"><i class="bi bi-bank"></i> Wire</button>
-<table class="table table-striped mt-3">
-<thead><tr><th>ID</th><th>Type</th><th>To</th><th>Amount</th><th>Date</th></tr></thead>
-<tbody id="checkingTx"></tbody>
-</table>
-</div>
-
-<!-- Savings Transactions -->
-<div id="savingsTransactions" class="section">
-<h3>Savings Account Transactions</h3>
-<p>Balance: $<span id="savingsBalance"></span></p>
-<button class="btn btn-primary action-btn" onclick="goToTransfer('Savings')"><i class="bi bi-arrow-left-right"></i> Transfer</button>
-<button class="btn btn-warning action-btn" onclick="goToWithdraw('Savings')"><i class="bi bi-wallet2"></i> Withdraw</button>
-<button class="btn btn-info action-btn" onclick="goToWire('Savings')"><i class="bi bi-bank"></i> Wire</button>
-<table class="table table-striped mt-3">
-<thead><tr><th>ID</th><th>Type</th><th>To</th><th>Amount</th><th>Date</th></tr></thead>
-<tbody id="savingsTx"></tbody>
-</table>
-</div>
-
-<!-- Transfer Page -->
-<div id="transferPage" class="section">
-<h3>Transfer from <span id="transferFromAccount"></span></h3>
-<form id="transferForm">
-<div class="mb-3"><label>To Account</label>
-<select id="transferToAccount" class="form-select"></select></div>
-<div class="mb-3"><label>Amount</label><input type="number" id="transferAmount" class="form-control" required></div>
-<button type="submit" class="btn btn-success">Continue</button>
-</form>
-</div>
-
-<!-- Withdraw Page -->
-<div id="withdrawPage" class="section">
-<h3>Withdraw from <span id="withdrawFromAccount"></span></h3>
-<form id="withdrawForm">
-<div class="mb-3"><label>Amount</label><input type="number" id="withdrawAmount" class="form-control" required></div>
-<button type="submit" class="btn btn-warning">Continue</button>
-</form>
-</div>
-
-<!-- Wire Page -->
-<div id="wirePage" class="section">
-<h3>Wire Transfer from <span id="wireFromAccount"></span></h3>
-<form id="wireForm">
-<div class="mb-3"><label>Bank / To</label><input type="text" id="wireTo" class="form-control" required></div>
-<div class="mb-3"><label>Amount</label><input type="number" id="wireAmount" class="form-control" required></div>
-<button type="submit" class="btn btn-info">Continue</button>
-</form>
-</div>
-
-<!-- Success Page -->
-<div id="successPage" class="section text-center">
-<h3>Transaction Successful!</h3>
-<div id="successDetails" class="card p-3 mt-3"></div>
-<button class="btn btn-primary mt-3" onclick="showSection('dashboard')">Back to Dashboard</button>
-</div>
+<!-- Workflow Sections -->
+<div id="sendSection" class="section"></div>
+<div id="topupWithdrawSection" class="section"></div>
+<div id="successSection" class="section text-center"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-// Hardcoded login
+// Login
 const demoEmail='Michiganbank@gmail.com';
 const demoPassword='Bank1&$';
 
-// LocalStorage setup
+// Initialize localStorage
 if(!localStorage.getItem('accounts')){
-  const initAccounts=[
-    {name:'Checking', balance:5000, tx:[]},
-    {name:'Savings', balance:2000, tx:[]}
-  ];
-  localStorage.setItem('accounts',JSON.stringify(initAccounts));
+  const accounts=[{name:'Checking',balance:5000,tx:[]},{name:'Savings',balance:2000,tx:[]}];
+  localStorage.setItem('accounts',JSON.stringify(accounts));
 }
 
-// Utilities
+// Utility functions
 function getAccounts(){ return JSON.parse(localStorage.getItem('accounts')); }
-function saveAccounts(accts){ localStorage.setItem('accounts',JSON.stringify(accts)); }
-function formatDate(){ const d=new Date(); return d.toLocaleString(); }
-function showSection(id){
-  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-  if(id==='dashboard'){ renderDashboard(); }
-  if(id==='checkingTransactions'){ renderAccountTx('Checking'); }
-  if(id==='savingsTransactions'){ renderAccountTx('Savings'); }
-}
+function saveAccounts(a){ localStorage.setItem('accounts',JSON.stringify(a)); }
+function formatDate(){ return new Date().toLocaleString(); }
 
-// Login
-document.getElementById('loginForm').addEventListener('submit',e=>{
+// Login logic
+document.getElementById('loginForm').addEventListener('submit', e=>{
   e.preventDefault();
   const email=document.getElementById('loginEmail').value;
   const pwd=document.getElementById('loginPassword').value;
@@ -162,126 +112,52 @@ document.getElementById('loginForm').addEventListener('submit',e=>{
   document.getElementById('loginLoading').style.display='flex';
   setTimeout(()=>{
     document.getElementById('loginLoading').style.display='none';
-    if(email===demoEmail && pwd===demoPassword){ showSection('dashboard'); updateGreeting(); }
+    if(email===demoEmail && pwd===demoPassword){ showSection('mainApp'); updateGreeting(); renderDashboard(); }
     else{ document.getElementById('loginError').textContent='Invalid email or password'; }
   },2000);
 });
 
+// Show section
+function showSection(id){ document.querySelectorAll('.section').forEach(s=>s.classList.remove('active')); document.getElementById(id).classList.add('active'); }
+
+// Greeting and date
 function updateGreeting(){
   const hour=new Date().getHours();
-  const greeting=hour<12?'Good Morning':'Good Evening';
-  document.getElementById('greeting').textContent=`${greeting} David`;
-  document.getElementById('currentDate').textContent=`${formatDate()}`;
+  const greet=hour<12?'Good Morning':'Good Evening';
+  document.getElementById('greeting').textContent=`${greet} David`;
+  document.getElementById('currentDate').textContent=formatDate();
 }
 
-// Dashboard render
+// Dashboard
 function renderDashboard(){
   const row=document.getElementById('accountsRow'); row.innerHTML='';
   const accounts=getAccounts();
+  let total=0;
+  accounts.forEach(a=>total+=a.balance);
+  document.getElementById('availableBalance').textContent=accounts[0].balance.toFixed(2);
+  document.getElementById('currentBalance').textContent=total.toFixed(2);
   accounts.forEach(a=>{
     const col=document.createElement('div'); col.className='col-md-6';
-    col.innerHTML=`<div class="account-card" onclick="showSection('${a.name==='Checking'?'checkingTransactions':'savingsTransactions'}')">
-      <h4>${a.name}</h4>
-      <p>Balance: $${a.balance.toFixed(2)}</p>
-      <p>${formatDate()}</p>
-      </div>`;
+    col.innerHTML=`<div class="card-custom" onclick="internalTransfer('${a.name}')"><h4>${a.name}</h4><p>Balance: $${a.balance.toFixed(2)}</p><p>${formatDate()}</p></div>`;
     row.appendChild(col);
   });
 }
 
-// Render transactions
-function renderAccountTx(name){
-  const accounts=getAccounts();
-  const acc=accounts.find(a=>a.name===name);
-  document.getElementById(name.toLowerCase()+'Balance').textContent=acc.balance.toFixed(2);
-  const tbody=document.getElementById(name.toLowerCase()+'Tx'); tbody.innerHTML='';
-  acc.tx.forEach(t=>{
-    const tr=document.createElement('tr');
-    tr.innerHTML=`<td>${t.id}</td><td>${t.type}</td><td>${t.to}</td><td>$${t.amount}</td><td>${t.date}</td>`;
-    tbody.appendChild(tr);
-  });
-}
-
-// Go to Transfer
-function goToTransfer(fromAccount){
-  document.getElementById('transferFromAccount').textContent=fromAccount;
-  const select=document.getElementById('transferToAccount'); select.innerHTML='';
-  const accounts=getAccounts();
-  accounts.filter(a=>a.name!==fromAccount).forEach(a=>{ select.innerHTML+=`<option value="${a.name}">${a.name}</option>`; });
-  showSection('transferPage');
-}
-
-// Transfer submit
-document.getElementById('transferForm').addEventListener('submit',e=>{
-  e.preventDefault();
-  const fromAccName=document.getElementById('transferFromAccount').textContent;
-  const toAccName=document.getElementById('transferToAccount').value;
-  const amt=parseFloat(document.getElementById('transferAmount').value);
-  const accounts=getAccounts();
-  const fromAcc=accounts.find(a=>a.name===fromAccName);
-  const toAcc=accounts.find(a=>a.name===toAccName);
-  if(amt>fromAcc.balance){ alert('Insufficient balance'); return; }
-  fromAcc.balance-=amt; toAcc.balance+=amt;
-  const tx={id:crypto.randomUUID(),type:'Transfer',to:toAccName,amount:amt,date:formatDate()};
-  fromAcc.tx.push(tx); saveAccounts(accounts);
-  showSuccess(tx,fromAcc.balance,fromAccName);
-});
-
-// Withdraw
-function goToWithdraw(fromAccount){
-  document.getElementById('withdrawFromAccount').textContent=fromAccount;
-  document.getElementById('withdrawAmount').value='';
-  showSection('withdrawPage');
-}
-document.getElementById('withdrawForm').addEventListener('submit',e=>{
-  e.preventDefault();
-  const fromAccName=document.getElementById('withdrawFromAccount').textContent;
-  const amt=parseFloat(document.getElementById('withdrawAmount').value);
-  const accounts=getAccounts();
-  const acc=accounts.find(a=>a.name===fromAccName);
-  if(amt>acc.balance){ alert('Insufficient balance'); return; }
-  acc.balance-=amt;
-  const tx={id:crypto.randomUUID(),type:'Withdraw',to:'Cash',amount:amt,date:formatDate()};
-  acc.tx.push(tx); saveAccounts(accounts);
-  showSuccess(tx,acc.balance,fromAccName);
-});
-
-// Wire
-function goToWire(fromAccount){
-  document.getElementById('wireFromAccount').textContent=fromAccount;
-  document.getElementById('wireTo').value='';
-  document.getElementById('wireAmount').value='';
-  showSection('wirePage');
-}
-document.getElementById('wireForm').addEventListener('submit',e=>{
-  e.preventDefault();
-  const fromAccName=document.getElementById('wireFromAccount').textContent;
-  const toBank=document.getElementById('wireTo').value;
-  const amt=parseFloat(document.getElementById('wireAmount').value);
-  const accounts=getAccounts();
-  const acc=accounts.find(a=>a.name===fromAccName);
-  if(amt>acc.balance){ alert('Insufficient balance'); return; }
-  acc.balance-=amt;
-  const tx={id:crypto.randomUUID(),type:'Wire',to:toBank,amount:amt,date:formatDate()};
-  acc.tx.push(tx); saveAccounts(accounts);
-  showSuccess(tx,acc.balance,fromAccName);
-});
-
-// Show success page
-function showSuccess(tx,balance,fromAccName){
-  const card=document.getElementById('successDetails');
-  card.innerHTML=`<p><strong>Transaction ID:</strong> ${tx.id}</p>
-  <p><strong>Type:</strong> ${tx.type}</p>
-  <p><strong>From:</strong> ${fromAccName}</p>
-  <p><strong>To:</strong> ${tx.to}</p>
-  <p><strong>Amount:</strong> $${tx.amount}</p>
-  <p><strong>Date:</strong> ${tx.date}</p>
-  <p><strong>Remaining Balance:</strong> $${balance.toFixed(2)}</p>`;
-  showSection('successPage');
-}
-
 // Logout
 function logout(){ showSection('loginPage'); }
+
+// Hamburger
+function toggleMenu(){alert('Hamburger menu placeholder');}
+
+// Internal transfer
+function internalTransfer(account){ alert('Internal transfer placeholder for '+account); }
+
+// Send / Wire workflow
+function startSend(){ alert('Send/Wire workflow placeholder'); }
+
+// Top-up / Withdraw workflow
+function startTopup(){ alert('Top-up workflow placeholder'); }
+function startWithdraw(){ alert('Withdraw workflow placeholder'); }
 
 </script>
 </body>
