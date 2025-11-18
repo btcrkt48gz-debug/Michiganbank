@@ -1,151 +1,639 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>OlaCreditUnion Bank Demo</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>OlaCreditUnion — Demo Bank</title>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
 <style>
-body {margin:0;font-family:'Segoe UI',sans-serif;background:linear-gradient(135deg,#4e54c8,#8f94fb);color:#333;overflow-x:hidden;}
-.section{display:none;padding:20px;}
-.section.active{display:block;transition:0.3s;}
-.login-card{max-width:400px;margin:auto;background:#fff;border-radius:15px;padding:30px;box-shadow:0 8px 25px rgba(0,0,0,.3);}
-h2,h3,h4{font-weight:600;}
-.btn-primary{background:linear-gradient(135deg,#4e54c8,#8f94fb);border:none;box-shadow:0 4px 10px rgba(0,0,0,.2);}
-.btn-primary:hover{opacity:.9;}
-.btn-success{background:linear-gradient(135deg,#43e97b,#38f9d7);border:none;box-shadow:0 4px 10px rgba(0,0,0,.2);}
-.btn-success:hover{opacity:.9;}
-.btn-danger{background:linear-gradient(135deg,#f5576c,#f093fb);border:none;box-shadow:0 4px 10px rgba(0,0,0,.2);}
-.btn-danger:hover{opacity:.9;}
-.card-custom{background:#fff;border-radius:15px;padding:20px;margin:10px;box-shadow:0 6px 20px rgba(0,0,0,.25);transition:.3s;cursor:pointer;}
-.card-custom:hover{transform:scale(1.02);}
-.balance-card{background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;border-radius:15px;padding:20px;margin-bottom:20px;box-shadow:0 8px 25px rgba(0,0,0,.3);}
-.bottom-nav{position:fixed;bottom:0;width:100%;display:flex;justify-content:space-around;background:#fff;padding:10px 0;box-shadow:0 -4px 15px rgba(0,0,0,.2);}
-.bottom-nav button{border:none;border-radius:50%;width:60px;height:60px;display:flex;justify-content:center;align-items:center;font-size:24px;box-shadow:0 4px 10px rgba(0,0,0,.2);}
-.bottom-nav button:hover{transform:scale(1.1);}
-.navbar{background:#fff;box-shadow:0 4px 10px rgba(0,0,0,.2);display:flex;justify-content:space-between;align-items:center;padding:0 10px;height:50px;}
-.profile-icon{font-size:28px;color:#4e54c8;cursor:pointer;}
-.form-control,.form-select{border-radius:10px;box-shadow:inset 0 1px 3px rgba(0,0,0,.1);}
-.success-card{background:#fff;border-radius:15px;padding:20px;margin-top:20px;box-shadow:0 6px 20px rgba(0,0,0,.25);color:#333;max-width:500px;margin-left:auto;margin-right:auto;}
-.receipt-row{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #ddd;}
-.menu{position:fixed;left:-250px;top:0;width:250px;height:100%;background:#fff;box-shadow:2px 0 10px rgba(0,0,0,.3);transition:0.3s;z-index:1000;padding-top:60px;}
-.menu a{display:flex;align-items:center;padding:15px;font-size:18px;color:#333;text-decoration:none;}
-.menu a:hover{background:#f0f0f0;}
-.menu a i{margin-right:10px;font-size:22px;}
-.menu.show{left:0;}
-.profile-pic{width:80px;height:80px;border-radius:50%;object-fit:cover;border:2px solid #764ba2;margin-bottom:15px;}
-.spinner{display:flex;justify-content:center;align-items:center;height:150px;}
-.spinner div{width:50px;height:50px;margin:10px;border:5px solid #007bff;border-top:5px solid transparent;border-radius:50%;animation:spin 1s linear infinite;}
-@keyframes spin{0%{transform:rotate(0deg);}100%{transform:rotate(360deg);}}
+  :root{
+    --accent-1: #4e54c8;
+    --accent-2: #8f94fb;
+    --accent-3: #667eea;
+    --accent-4: #764ba2;
+  }
+  html,body{height:100%;margin:0;font-family:Inter, 'Segoe UI', system-ui, Roboto, "Helvetica Neue", Arial;}
+  body{
+    background: linear-gradient(135deg,var(--accent-1),var(--accent-2));
+    color:#222; -webkit-font-smoothing:antialiased;
+  }
+  .section{display:none;padding:18px 18px 90px;}
+  .section.active{display:block;}
+  .login-card{max-width:420px;margin:64px auto;background:#fff;border-radius:14px;padding:28px;box-shadow:0 18px 50px rgba(0,0,0,.25);}
+  .btn-primary{background:linear-gradient(135deg,var(--accent-1),var(--accent-2));border:0;color:#fff;box-shadow:0 8px 30px rgba(0,0,0,.18);border-radius:10px;padding:10px 14px;}
+  .btn-success{background:linear-gradient(135deg,#43e97b,#38f9d7);border:0;color:#fff;border-radius:10px;padding:10px 14px;}
+  .btn-danger{background:linear-gradient(135deg,#f5576c,#f093fb);border:0;color:#fff;border-radius:10px;padding:10px 14px;}
+  .navbar{height:58px;background:#fff;border-radius:8px;display:flex;align-items:center;justify-content:space-between;padding:0 12px;box-shadow:0 6px 18px rgba(0,0,0,.12);}
+  .navbar .icon{font-size:22px;color:var(--accent-4);cursor:pointer}
+  .profile-icon{font-size:26px;color:var(--accent-4);cursor:pointer}
+  .balance-card{background:linear-gradient(135deg,var(--accent-3),var(--accent-4));color:#fff;border-radius:14px;padding:18px;margin:14px 0;box-shadow:0 12px 40px rgba(0,0,0,.22)}
+  .card-custom{background:#fff;border-radius:12px;padding:14px;box-shadow:0 8px 28px rgba(0,0,0,.12);cursor:pointer;margin:8px}
+  .card-custom h5{margin:0;font-size:15px;font-weight:600}
+  .card-custom p{margin:6px 0 0;color:#666}
+  .bottom-nav{position:fixed;left:0;right:0;bottom:14px;margin:auto;display:flex;gap:18px;justify-content:center;pointer-events:auto;}
+  .bottom-nav button{width:64px;height:64px;border-radius:32px;border:0;box-shadow:0 10px 30px rgba(0,0,0,.18);display:flex;align-items:center;justify-content:center;font-size:20px;cursor:pointer}
+  .menu{position:fixed;left:-290px;top:0;height:100%;width:270px;background:#fff;box-shadow:4px 0 30px rgba(0,0,0,.2);padding-top:64px;transition:left .22s;}
+  .menu.show{left:0}
+  .menu a{display:flex;align-items:center;padding:12px 16px;color:#333;text-decoration:none;border-bottom:1px solid #f2f2f2}
+  .menu a i{font-size:18px;margin-right:12px;color:var(--accent-4)}
+  .profile-pic{width:78px;height:78px;border-radius:50%;object-fit:cover;border:3px solid #fff;box-shadow:0 6px 22px rgba(0,0,0,.18)}
+  .success-card{background:#fff;border-radius:12px;padding:16px;box-shadow:0 12px 34px rgba(0,0,0,.14);max-width:560px;margin:18px auto;color:#222}
+  .receipt-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #f0f0f0}
+  .small-muted{font-size:13px;color:#666}
+  .spinner{display:flex;justify-content:center;align-items:center;padding:40px}
+  .spinner .dot{width:48px;height:48px;border-radius:50%;border:6px solid rgba(255,255,255,.18);border-top-color:#fff;animation:spin 1s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  input,select,textarea{border-radius:10px;padding:10px;border:1px solid #e6e6e6;box-shadow:inset 0 1px 2px rgba(0,0,0,.03);width:100%}
+  label{font-weight:600;font-size:14px;color:#333}
+  .link-like{color:var(--accent-4);cursor:pointer}
+  .muted{color:#777;font-size:13px}
+  @media (min-width:900px){.section{max-width:980px;margin:0 auto}}
 </style>
 </head>
 <body>
 
-<!-- LOGIN PAGE -->
 <div id="loginPage" class="section active">
-<div class="login-card mt-5">
-<h2 class="text-center mb-4">OlaCreditUnion Bank</h2>
-<form id="loginForm">
-<div class="mb-3"><label>Email</label><input type="email" id="loginEmail" class="form-control" required></div>
-<div class="mb-3"><label>Password</label><input type="password" id="loginPassword" class="form-control" required></div>
-<button type="submit" class="btn btn-primary w-100">Login</button>
-</form>
-<div id="loginError" class="text-danger mt-2 text-center"></div>
-<div id="loginLoading" class="spinner" style="display:none;"><div></div></div>
-</div>
-</div>
-
-<!-- MENU -->
-<div id="sideMenu" class="menu">
-<a href="#" onclick="showSection('mainApp')"><i class="bi bi-house-door-fill"></i> Dashboard</a>
-<a href="#" onclick="internalTransferPage()"><i class="bi bi-bank"></i> Internal Transfer</a>
-<a href="#" onclick="sendPage()"><i class="bi bi-cash-stack"></i> Send</a>
-<a href="#" onclick="wirePage()"><i class="bi bi-arrow-right-square"></i> Wire</a>
-<a href="#" onclick="topupPage()"><i class="bi bi-plus-lg"></i> Top-up</a>
-<a href="#" onclick="withdrawPage()"><i class="bi bi-wallet2"></i> Withdraw</a>
-<a href="#" onclick="profilePage()"><i class="bi bi-person-circle"></i> Profile</a>
-<a href="#" onclick="logout()"><i class="bi bi-box-arrow-right"></i> Logout</a>
+  <div class="login-card">
+    <h2 class="text-center mb-3">OlaCreditUnion</h2>
+    <p class="text-center small-muted mb-3">Professional demo bank — login to explore</p>
+    <form id="loginForm">
+      <label for="loginEmail">Email</label>
+      <input id="loginEmail" type="email" placeholder="you@example.com" value="Michiganbank@gmail.com" required />
+      <div style="height:10px"></div>
+      <label for="loginPassword">Password</label>
+      <input id="loginPassword" type="password" placeholder="Password" value="Bank1&$" required />
+      <div style="height:14px"></div>
+      <button class="btn btn-primary w-100" type="submit">Login</button>
+      <div id="loginError" style="color:#d33;margin-top:10px;text-align:center"></div>
+      <div id="loginLoading" style="display:none;margin-top:14px" class="spinner"><div class="dot"></div></div>
+    </form>
+  </div>
 </div>
 
-<!-- DASHBOARD -->
+<div id="sideMenu" class="menu" aria-hidden="true">
+  <div style="padding:0 16px 18px;border-bottom:1px solid #f5f5f5">
+    <div style="display:flex;align-items:center;gap:12px">
+      <img id="menuPic" src="" class="profile-pic" alt="Profile" />
+      <div>
+        <div id="menuName" style="font-weight:700"></div>
+        <div class="muted" id="menuEmail" style="font-size:13px"></div>
+      </div>
+    </div>
+  </div>
+  <a href="#" onclick="showSection('mainApp')"><i class="bi bi-house-door-fill"></i> Dashboard</a>
+  <a href="#" onclick="internalTransferPage()"><i class="bi bi-arrow-left-right"></i> Internal Transfer</a>
+  <a href="#" onclick="sendPage()"><i class="bi bi-cash-stack"></i> Send</a>
+  <a href="#" onclick="wirePage()"><i class="bi bi-bank"></i> Wire Transfer</a>
+  <a href="#" onclick="topupPage()"><i class="bi bi-plus-circle"></i> Top-up</a>
+  <a href="#" onclick="withdrawPage()"><i class="bi bi-wallet2"></i> Withdraw</a>
+  <a href="#" onclick="profilePage()"><i class="bi bi-person-circle"></i> Profile</a>
+  <a href="#" onclick="logout()"><i class="bi bi-box-arrow-right"></i> Logout</a>
+</div>
+
 <div id="mainApp" class="section">
-<nav class="navbar">
-<span class="bi bi-list fs-3" onclick="toggleMenu()"></span>
-<span class="profile-icon bi bi-person-circle" onclick="profilePage()"></span>
-</nav>
-<div class="balance-card text-center">
-<h4 id="greeting"></h4>
-<p id="currentDate"></p>
-<p>Available Balance: $<span id="availableBalance">0.00</span></p>
-<p>Current Balance: $<span id="currentBalance">0.00</span></p>
-</div>
-<div class="row" id="accountsRow"></div>
-<div class="bottom-nav">
-<button class="btn btn-primary" title="Send" onclick="sendPage()"><i class="bi bi-cash-stack"></i></button>
-<button class="btn btn-success" title="Top-up" onclick="topupPage()"><i class="bi bi-plus-lg"></i></button>
-<button class="btn btn-danger" title="Withdraw" onclick="withdrawPage()"><i class="bi bi-wallet2"></i></button>
-</div>
+  <div class="navbar mb-3">
+    <div class="icon" onclick="toggleMenu()"><i class="bi bi-list"></i></div>
+    <div style="display:flex;align-items:center;gap:12px">
+      <div class="muted" style="font-size:13px" id="topClock"></div>
+      <div class="profile-icon" onclick="profilePage()"><i class="bi bi-person-circle"></i></div>
+    </div>
+  </div>
+
+  <div class="balance-card">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <div>
+        <div id="greeting" style="font-size:18px;font-weight:700">Good Morning David</div>
+        <div id="liveTime" style="font-size:13px;opacity:.95"></div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-size:13px;opacity:.95">Total Balance</div>
+        <div id="totalBalance" style="font-size:20px;font-weight:700">$0.00</div>
+      </div>
+    </div>
+    <div style="margin-top:12px;display:flex;gap:12px">
+      <div style="flex:1;background:rgba(255,255,255,.12);padding:12px;border-radius:10px">
+        <div class="small-muted">Available (Checking)</div>
+        <div id="availChecking" style="font-weight:700;margin-top:6px">$0.00</div>
+      </div>
+      <div style="flex:1;background:rgba(255,255,255,.08);padding:12px;border-radius:10px">
+        <div class="small-muted">Savings</div>
+        <div id="availSavings" style="font-weight:700;margin-top:6px">$0.00</div>
+      </div>
+    </div>
+  </div>
+
+  <div style="display:flex;gap:10px;flex-wrap:wrap">
+    <div class="card-custom" style="flex:1;min-width:220px" onclick="internalTransferPage('Checking')">
+      <h5>Checking</h5>
+      <p id="chkBal" class="muted">$0.00</p>
+    </div>
+    <div class="card-custom" style="flex:1;min-width:220px" onclick="internalTransferPage('Savings')">
+      <h5>Savings</h5>
+      <p id="savBal" class="muted">$0.00</p>
+    </div>
+    <div class="card-custom" style="flex:1;min-width:220px" onclick="showTransactions()">
+      <h5>Transactions</h5>
+      <p class="muted">View recent activity</p>
+    </div>
+    <div class="card-custom" style="flex:1;min-width:220px" onclick="profilePage()">
+      <h5>Profile</h5>
+      <p class="muted">Edit personal info</p>
+    </div>
+  </div>
 </div>
 
-<!-- PLACEHOLDER SECTIONS -->
-<div id="internalTransferSection" class="section"></div>
-<div id="sendSection" class="section"></div>
-<div id="topupSection" class="section"></div>
-<div id="withdrawSection" class="section"></div>
-<div id="wireSection" class="section"></div>
-<div id="profileSection" class="section"></div>
-<div id="successSection" class="section text-center"></div>
-<div id="loadingSection" class="section text-center"><div class="spinner"><div></div></div></div>
+<div id="internalTransferSection" class="section">
+  <div class="navbar mb-3">
+    <div class="icon" onclick="showSection('mainApp')"><i class="bi bi-arrow-left"></i></div>
+    <div style="font-weight:700">Internal Transfer</div>
+    <div style="width:36px"></div>
+  </div>
+  <form id="transferForm">
+    <label>From</label>
+    <select id="transferFrom"></select>
+    <div style="height:10px"></div>
+    <label>To</label>
+    <select id="transferTo"></select>
+    <div style="height:10px"></div>
+    <label>Amount</label>
+    <input id="transferAmount" type="number" min="0" step="0.01" />
+    <div style="height:10px"></div>
+    <div class="muted">Fee (5%): $<span id="transferFee">0.00</span></div>
+    <div style="height:14px"></div>
+    <button class="btn btn-primary" type="submit">Transfer</button>
+  </form>
+</div>
+
+<div id="sendSection" class="section">
+  <div class="navbar mb-3">
+    <div class="icon" onclick="showSection('mainApp')"><i class="bi bi-arrow-left"></i></div>
+    <div style="font-weight:700">Send Money</div>
+    <div style="width:36px"></div>
+  </div>
+  <form id="sendForm">
+    <label>Recipient Name</label>
+    <input id="sendName" type="text" required />
+    <div style="height:10px"></div>
+    <label>Bank</label>
+    <input id="sendBank" type="text" required />
+    <div style="height:10px"></div>
+    <label>Amount</label>
+    <input id="sendAmount" type="number" min="0" step="0.01" />
+    <div style="height:10px"></div>
+    <div class="muted">Fee (5%): $<span id="sendFee">0.00</span></div>
+    <div style="height:14px"></div>
+    <button class="btn btn-primary" type="submit">Send</button>
+  </form>
+</div>
+
+<div id="topupSection" class="section">
+  <div class="navbar mb-3">
+    <div class="icon" onclick="showSection('mainApp')"><i class="bi bi-arrow-left"></i></div>
+    <div style="font-weight:700">Top-up</div>
+    <div style="width:36px"></div>
+  </div>
+  <div>
+    <label>From Card</label>
+    <select id="topupCard"></select>
+    <div style="height:10px"></div>
+    <div style="display:flex;gap:8px;align-items:center">
+      <button class="btn btn-light" id="addCardBtn" style="border-radius:8px">+ Add Card</button>
+      <div class="muted">Cards saved locally</div>
+    </div>
+    <div style="height:12px"></div>
+    <label>Amount</label>
+    <input id="topupAmount" type="number" min="0" step="0.01" />
+    <div style="height:10px"></div>
+    <div class="muted">Fee (5%): $<span id="topupFee">0.00</span></div>
+    <div style="height:14px"></div>
+    <button class="btn btn-success" id="topupSubmit">Top-up</button>
+  </div>
+</div>
+
+<div id="withdrawSection" class="section">
+  <div class="navbar mb-3">
+    <div class="icon" onclick="showSection('mainApp')"><i class="bi bi-arrow-left"></i></div>
+    <div style="font-weight:700">Withdraw</div>
+    <div style="width:36px"></div>
+  </div>
+  <form id="withdrawForm">
+    <label>Amount</label>
+    <input id="withdrawAmount" type="number" min="0" step="0.01" />
+    <div style="height:10px"></div>
+    <div class="muted">Fee (5%): $<span id="withdrawFee">0.00</span></div>
+    <div style="height:14px"></div>
+    <button class="btn btn-danger" type="submit">Withdraw</button>
+  </form>
+</div>
+
+<div id="wireSection" class="section">
+  <div class="navbar mb-3">
+    <div class="icon" onclick="showSection('mainApp')"><i class="bi bi-arrow-left"></i></div>
+    <div style="font-weight:700">Wire Transfer</div>
+    <div style="width:36px"></div>
+  </div>
+  <form id="wireForm">
+    <label>Recipient Bank</label>
+    <input id="wireBank" type="text" required />
+    <div style="height:10px"></div>
+    <label>Country</label>
+    <select id="wireCountry">
+      <option value="">Select country</option>
+      <option value="USA">United States</option>
+      <option value="UK">United Kingdom</option>
+      <option value="Germany">Germany</option>
+      <option value="Nigeria">Nigeria</option>
+      <option value="Other">Other</option>
+    </select>
+    <div style="height:10px"></div>
+    <label>Account Number</label>
+    <input id="wireAccount" type="text" required />
+    <div style="height:10px"></div>
+    <label id="wireCodeLabel">Routing / SWIFT</label>
+    <input id="wireCode" type="text" required />
+    <div style="height:10px"></div>
+    <label>Recipient Address</label>
+    <input id="wireRecipientAddress" type="text" />
+    <div style="height:10px"></div>
+    <label>Your (Sender) Address</label>
+    <input id="wireSenderAddress" type="text" />
+    <div style="height:10px"></div>
+    <label>Amount</label>
+    <input id="wireAmount" type="number" min="0" step="0.01" />
+    <div style="height:10px"></div>
+    <div class="muted">Fee (5%): $<span id="wireFee">0.00</span></div>
+    <div style="height:14px"></div>
+    <button class="btn btn-primary" type="submit">Wire Transfer</button>
+  </form>
+</div>
+
+<div id="profileSection" class="section">
+  <div class="navbar mb-3">
+    <div class="icon" onclick="showSection('mainApp')"><i class="bi bi-arrow-left"></i></div>
+    <div style="font-weight:700">Profile</div>
+    <div style="width:36px"></div>
+  </div>
+  <div style="text-align:center;margin-bottom:12px">
+    <img id="profilePhoto" class="profile-pic" src="" alt="profile" />
+  </div>
+  <form id="profileForm">
+    <label>Name</label>
+    <input id="profileName" type="text" />
+    <div style="height:10px"></div>
+    <label>Email</label>
+    <input id="profileEmail" type="email" />
+    <div style="height:10px"></div>
+    <label>Phone</label>
+    <input id="profilePhone" type="text" />
+    <div style="height:10px"></div>
+    <label>Account Number</label>
+    <input id="profileAccount" type="text" />
+    <div style="height:10px"></div>
+    <label>Upload Picture</label>
+    <input id="profilePicInput" type="file" accept="image/*" />
+    <div style="height:14px"></div>
+    <button class="btn btn-primary" type="submit">Save Profile</button>
+  </form>
+</div>
+
+<div id="successSection" class="section">
+  <!-- populated dynamically -->
+</div>
+
+<div id="loadingSection" class="section text-center">
+  <div class="spinner"><div class="dot"></div></div>
+  <div class="muted">Processing transaction...</div>
+</div>
 
 <script>
-// ----------------- DATA -----------------
-const validEmail="Michiganbank@gmail.com";
-const validPassword="Bank1&$";
-let accounts=JSON.parse(localStorage.getItem("accounts"))||{Checking:5000,Savings:3000};
-let transactions=JSON.parse(localStorage.getItem("transactions"))||[];
-let profile=JSON.parse(localStorage.getItem("profile"))||{name:"David",email:validEmail,phone:"1234567890",accountNumber:"000123456789",pic:""};
-function saveData(){localStorage.setItem("accounts",JSON.stringify(accounts));localStorage.setItem("transactions",JSON.stringify(transactions));localStorage.setItem("profile",JSON.stringify(profile));}
-function generateTxID(){return "TX"+Math.floor(Math.random()*1000000);}
-function calculateFee(amount){return parseFloat((amount*0.05).toFixed(2));}
-function showSection(id){document.querySelectorAll(".section").forEach(s=>s.classList.remove("active"));document.getElementById(id).classList.add("active");toggleMenu(true);}
-function toggleMenu(forceClose=null){const menu=document.getElementById("sideMenu");if(forceClose===true)menu.classList.remove("show");else if(forceClose===false)menu.classList.add("show");else menu.classList.toggle("show");}
-document.querySelectorAll(".menu a").forEach(link=>{link.addEventListener("click",()=>toggleMenu(true));});
+  const validEmail = "Michiganbank@gmail.com";
+  const validPassword = "Bank1&$";
+  let accounts = JSON.parse(localStorage.getItem('accounts') || null) || { Checking: 5000.00, Savings: 3000.00 };
+  let transactions = JSON.parse(localStorage.getItem('transactions') || null) || [];
+  let profile = JSON.parse(localStorage.getItem('profile') || null) || { name: "David", email: validEmail, phone: "1234567890", accountNumber: "000123456789", pic: "" };
+  let cards = JSON.parse(localStorage.getItem('cards') || null) || ["OlaCreditunion Bank • 1234"];
 
-// ----------------- DASHBOARD -----------------
-function renderDashboard(){
-  const now=new Date();
-  let hour=now.getHours();
-  let greet="Good Morning";
-  if(hour>=12&&hour<18)greet="Good Afternoon";
-  else if(hour>=18)greet="Good Evening";
-  document.getElementById("greeting").innerText=greet+" "+profile.name;
-  document.getElementById("currentDate").innerText=now.toLocaleString();
-  document.getElementById("availableBalance").innerText=accounts.Checking.toFixed(2);
-  document.getElementById("currentBalance").innerText=(accounts.Checking+accounts.Savings).toFixed(2);
-  let row=document.getElementById("accountsRow");row.innerHTML="";
-  for(let acc in accounts){
-    row.innerHTML+=`<div class="col-6"><div class="card-custom" onclick="internalTransferPage('${acc}')">${acc}<br>$${accounts[acc].toFixed(2)}</div></div>`;
+  function saveAll(){ localStorage.setItem('accounts', JSON.stringify(accounts)); localStorage.setItem('transactions', JSON.stringify(transactions)); localStorage.setItem('profile', JSON.stringify(profile)); localStorage.setItem('cards', JSON.stringify(cards)); }
+  function txid(){ return 'TX' + Math.floor(Math.random() * 900000 + 100000); }
+  function feeOf(a){ return +( (a || 0) * 0.05 ).toFixed(2); }
+  function showSection(id){
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    toggleMenu(true);
+    if(id === 'mainApp') renderDashboard();
   }
-}
+  function toggleMenu(forceClose = null){
+    const m = document.getElementById('sideMenu');
+    if(forceClose === true) { m.classList.remove('show'); m.setAttribute('aria-hidden','true'); }
+    else if(forceClose === false) { m.classList.add('show'); m.setAttribute('aria-hidden','false'); }
+    else { m.classList.toggle('show'); m.classList.contains('show') ? m.setAttribute('aria-hidden','false') : m.setAttribute('aria-hidden','true'); }
+  }
 
-// ----------------- LOGIN -----------------
-document.getElementById("loginForm").addEventListener("submit",function(e){
-  e.preventDefault();
-  const email=document.getElementById("loginEmail").value;
-  const password=document.getElementById("loginPassword").value;
-  const errorDiv=document.getElementById("loginError");
-  const spinner=document.getElementById("loginLoading");
-  errorDiv.innerText="";
-  spinner.style.display="flex";
-  setTimeout(()=>{
-    spinner.style.display="none";
-    if(email===validEmail&&password===validPassword){
-      showSection("mainApp");
+  function renderDashboard(){
+    const now = new Date();
+    const hr = now.getHours();
+    let greet = "Good Morning";
+    if(hr >= 12 && hr < 18) greet = "Good Afternoon";
+    else if(hr >= 18) greet = "Good Evening";
+    document.getElementById('greeting').innerText = `${greet} ${profile.name}`;
+    document.getElementById('liveTime').innerText = now.toLocaleString();
+    document.getElementById('topClock').innerText = now.toLocaleTimeString();
+    document.getElementById('totalBalance').innerText = `$${(accounts.Checking + accounts.Savings).toFixed(2)}`;
+    document.getElementById('availChecking').innerText = `$${accounts.Checking.toFixed(2)}`;
+    document.getElementById('availSavings').innerText = `$${accounts.Savings.toFixed(2)}`;
+    document.getElementById('chkBal').innerText = `$${accounts.Checking.toFixed(2)}`;
+    document.getElementById('savBal').innerText = `$${accounts.Savings.toFixed(2)}`;
+    document.getElementById('menuName').innerText = profile.name;
+    document.getElementById('menuEmail').innerText = profile.email;
+    document.getElementById('menuPic').src = profile.pic || 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80"></svg>';
+    document.getElementById('profilePhoto').src = profile.pic || 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80"></svg>';
+  }
+
+  // Live clock update
+  setInterval(() => { if(document.getElementById('mainApp').classList.contains('active')) renderDashboard(); }, 1000);
+
+  // LOGIN
+  document.getElementById('loginForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const email = document.getElementById('loginEmail').value.trim();
+    const pass = document.getElementById('loginPassword').value;
+    const err = document.getElementById('loginError');
+    const sp = document.getElementById('loginLoading');
+    err.innerText = '';
+    sp.style.display = 'block';
+    setTimeout(() => {
+      sp.style.display = 'none';
+      if(email === validEmail && pass === validPassword){
+        showSection('mainApp');
+        renderDashboard();
+      } else {
+        err.innerText = 'Invalid email or password.';
+      }
+    }, 1400);
+  });
+
+  // INTERNAL TRANSFER UI
+  function internalTransferPage(pref = null){
+    showSection('internalTransferSection');
+    const from = document.getElementById('transferFrom');
+    const to = document.getElementById('transferTo');
+    from.innerHTML = '';
+    to.innerHTML = '';
+    Object.keys(accounts).forEach(acc => {
+      const o1 = document.createElement('option'); o1.value = acc; o1.innerText = acc; if(pref === acc) o1.selected = true;
+      from.appendChild(o1);
+      const o2 = document.createElement('option'); o2.value = acc; o2.innerText = acc;
+      to.appendChild(o2);
+    });
+    if(pref) {
+      // pick other for 'to'
+      if(to.options[0] && to.options[0].value === pref) to.selectedIndex = 1;
+    }
+    document.getElementById('transferAmount').value = '';
+    document.getElementById('transferFee').innerText = '0.00';
+  }
+
+  document.getElementById('transferAmount').addEventListener('input', (e) => {
+    const v = parseFloat(e.target.value) || 0;
+    document.getElementById('transferFee').innerText = feeOf(v).toFixed(2);
+  });
+
+  document.getElementById('transferForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const from = document.getElementById('transferFrom').value;
+    const to = document.getElementById('transferTo').value;
+    const amt = +(parseFloat(document.getElementById('transferAmount').value) || 0);
+    if(!amt || amt <= 0){ alert('Enter valid amount'); return; }
+    if(from === to){ alert('Select different accounts'); return; }
+    const fee = feeOf(amt);
+    if((amt + fee) > accounts[from]){ alert('Insufficient funds'); return; }
+    accounts[from] = +(accounts[from] - amt - fee).toFixed(2);
+    accounts[to] = +(accounts[to] + amt).toFixed(2);
+    const tx = { type: 'Internal Transfer', from, to, amount: amt.toFixed(2), fee: fee.toFixed(2), date: new Date().toLocaleString(), txid: txid() };
+    transactions.unshift(tx);
+    saveAll();
+    showLoadingThenReceipt(tx);
+  });
+
+  // SEND
+  function sendPage(){
+    showSection('sendSection');
+    document.getElementById('sendForm').reset();
+    document.getElementById('sendFee').innerText = '0.00';
+  }
+  document.getElementById('sendAmount').addEventListener('input', (e) => {
+    document.getElementById('sendFee').innerText = feeOf(parseFloat(e.target.value) || 0).toFixed(2);
+  });
+  document.getElementById('sendForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const name = document.getElementById('sendName').value.trim();
+    const bank = document.getElementById('sendBank').value.trim();
+    const amt = +(parseFloat(document.getElementById('sendAmount').value) || 0);
+    if(!name || !bank || !amt){ alert('Complete all fields'); return; }
+    const fee = feeOf(amt);
+    if((amt + fee) > accounts.Checking){ alert('Insufficient funds'); return; }
+    accounts.Checking = +(accounts.Checking - amt - fee).toFixed(2);
+    const tx = { type: 'Send Money', toName: name, toBank: bank, amount: amt.toFixed(2), fee: fee.toFixed(2), date: new Date().toLocaleString(), txid: txid() };
+    transactions.unshift(tx);
+    saveAll();
+    showLoadingThenReceipt(tx);
+  });
+
+  // TOPUP
+  function topupPage(){
+    showSection('topupSection');
+    renderCards();
+    document.getElementById('topupAmount').value = '';
+    document.getElementById('topupFee').innerText = '0.00';
+  }
+  function renderCards(){
+    const sel = document.getElementById('topupCard');
+    sel.innerHTML = '';
+    cards.forEach(c => {
+      const o = document.createElement('option'); o.value = c; o.innerText = c; sel.appendChild(o);
+    });
+  }
+  document.getElementById('addCardBtn').addEventListener('click', (e) => {
+    e.preventDefault();
+    const n = prompt('Enter card display text (e.g. Bank • 1234):');
+    if(n && n.trim()){
+      cards.unshift(n.trim());
+      saveAll();
+      renderCards();
+      alert('Card added locally');
+    }
+  });
+  document.getElementById('topupAmount').addEventListener('input', (e) => {
+    document.getElementById('topupFee').innerText = feeOf(parseFloat(e.target.value) || 0).toFixed(2);
+  });
+  document.getElementById('topupSubmit').addEventListener('click', (e) => {
+    e.preventDefault();
+    const card = document.getElementById('topupCard').value;
+    const amt = +(parseFloat(document.getElementById('topupAmount').value) || 0);
+    if(!card || !amt){ alert('Choose card and enter amount'); return; }
+    const fee = feeOf(amt);
+    // top-up goes to Checking only
+    accounts.Checking = +(accounts.Checking + amt).toFixed(2);
+    const tx = { type: 'Top-up', fromCard: card, amount: amt.toFixed(2), fee: fee.toFixed(2), date: new Date().toLocaleString(), txid: txid() };
+    transactions.unshift(tx);
+    saveAll();
+    showLoadingThenReceipt(tx);
+  });
+
+  // WITHDRAW
+  function withdrawPage(){ showSection('withdrawSection'); document.getElementById('withdrawForm').reset(); document.getElementById('withdrawFee').innerText = '0.00'; }
+  document.getElementById('withdrawAmount').addEventListener('input', (e) => {
+    document.getElementById('withdrawFee').innerText = feeOf(parseFloat(e.target.value) || 0).toFixed(2);
+  });
+  document.getElementById('withdrawForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const amt = +(parseFloat(document.getElementById('withdrawAmount').value) || 0);
+    if(!amt || amt <= 0){ alert('Enter valid amount'); return; }
+    const fee = feeOf(amt);
+    if((amt + fee) > accounts.Checking){ alert('Insufficient funds'); return; }
+    accounts.Checking = +(accounts.Checking - amt - fee).toFixed(2);
+    const tx = { type: 'Withdraw', amount: amt.toFixed(2), fee: fee.toFixed(2), date: new Date().toLocaleString(), txid: txid() };
+    transactions.unshift(tx);
+    saveAll();
+    showLoadingThenReceipt(tx);
+  });
+
+  // WIRE
+  function wirePage(){ showSection('wireSection'); document.getElementById('wireForm').reset(); document.getElementById('wireFee').innerText = '0.00'; }
+  document.getElementById('wireCountry').addEventListener('change', (e) => {
+    const c = e.target.value;
+    const label = document.getElementById('wireCodeLabel');
+    if(c === 'USA'){ label.innerText = 'Routing Number'; document.getElementById('wireCode').placeholder = 'e.g. 111000025'; }
+    else { label.innerText = 'SWIFT / BIC'; document.getElementById('wireCode').placeholder = 'e.g. DEUTDEFF'; }
+  });
+  document.getElementById('wireAmount').addEventListener('input', (e) => {
+    document.getElementById('wireFee').innerText = feeOf(parseFloat(e.target.value) || 0).toFixed(2);
+  });
+  document.getElementById('wireForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const bank = document.getElementById('wireBank').value.trim();
+    const country = document.getElementById('wireCountry').value;
+    const accNum = document.getElementById('wireAccount').value.trim();
+    const code = document.getElementById('wireCode').value.trim();
+    const recAddr = document.getElementById('wireRecipientAddress').value.trim();
+    const sendAddr = document.getElementById('wireSenderAddress').value.trim();
+    const amt = +(parseFloat(document.getElementById('wireAmount').value) || 0);
+    if(!bank || !country || !accNum || !code || !amt){ alert('Complete required fields'); return; }
+    const fee = feeOf(amt);
+    if((amt + fee) > accounts.Checking){ alert('Insufficient funds'); return; }
+    accounts.Checking = +(accounts.Checking - amt - fee).toFixed(2);
+    const tx = { type: 'Wire Transfer', toBank: bank, country, accountNumber: accNum, code, recipientAddress: recAddr, senderAddress: sendAddr, amount: amt.toFixed(2), fee: fee.toFixed(2), date: new Date().toLocaleString(), txid: txid() };
+    transactions.unshift(tx);
+    saveAll();
+    showLoadingThenReceipt(tx);
+  });
+
+  // PROFILE
+  function profilePage(){
+    showSection('profileSection');
+    document.getElementById('profileName').value = profile.name;
+    document.getElementById('profileEmail').value = profile.email;
+    document.getElementById('profilePhone').value = profile.phone;
+    document.getElementById('profileAccount').value = profile.accountNumber;
+    document.getElementById('profilePhoto').src = profile.pic || '';
+  }
+  document.getElementById('profileForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    profile.name = document.getElementById('profileName').value || profile.name;
+    profile.email = document.getElementById('profileEmail').value || profile.email;
+    profile.phone = document.getElementById('profilePhone').value || profile.phone;
+    profile.accountNumber = document.getElementById('profileAccount').value || profile.accountNumber;
+    saveAll();
+    alert('Profile saved locally');
+    renderDashboard();
+    showSection('mainApp');
+  });
+  document.getElementById('profilePicInput').addEventListener('change', (e) => {
+    const f = e.target.files[0];
+    if(!f) return;
+    const r = new FileReader();
+    r.onload = () => {
+      profile.pic = r.result;
+      saveAll();
+      document.getElementById('profilePhoto').src = profile.pic;
+      document.getElementById('menuPic').src = profile.pic;
+      alert('Profile picture saved locally');
+    };
+    r.readAsDataURL(f);
+  });
+
+  // Transactions viewer
+  function showTransactions(){
+    showSection('successSection');
+    let html = '<div class="success-card"><h4>Recent Transactions</h4>';
+    if(transactions.length === 0) html += '<p class="muted">No transactions yet</p>';
+    else {
+      html += '<div style="max-height:380px;overflow:auto;padding-top:10px">';
+      transactions.slice(0,50).forEach(t => {
+        html += `<div style="padding:10px;border-bottom:1px solid #f2f2f2"><div style="display:flex;justify-content:space-between"><div><strong>${t.type}</strong><div class="small-muted">${t.date}</div></div><div style="text-align:right"><div style="font-weight:700">$${(+t.amount).toFixed(2)}</div><div class="small-muted">Fee $${(+t.fee).toFixed(2)}</div></div></div><div style="margin-top:8px;font-size:13px;color:#666">ID: ${t.txid}</div></div>`;
+      });
+      html += '</div>';
+    }
+    html += `<div style="margin-top:14px"><button class="btn btn-primary" onclick="renderDashboard();showSection('mainApp')">Back to Dashboard</button></div></div>`;
+    document.getElementById('successSection').innerHTML = html;
+  }
+
+  // Loading then receipt
+  function showLoadingThenReceipt(tx){
+    showSection('loadingSection');
+    setTimeout(() => {
+      renderReceipt(tx);
       renderDashboard();
-    }else errorDiv.innerText="Invalid email or password.";
-  },2000);
-});
+    }, 1600);
+  }
+
+  function renderReceipt(tx){
+    showSection('successSection');
+    let html = '<div class="success-card">';
+    html += `<div style="display:flex;justify-content:space-between;align-items:center"><div><h4 style="margin:0">${tx.type}</h4><div class="small-muted">${tx.date}</div></div><div style="text-align:right"><div style="font-weight:700;font-size:18px">$${(+tx.amount).toFixed(2)}</div></div></div>`;
+    html += '<div style="margin-top:12px">';
+    const keysOrder = ['txid','type','from','to','toName','toBank','fromCard','amount','fee','country','accountNumber','code','recipientAddress','senderAddress','date'];
+    // left/right receipt style: show labels and values
+    function row(label, val){ if(val === undefined || val === null || val === '') return ''; return `<div class="receipt-row"><div>${label}</div><div style="font-weight:700">${val}</div></div>`; }
+    html += row('Transaction ID', tx.txid);
+    if(tx.from) html += row('From', tx.from);
+    if(tx.to) html += row('To', tx.to);
+    if(tx.toName) html += row('Recipient', tx.toName);
+    if(tx.toBank) html += row('Bank', tx.toBank);
+    if(tx.fromCard) html += row('Card', tx.fromCard);
+    html += row('Amount', `$${(+tx.amount).toFixed(2)}`);
+    html += row('Fee', `$${(+tx.fee).toFixed(2)}`);
+    if(tx.country) html += row('Country', tx.country);
+    if(tx.accountNumber) html += row('Account No.', tx.accountNumber);
+    if(tx.code) html += row('Routing / SWIFT', tx.code);
+    if(tx.recipientAddress) html += row('Recipient Address', tx.recipientAddress);
+    if(tx.senderAddress) html += row('Sender Address', tx.senderAddress);
+    html += row('Date', tx.date);
+    html += '</div>';
+    html += `<div style="text-align:center;margin-top:14px"><button class="btn btn-primary" onclick="renderDashboard();showSection('mainApp')">Back to Dashboard</button></div>`;
+    html += `<div style="text-align:center;margin-top:12px;color:green;font-weight:700">✅ Successful</div>`;
+    html += '</div>';
+    document.getElementById('successSection').innerHTML = html;
+  }
+
+  // LOGOUT
+  function logout(){ showSection('loginPage'); }
+
+  // initialize UI
+  renderDashboard();
+  renderCards();
+
+  // Prepopulate input placeholders
+  document.getElementById('loginEmail').placeholder = validEmail;
+  document.getElementById('loginPassword').placeholder = 'Bank1&$';
+
+  // Keyboard: Enter login
+  document.getElementById('loginPassword').addEventListener('keydown', (e) => { if(e.key === 'Enter'){ e.preventDefault(); document.getElementById('loginForm').dispatchEvent(new Event('submit')); } });
+
+  // Ensure profile pic placeholders
+  document.getElementById('menuPic').src = profile.pic || '';
+  document.getElementById('profilePhoto').src = profile.pic || '';
 
 </script>
 </body>
