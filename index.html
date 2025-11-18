@@ -2,41 +2,42 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>OlaCreditUnion Bank Demo</title>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
 <style>
-body { margin:0; font-family:'Segoe UI',sans-serif; background:linear-gradient(135deg,#4e54c8,#8f94fb); color:#333; overflow-x:hidden;}
-.section { display:none; padding:20px; }
-.section.active { display:block; transition:0.3s; }
-.login-card { max-width:400px; margin:auto; background:#fff; border-radius:15px; padding:30px; box-shadow:0 8px 25px rgba(0,0,0,.3); }
-h2,h3,h4{ font-weight:600; }
-.btn-primary{ background:linear-gradient(135deg,#4e54c8,#8f94fb); border:none; box-shadow:0 4px 10px rgba(0,0,0,.2); }
-.btn-primary:hover{ opacity:.9; }
-.btn-success{ background:linear-gradient(135deg,#43e97b,#38f9d7); border:none; box-shadow:0 4px 10px rgba(0,0,0,.2); }
-.btn-success:hover{ opacity:.9; }
-.btn-danger{ background:linear-gradient(135deg,#f5576c,#f093fb); border:none; box-shadow:0 4px 10px rgba(0,0,0,.2); }
-.btn-danger:hover{ opacity:.9; }
-.card-custom{ background:#fff; border-radius:15px; padding:20px; margin:10px; box-shadow:0 6px 20px rgba(0,0,0,.25); transition:.3s; cursor:pointer; }
-.card-custom:hover{ transform:scale(1.02); }
-.balance-card{ background:linear-gradient(135deg,#667eea,#764ba2); color:#fff; border-radius:15px; padding:20px; margin-bottom:20px; box-shadow:0 8px 25px rgba(0,0,0,.3); }
-.bottom-nav{ position:fixed; bottom:0; width:100%; display:flex; justify-content:space-around; background:#fff; padding:10px 0; box-shadow:0 -4px 15px rgba(0,0,0,.2); }
-.bottom-nav button{ border:none; border-radius:50%; width:60px; height:60px; display:flex; justify-content:center; align-items:center; font-size:24px; box-shadow:0 4px 10px rgba(0,0,0,.2); }
-.bottom-nav button:hover{ transform:scale(1.1); }
-.spinner{ display:flex; justify-content:center; align-items:center; height:150px; }
-.spinner div{ width:50px; height:50px; margin:10px; border:5px solid #007bff; border-top:5px solid transparent; border-radius:50%; animation:spin 1s linear infinite; }
+body{margin:0;font-family:'Segoe UI',sans-serif;background:linear-gradient(135deg,#4e54c8,#8f94fb);color:#333;overflow-x:hidden;}
+.section{display:none;padding:20px;}
+.section.active{display:block;transition:0.3s;}
+.login-card{max-width:400px;margin:auto;background:#fff;border-radius:15px;padding:30px;box-shadow:0 8px 25px rgba(0,0,0,.3);}
+h2,h3,h4{font-weight:600;}
+.btn-primary{background:linear-gradient(135deg,#4e54c8,#8f94fb);border:none;box-shadow:0 4px 10px rgba(0,0,0,.2);}
+.btn-primary:hover{opacity:.9;}
+.btn-success{background:linear-gradient(135deg,#43e97b,#38f9d7);border:none;box-shadow:0 4px 10px rgba(0,0,0,.2);}
+.btn-success:hover{opacity:.9;}
+.btn-danger{background:linear-gradient(135deg,#f5576c,#f093fb);border:none;box-shadow:0 4px 10px rgba(0,0,0,.2);}
+.btn-danger:hover{opacity:.9;}
+.card-custom{background:#fff;border-radius:15px;padding:20px;margin:10px;box-shadow:0 6px 20px rgba(0,0,0,.25);transition:.3s;cursor:pointer;}
+.card-custom:hover{transform:scale(1.02);}
+.balance-card{background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;border-radius:15px;padding:20px;margin-bottom:20px;box-shadow:0 8px 25px rgba(0,0,0,.3);}
+.bottom-nav{position:fixed;bottom:0;width:100%;display:flex;justify-content:space-around;background:#fff;padding:10px 0;box-shadow:0 -4px 15px rgba(0,0,0,.2);}
+.bottom-nav button{border:none;border-radius:50%;width:60px;height:60px;display:flex;justify-content:center;align-items:center;font-size:24px;box-shadow:0 4px 10px rgba(0,0,0,.2);}
+.bottom-nav button:hover{transform:scale(1.1);}
+.spinner{display:flex;justify-content:center;align-items:center;height:150px;}
+.spinner div{width:50px;height:50px;margin:10px;border:5px solid #007bff;border-top:5px solid transparent;border-radius:50%;animation:spin 1s linear infinite;}
 @keyframes spin{0%{transform:rotate(0deg);}100%{transform:rotate(360deg);}}
-.navbar{ background:#fff; box-shadow:0 4px 10px rgba(0,0,0,.2); display:flex; justify-content:space-between; align-items:center; padding:0 10px; height:50px; }
-.profile-icon{ font-size:28px; color:#4e54c8; cursor:pointer; }
-.form-control,.form-select{ border-radius:10px; box-shadow: inset 0 1px 3px rgba(0,0,0,.1);}
-.success-card{ background:#fff; border-radius:15px; padding:20px; margin-top:20px; box-shadow:0 6px 20px rgba(0,0,0,.25); color:#333; max-width:500px; margin-left:auto; margin-right:auto; }
-.receipt-row{ display:flex; justify-content:space-between; padding:5px 0; border-bottom:1px solid #ddd; }
-.menu { position:fixed; left:-250px; top:0; width:250px; height:100%; background:#fff; box-shadow:2px 0 10px rgba(0,0,0,.3); transition:0.3s; z-index:1000; padding-top:60px; }
-.menu a{ display:flex; align-items:center; padding:15px; font-size:18px; color:#333; text-decoration:none; }
-.menu a:hover{ background:#f0f0f0; }
-.menu a i{ margin-right:10px; font-size:22px; }
-.menu.show { left:0; }
+.navbar{background:#fff;box-shadow:0 4px 10px rgba(0,0,0,.2);display:flex;justify-content:space-between;align-items:center;padding:0 10px;height:50px;}
+.profile-icon{font-size:28px;color:#4e54c8;cursor:pointer;}
+.form-control,.form-select{border-radius:10px;box-shadow: inset 0 1px 3px rgba(0,0,0,.1);}
+.success-card{background:#fff;border-radius:15px;padding:20px;margin-top:20px;box-shadow:0 6px 20px rgba(0,0,0,.25);color:#333;max-width:500px;margin-left:auto;margin-right:auto;}
+.receipt-row{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #ddd;}
+.menu{position:fixed;left:-250px;top:0;width:250px;height:100%;background:#fff;box-shadow:2px 0 10px rgba(0,0,0,.3);transition:0.3s;z-index:1000;padding-top:60px;}
+.menu a{display:flex;align-items:center;padding:15px;font-size:18px;color:#333;text-decoration:none;}
+.menu a:hover{background:#f0f0f0;}
+.menu a i{margin-right:10px;font-size:22px;}
+.menu.show{left:0;}
+.profile-pic{width:80px;height:80px;border-radius:50%;object-fit:cover;border:2px solid #764ba2;margin-bottom:15px;}
 </style>
 </head>
 <body>
@@ -64,22 +65,22 @@ h2,h3,h4{ font-weight:600; }
 <!-- HAMBURGER MENU -->
 <div id="sideMenu" class="menu">
   <a href="#" onclick="goTo('mainApp')"><i class="bi bi-house-door-fill"></i> Dashboard</a>
-  <a href="#" onclick="internalTransfer('Checking')"><i class="bi bi-bank"></i> Checking</a>
-  <a href="#" onclick="internalTransfer('Savings')"><i class="bi bi-bank2"></i> Savings</a>
-  <a href="#" onclick="startSend()"><i class="bi bi-cash-stack"></i> Send</a>
-  <a href="#" onclick="startWire()"><i class="bi bi-arrow-right-square"></i> Wire</a>
-  <a href="#" onclick="startTopup()"><i class="bi bi-plus-lg"></i> Top-up</a>
-  <a href="#" onclick="startWithdraw()"><i class="bi bi-wallet2"></i> Withdraw</a>
+  <a href="#" onclick="internalTransferPage()"><i class="bi bi-bank"></i> Internal Transfer</a>
+  <a href="#" onclick="sendPage()"><i class="bi bi-cash-stack"></i> Send</a>
+  <a href="#" onclick="wirePage()"><i class="bi bi-arrow-right-square"></i> Wire</a>
+  <a href="#" onclick="topupPage()"><i class="bi bi-plus-lg"></i> Top-up</a>
+  <a href="#" onclick="withdrawPage()"><i class="bi bi-wallet2"></i> Withdraw</a>
+  <a href="#" onclick="profilePage()"><i class="bi bi-person-circle"></i> Profile</a>
   <a href="#" onclick="showCreditScore()"><i class="bi bi-speedometer2"></i> Credit Score</a>
   <a href="#" onclick="showPayBills()"><i class="bi bi-file-text"></i> Pay Bills</a>
   <a href="#" onclick="logout()"><i class="bi bi-box-arrow-right"></i> Logout</a>
 </div>
 
-<!-- MAIN DASHBOARD -->
+<!-- DASHBOARD -->
 <div id="mainApp" class="section">
   <nav class="navbar">
     <span class="bi bi-list fs-3" onclick="toggleMenu()"></span>
-    <span class="profile-icon bi bi-person-circle" onclick="logout()"></span>
+    <span class="profile-icon bi bi-person-circle" onclick="profilePage()"></span>
   </nav>
   <div class="balance-card text-center">
     <h4 id="greeting"></h4>
@@ -93,59 +94,44 @@ h2,h3,h4{ font-weight:600; }
     <button class="btn btn-light card-custom" onclick="showPayBills()">Pay Bills</button>
   </div>
   <div class="bottom-nav">
-    <button class="btn btn-primary" title="Send" onclick="startSend()"><i class="bi bi-cash-stack"></i></button>
-    <button class="btn btn-success" title="Top-up" onclick="startTopup()"><i class="bi bi-plus-lg"></i></button>
-    <button class="btn btn-danger" title="Withdraw" onclick="startWithdraw()"><i class="bi bi-wallet2"></i></button>
+    <button class="btn btn-primary" title="Send" onclick="sendPage()"><i class="bi bi-cash-stack"></i></button>
+    <button class="btn btn-success" title="Top-up" onclick="topupPage()"><i class="bi bi-plus-lg"></i></button>
+    <button class="btn btn-danger" title="Withdraw" onclick="withdrawPage()"><i class="bi bi-wallet2"></i></button>
   </div>
 </div>
 
-<!-- SECTIONS -->
+<!-- OTHER SECTIONS -->
 <div id="internalTransferSection" class="section"></div>
 <div id="sendSection" class="section"></div>
 <div id="topupWithdrawSection" class="section"></div>
+<div id="wireSection" class="section"></div>
+<div id="profileSection" class="section"></div>
 <div id="successSection" class="section text-center"></div>
 <div id="loadingSection" class="section text-center"><div class="spinner"><div></div></div></div>
 <div id="creditScoreSection" class="section text-center"></div>
 <div id="payBillsSection" class="section text-center"></div>
 
 <script>
-// ----------------- DATA -----------------
+// ---------------- DATA ----------------
 const demoEmail='Michiganbank@gmail.com';
 const demoPassword='Bank1&$';
 const FEE_RATE=0.05;
 const predefinedBanks=['OlaCreditUnion Bank','DemoBank','SampleBank'];
 const predefinedCards=['1111 2222 3333 4444','5555 6666 7777 8888'];
-
-if(!localStorage.getItem('accounts')) localStorage.setItem('accounts',JSON.stringify([
-  {name:'Checking',balance:5000,tx:[]},
-  {name:'Savings',balance:2000,tx:[]}
-]));
-
+const profileDefault={name:'David',email:demoEmail,phone:'123-456-7890',account:'AC123456789',pic:''};
+if(!localStorage.getItem('accounts')) localStorage.setItem('accounts',JSON.stringify([{name:'Checking',balance:5000,tx:[]},{name:'Savings',balance:2000,tx:[]}]));
+if(!localStorage.getItem('profile')) localStorage.setItem('profile',JSON.stringify(profileDefault));
 function getAccounts(){ return JSON.parse(localStorage.getItem('accounts')); }
 function saveAccounts(a){ localStorage.setItem('accounts',JSON.stringify(a)); }
+function getProfile(){ return JSON.parse(localStorage.getItem('profile')); }
+function saveProfile(p){ localStorage.setItem('profile',JSON.stringify(p)); }
 function formatDate(){ return new Date().toLocaleString(); }
 function generateTxID(){ return 'TX-'+Date.now(); }
 function showSection(id){ document.querySelectorAll('.section').forEach(s=>s.classList.remove('active')); document.getElementById(id).classList.add('active'); closeMenu(); }
-function updateGreeting(){ const h=new Date().getHours(); const greet=h<12?'Good Morning':'Good Evening'; document.getElementById('greeting').textContent=`${greet} David`; document.getElementById('currentDate').textContent=formatDate(); }
-function renderDashboard(){
-  const row=document.getElementById('accountsRow'); row.innerHTML=''; 
-  const accounts=getAccounts(); 
-  let total=0; 
-  accounts.forEach(a=>total+=a.balance); 
-  document.getElementById('availableBalance').textContent=accounts[0].balance.toFixed(2); 
-  document.getElementById('currentBalance').textContent=total.toFixed(2); 
-  accounts.forEach(a=>{
-    const col=document.createElement('div'); col.className='col-md-6'; 
-    col.innerHTML=`<div class="card-custom" onclick="internalTransfer('${a.name}')"><h4>${a.name}</h4><p>Balance: $${a.balance.toFixed(2)}</p><p>${formatDate()}</p></div>`; 
-    row.appendChild(col); 
-  });
-}
-function logout(){ showSection('loginPage'); }
 function toggleMenu(){ document.getElementById('sideMenu').classList.toggle('show'); }
 function closeMenu(){ document.getElementById('sideMenu').classList.remove('show'); }
-function goTo(section){ showSection(section); }
 
-// ----------------- LOGIN -----------------
+// ---------------- LOGIN ----------------
 document.getElementById('loginForm').addEventListener('submit',e=>{
   e.preventDefault(); 
   const email=document.getElementById('loginEmail').value; 
@@ -159,17 +145,41 @@ document.getElementById('loginForm').addEventListener('submit',e=>{
       updateGreeting(); 
       renderDashboard(); 
     } else { document.getElementById('loginError').textContent='Invalid email or password'; } 
-  },2000); 
+  },2000);
 });
 
-// ----------------- UTIL FUNCTIONS -----------------
+// ---------------- DASHBOARD ----------------
+function updateGreeting(){
+  const h=new Date().getHours();
+  const greet=h<12?'Good Morning':'Good Evening';
+  document.getElementById('greeting').textContent=`${greet} ${getProfile().name}`;
+  document.getElementById('currentDate').textContent=formatDate();
+}
+function renderDashboard(){
+  const row=document.getElementById('accountsRow'); row.innerHTML=''; 
+  const accounts=getAccounts(); 
+  let total=0; accounts.forEach(a=>total+=a.balance);
+  document.getElementById('availableBalance').textContent=accounts[0].balance.toFixed(2);
+  document.getElementById('currentBalance').textContent=total.toFixed(2);
+  accounts.forEach(a=>{
+    const col=document.createElement('div'); col.className='col-md-6';
+    col.innerHTML=`<div class="card-custom" onclick="internalTransferPage('${a.name}')"><h4>${a.name}</h4><p>Balance: $${a.balance.toFixed(2)}</p><p>${formatDate()}</p></div>`;
+    row.appendChild(col);
+  });
+}
+
+// ---------------- LOGOUT ----------------
+function logout(){ showSection('loginPage'); }
+
+// ---------------- LOADING ----------------
 async function showLoading(seconds=1500){
   showSection('loadingSection');
   return new Promise(resolve=>setTimeout(resolve,seconds));
 }
 
-function performTransaction(tx){
-  const successHTML = `
+// ---------------- SUCCESS RECEIPT ----------------
+function showReceipt(tx){
+  const successHTML=`
     <div class="success-card">
       <h2>Transaction Receipt</h2>
       <div class="receipt-row"><span>Transaction ID:</span><span>${tx.txID}</span></div>
@@ -181,97 +191,18 @@ function performTransaction(tx){
       <div class="receipt-row"><span>To:</span><span>${tx.to||'-'}</span></div>
       <div style="margin-top:20px; font-size:24px; color:green; font-weight:700;">✅ Successful</div>
       <button class="btn btn-primary mt-3" onclick="showSection('mainApp'); renderDashboard();">Back to Dashboard</button>
-    </div>
-  `;
-  document.getElementById('successSection').innerHTML = successHTML;
+    </div>`;
+  document.getElementById('successSection').innerHTML=successHTML;
   showSection('successSection');
 }
 
-// ----------------- TRANSACTIONS -----------------
-async function internalTransfer(accountName){
-  const accounts=getAccounts();
-  const fromAcc=accounts.find(a=>a.name===accountName);
-  const toAcc=accounts.find(a=>a.name!==accountName);
-  const amount=prompt(`Enter amount to transfer from ${fromAcc.name} to ${toAcc.name}:`);
-  const amt=parseFloat(amount);
-  if(isNaN(amt)||amt<=0||amt>fromAcc.balance){ alert('Invalid amount'); return; }
-  const fee=amt*FEE_RATE;
-  fromAcc.balance-=amt+fee;
-  toAcc.balance+=amt;
-  const tx={txID:generateTxID(),type:'Internal Transfer',amount:amt,fee:fee,date:formatDate(),from:fromAcc.name,to:toAcc.name};
-  fromAcc.tx.push(tx); toAcc.tx.push(tx);
-  saveAccounts(accounts);
-  await showLoading();
-  performTransaction(tx);
-}
+// ---------------- MENU NAV ----------------
+function goTo(id){ if(id==='mainApp'){ renderDashboard(); updateGreeting(); } showSection(id); }
 
-async function startSend(){
-  const amount=prompt('Enter amount to send:');
-  const bank=prompt('Enter recipient bank:');
-  const name=prompt('Enter recipient name:');
-  const amt=parseFloat(amount);
-  if(isNaN(amt)||amt<=0){ alert('Invalid amount'); return; }
-  const accounts=getAccounts();
-  if(amt>accounts[0].balance){ alert('Insufficient balance'); return; }
-  const fee=amt*FEE_RATE;
-  accounts[0].balance-=amt+fee;
-  const tx={txID:generateTxID(),type:'Send',amount:amt,fee:fee,date:formatDate(),from:'Checking',to:`${name} - ${bank}`};
-  accounts[0].tx.push(tx); saveAccounts(accounts);
-  await showLoading();
-  performTransaction(tx);
-}
-
-async function startTopup(){
-  const card=prompt(`Choose card:\n${predefinedCards.join('\n')}`);
-  const amount=prompt('Enter top-up amount:');
-  const amt=parseFloat(amount);
-  if(isNaN(amt)||amt<=0){ alert('Invalid amount'); return; }
-  const fee=amt*FEE_RATE;
-  const accounts=getAccounts();
-  accounts[0].balance+=amt-fee;
-  const tx={txID:generateTxID(),type:'Top-up',amount:amt,fee:fee,date:formatDate(),from:card,to:'Checking'};
-  accounts[0].tx.push(tx); saveAccounts(accounts);
-  await showLoading();
-  performTransaction(tx);
-}
-
-async function startWithdraw(){
-  const amount=prompt('Enter withdraw amount:');
-  const amt=parseFloat(amount);
-  if(isNaN(amt)||amt<=0){ alert('Invalid amount'); return; }
-  const fee=amt*FEE_RATE;
-  const accounts=getAccounts();
-  if(amt+fee>accounts[0].balance){ alert('Insufficient balance'); return; }
-  accounts[0].balance-=amt+fee;
-  const tx={txID:generateTxID(),type:'Withdraw',amount:amt,fee:fee,date:formatDate(),from:'Checking',to:'Cash'};
-  accounts[0].tx.push(tx); saveAccounts(accounts);
-  await showLoading();
-  performTransaction(tx);
-}
-
-async function startWire(){
-  const bank=prompt('Enter bank name:');
-  const country=prompt('Enter country:');
-  const accountNumber=prompt('Enter account number:');
-  const code=prompt(country.toLowerCase().includes('america')?'Enter routing number':'Enter SWIFT code');
-  const recipientAddress=prompt('Enter recipient address');
-  const senderAddress=prompt('Enter your address');
-  const amount=prompt('Enter amount:');
-  const amt=parseFloat(amount);
-  if(isNaN(amt)||amt<=0){ alert('Invalid amount'); return; }
-  const fee=amt*FEE_RATE;
-  const accounts=getAccounts();
-  if(amt+fee>accounts[0].balance){ alert('Insufficient balance'); return; }
-  accounts[0].balance-=amt+fee;
-  const tx={txID:generateTxID(),type:'Wire',amount:amt,fee:fee,date:formatDate(),from:'Checking',to:`${bank} - ${accountNumber}`,bankCode:code,recipientAddress,senderAddress};
-  accounts[0].tx.push(tx); saveAccounts(accounts);
-  await showLoading();
-  performTransaction(tx);
-}
-
-// ----------------- PLACEHOLDER SECTIONS -----------------
+// ---------------- PLACEHOLDERS ----------------
 function showCreditScore(){ alert('Credit Score page placeholder'); }
 function showPayBills(){ alert('Pay Bills page placeholder'); }
+
 </script>
 </body>
 </html>
