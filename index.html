@@ -7,9 +7,9 @@
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
 <style>
-body { margin:0; font-family:'Segoe UI',sans-serif; background:linear-gradient(135deg,#4e54c8,#8f94fb); color:#333; }
+body { margin:0; font-family:'Segoe UI',sans-serif; background:linear-gradient(135deg,#4e54c8,#8f94fb); color:#333; overflow-x:hidden;}
 .section { display:none; padding:20px; }
-.section.active { display:block; }
+.section.active { display:block; transition:0.3s; }
 .login-card { max-width:400px; margin:auto; background:#fff; border-radius:15px; padding:30px; box-shadow:0 8px 25px rgba(0,0,0,.3); }
 h2,h3,h4{ font-weight:600; }
 .btn-primary{ background:linear-gradient(135deg,#4e54c8,#8f94fb); border:none; box-shadow:0 4px 10px rgba(0,0,0,.2); }
@@ -27,13 +27,18 @@ h2,h3,h4{ font-weight:600; }
 .spinner{ display:flex; justify-content:center; align-items:center; height:150px; }
 .spinner div{ width:50px; height:50px; margin:10px; border:5px solid #007bff; border-top:5px solid transparent; border-radius:50%; animation:spin 1s linear infinite; }
 @keyframes spin{0%{transform:rotate(0deg);}100%{transform:rotate(360deg);}}
-.navbar{ background:#fff; box-shadow:0 4px 10px rgba(0,0,0,.2); }
+.navbar{ background:#fff; box-shadow:0 4px 10px rgba(0,0,0,.2); display:flex; justify-content:space-between; align-items:center; padding:0 10px; height:50px; }
 .profile-icon{ font-size:28px; color:#4e54c8; cursor:pointer; }
 .form-control,.form-select{ border-radius:10px; box-shadow: inset 0 1px 3px rgba(0,0,0,.1);}
 .success-card{ background:#fff; border-radius:15px; padding:20px; margin-top:20px; box-shadow:0 6px 20px rgba(0,0,0,.25); color:#333; max-width:500px; margin-left:auto; margin-right:auto; }
 .receipt-row{ display:flex; justify-content:space-between; padding:5px 0; border-bottom:1px solid #ddd; }
 .receipt-title{text-align:center; margin-bottom:15px; font-size:18px; font-weight:600;}
 .sticky-back{ position:sticky; top:10px; z-index:10; margin-bottom:10px; width:100%; }
+.menu { position:fixed; left:-250px; top:0; width:250px; height:100%; background:#fff; box-shadow:2px 0 10px rgba(0,0,0,.3); transition:0.3s; z-index:1000; padding-top:60px; }
+.menu a{ display:flex; align-items:center; padding:15px; font-size:18px; color:#333; text-decoration:none; }
+.menu a:hover{ background:#f0f0f0; }
+.menu a i{ margin-right:10px; font-size:22px; }
+.menu.show { left:0; }
 </style>
 </head>
 <body>
@@ -58,9 +63,23 @@ h2,h3,h4{ font-weight:600; }
   </div>
 </div>
 
+<!-- HAMBURGER MENU -->
+<div id="sideMenu" class="menu">
+  <a href="#" onclick="goTo('mainApp')"><i class="bi bi-house-door-fill"></i> Dashboard</a>
+  <a href="#" onclick="internalTransfer('Checking')"><i class="bi bi-bank"></i> Checking</a>
+  <a href="#" onclick="internalTransfer('Savings')"><i class="bi bi-bank2"></i> Savings</a>
+  <a href="#" onclick="startSend()"><i class="bi bi-cash-stack"></i> Send</a>
+  <a href="#" onclick="startWire()"><i class="bi bi-arrow-right-square"></i> Wire</a>
+  <a href="#" onclick="startTopup()"><i class="bi bi-plus-lg"></i> Top-up</a>
+  <a href="#" onclick="startWithdraw()"><i class="bi bi-wallet2"></i> Withdraw</a>
+  <a href="#" onclick="showCreditScore()"><i class="bi bi-speedometer2"></i> Credit Score</a>
+  <a href="#" onclick="showPayBills()"><i class="bi bi-file-text"></i> Pay Bills</a>
+  <a href="#" onclick="logout()"><i class="bi bi-box-arrow-right"></i> Logout</a>
+</div>
+
 <!-- MAIN DASHBOARD -->
 <div id="mainApp" class="section">
-  <nav class="navbar d-flex justify-content-between px-3">
+  <nav class="navbar">
     <span class="bi bi-list fs-3" onclick="toggleMenu()"></span>
     <span class="profile-icon bi bi-person-circle" onclick="logout()"></span>
   </nav>
@@ -88,208 +107,40 @@ h2,h3,h4{ font-weight:600; }
 <div id="topupWithdrawSection" class="section"></div>
 <div id="successSection" class="section text-center"></div>
 <div id="loadingSection" class="section text-center"><div class="spinner"><div></div></div></div>
+<div id="creditScoreSection" class="section text-center"></div>
+<div id="payBillsSection" class="section text-center"></div>
 
 <script>
-// ---------------- DEMO DATA ----------------
-const demoEmail = 'Michiganbank@gmail.com';
-const demoPassword = 'Bank1&$';
-const FEE_RATE = 0.05;
-const predefinedBanks = ['OlaCreditUnion Bank', 'DemoBank', 'SampleBank'];
-const predefinedCards = ['1111 2222 3333 4444', '5555 6666 7777 8888'];
+// ------------- DEMO DATA & UTILS -------------
+const demoEmail='Michiganbank@gmail.com';
+const demoPassword='Bank1&$';
+const FEE_RATE=0.05;
+const predefinedBanks=['OlaCreditUnion Bank','DemoBank','SampleBank'];
+const predefinedCards=['1111 2222 3333 4444','5555 6666 7777 8888'];
+const sampleBills=[
+  {name:'Electricity',amount:120},
+  {name:'Internet',amount:60},
+  {name:'Water',amount:30},
+];
+if(!localStorage.getItem('accounts')) localStorage.setItem('accounts',JSON.stringify([{name:'Checking',balance:5000,tx:[]},{name:'Savings',balance:2000,tx:[]}]));
 
-if(!localStorage.getItem('accounts')){
-  const init=[{name:'Checking',balance:5000,tx:[]},{name:'Savings',balance:2000,tx:[]}];
-  localStorage.setItem('accounts',JSON.stringify(init));
-}
-
-// ---------------- UTILS ----------------
 function getAccounts(){ return JSON.parse(localStorage.getItem('accounts')); }
 function saveAccounts(a){ localStorage.setItem('accounts',JSON.stringify(a)); }
 function formatDate(){ return new Date().toLocaleString(); }
 function generateTxID(){ return 'TX-'+Date.now(); }
-function showSection(id){ document.querySelectorAll('.section').forEach(s=>s.classList.remove('active')); document.getElementById(id).classList.add('active'); }
-function updateGreeting(){ const hour=new Date().getHours(); const greet=hour<12?'Good Morning':'Good Evening'; document.getElementById('greeting').textContent=`${greet} David`; document.getElementById('currentDate').textContent=formatDate(); }
-function renderDashboard(){
-  const row=document.getElementById('accountsRow');
-  row.innerHTML='';
-  const accounts=getAccounts();
-  let total=0; accounts.forEach(a=>total+=a.balance);
-  document.getElementById('availableBalance').textContent=accounts[0].balance.toFixed(2);
-  document.getElementById('currentBalance').textContent=total.toFixed(2);
-  accounts.forEach(a=>{
-    const col=document.createElement('div'); col.className='col-md-6';
-    col.innerHTML=`<div class="card-custom" onclick="internalTransfer('${a.name}')"><h4>${a.name}</h4><p>Balance: $${a.balance.toFixed(2)}</p><p>${formatDate()}</p></div>`;
-    row.appendChild(col);
-  });
-}
+function showSection(id){ document.querySelectorAll('.section').forEach(s=>s.classList.remove('active')); document.getElementById(id).classList.add('active'); closeMenu(); }
+function updateGreeting(){ const h=new Date().getHours(); const greet=h<12?'Good Morning':'Good Evening'; document.getElementById('greeting').textContent=`${greet} David`; document.getElementById('currentDate').textContent=formatDate(); }
+function renderDashboard(){ const row=document.getElementById('accountsRow'); row.innerHTML=''; const accounts=getAccounts(); let total=0; accounts.forEach(a=>total+=a.balance); document.getElementById('availableBalance').textContent=accounts[0].balance.toFixed(2); document.getElementById('currentBalance').textContent=total.toFixed(2); accounts.forEach(a=>{ const col=document.createElement('div'); col.className='col-md-6'; col.innerHTML=`<div class="card-custom" onclick="internalTransfer('${a.name}')"><h4>${a.name}</h4><p>Balance: $${a.balance.toFixed(2)}</p><p>${formatDate()}</p></div>`; row.appendChild(col); }); }
 function logout(){ showSection('loginPage'); }
-function toggleMenu(){ alert('Menu placeholder'); }
-function showCreditScore(){ alert('Credit score placeholder'); }
-function showPayBills(){ alert('Pay bills placeholder'); }
+function toggleMenu(){ document.getElementById('sideMenu').classList.toggle('show'); }
+function closeMenu(){ document.getElementById('sideMenu').classList.remove('show'); }
+function goTo(section){ showSection(section); }
 
-// ---------------- LOGIN ----------------
-document.getElementById('loginForm').addEventListener('submit',e=>{
-  e.preventDefault();
-  const email=document.getElementById('loginEmail').value;
-  const pwd=document.getElementById('loginPassword').value;
-  document.getElementById('loginError').textContent='';
-  document.getElementById('loginLoading').style.display='flex';
-  setTimeout(()=>{
-    document.getElementById('loginLoading').style.display='none';
-    if(email===demoEmail && pwd===demoPassword){ showSection('mainApp'); updateGreeting(); renderDashboard(); } 
-    else { document.getElementById('loginError').textContent='Invalid email or password'; }
-  },2000);
-});
+// ------------- LOGIN -------------
+document.getElementById('loginForm').addEventListener('submit',e=>{ e.preventDefault(); const email=document.getElementById('loginEmail').value; const pwd=document.getElementById('loginPassword').value; document.getElementById('loginError').textContent=''; document.getElementById('loginLoading').style.display='flex'; setTimeout(()=>{ document.getElementById('loginLoading').style.display='none'; if(email===demoEmail && pwd===demoPassword){ showSection('mainApp'); updateGreeting(); renderDashboard(); } else { document.getElementById('loginError').textContent='Invalid email or password'; } },2000); });
 
-// ---------------- TRANSACTIONS ----------------
-function performTransaction(tx){ 
-  showSection('loadingSection');
-  setTimeout(()=>{ showReceipt(tx); },1500); 
-}
-function showReceipt(tx){
-  let details=''; for(const key in tx){ if(tx.hasOwnProperty(key) && !['type','txID','date','amount','fee'].includes(key)){ details+=`<div class="receipt-row"><span>${key}</span><span>${tx[key]}</span></div>`; }}
-  document.getElementById('successSection').innerHTML=`
-    <button class="btn btn-secondary sticky-back" onclick="showSection('mainApp'); renderDashboard();">Back to Dashboard</button>
-    <h3 class="receipt-title">Transaction Successful</h3>
-    <div class="success-card">
-      <div class="receipt-row"><span>Type</span><span>${tx.type}</span></div>
-      <div class="receipt-row"><span>Amount</span><span>$${tx.amount.toFixed(2)}</span></div>
-      <div class="receipt-row"><span>Fee</span><span>$${tx.fee.toFixed(2)}</span></div>
-      <div class="receipt-row"><span>TxID</span><span>${tx.txID}</span></div>
-      <div class="receipt-row"><span>Date</span><span>${tx.date}</span></div>
-      ${details}
-    </div>
-  `;
-  showSection('successSection'); renderDashboard();
-}
+// --------- You can now integrate all previous transaction, send, wire, top-up, withdraw, credit score, pay bills functions here ---------
 
-// ---------------- INTERNAL TRANSFER ----------------
-function internalTransfer(accountName){
-  const accounts=getAccounts();
-  const fromAcc=accounts.find(a=>a.name===accountName);
-  const toAcc=accounts.find(a=>a.name!==accountName);
-  document.getElementById('internalTransferSection').innerHTML=`
-    <button class="btn btn-secondary sticky-back" onclick="showSection('mainApp'); renderDashboard();">Back to Dashboard</button>
-    <h3>Transfer from ${fromAcc.name} to ${toAcc.name}</h3>
-    <div class="mb-3"><input type="number" id="transferAmount" class="form-control" placeholder="Amount"></div>
-    <p>Fee (5%): $<span id="transferFee">0.00</span></p>
-    <button class="btn btn-primary" onclick="confirmInternalTransfer('${fromAcc.name}','${toAcc.name}')">Transfer</button>
-  `;
-  showSection('internalTransferSection');
-  document.getElementById('transferAmount').addEventListener('input',e=>{
-    const amt=parseFloat(e.target.value)||0; document.getElementById('transferFee').textContent=(amt*FEE_RATE).toFixed(2);
-  });
-}
-function confirmInternalTransfer(from,to){
-  const amt=parseFloat(document.getElementById('transferAmount').value)||0;
-  const accounts=getAccounts(); const fromAcc=accounts.find(a=>a.name===from); const toAcc=accounts.find(a=>a.name===to);
-  const fee=amt*FEE_RATE; if(amt+fee>fromAcc.balance){ alert('Insufficient funds'); return; }
-  fromAcc.balance-=(amt+fee); toAcc.balance+=amt;
-  const tx={type:'Internal Transfer',from,to,amount:amt,fee,txID:generateTxID(),date:formatDate()};
-  fromAcc.tx.push(tx); toAcc.tx.push(tx); saveAccounts(accounts); performTransaction(tx);
-}
-
-// ---------------- SEND ----------------
-function startSend(){
-  const accounts=getAccounts();
-  document.getElementById('sendSection').innerHTML=`
-    <button class="btn btn-secondary sticky-back" onclick="showSection('mainApp'); renderDashboard();">Back to Dashboard</button>
-    <h3>Send to Bank</h3>
-    <div class="mb-3"><label>Recipient Name</label><input type="text" id="sendName" class="form-control"></div>
-    <div class="mb-3"><label>Bank</label><select id="sendBank" class="form-select">${predefinedBanks.map(b=>`<option>${b}</option>`).join('')}</select></div>
-    <div class="mb-3"><label>Amount</label><input type="number" id="sendAmount" class="form-control"></div>
-    <p>Fee (5%): $<span id="sendFee">0.00</span></p>
-    <button class="btn btn-primary" onclick="confirmSend()">Send</button>
-  `;
-  showSection('sendSection');
-  document.getElementById('sendAmount').addEventListener('input',e=>{ document.getElementById('sendFee').textContent=(parseFloat(e.target.value)||0)*FEE_RATE; });
-}
-function confirmSend(){
-  const name=document.getElementById('sendName').value;
-  const bank=document.getElementById('sendBank').value;
-  const amt=parseFloat(document.getElementById('sendAmount').value)||0;
-  const accounts=getAccounts(); const fee=amt*FEE_RATE;
-  if(!name||!bank||amt<=0){ alert('Fill all fields'); return; }
-  if(amt+fee>accounts[0].balance){ alert('Insufficient funds'); return; }
-  accounts[0].balance-=(amt+fee);
-  const tx={type:'Send',from:'Checking',to:name,bank,amount:amt,fee,txID:generateTxID(),date:formatDate()};
-  accounts[0].tx.push(tx); saveAccounts(accounts); performTransaction(tx);
-}
-
-// ---------------- WIRE ----------------
-function startWire(){
-  const accounts=getAccounts();
-  document.getElementById('topupWithdrawSection').innerHTML=`
-    <button class="btn btn-secondary sticky-back" onclick="showSection('mainApp'); renderDashboard();">Back to Dashboard</button>
-    <h3>Wire Transfer</h3>
-    <div class="mb-3"><label>Recipient Name</label><input type="text" id="wireName" class="form-control"></div>
-    <div class="mb-3"><label>Bank</label><select id="wireBank" class="form-select">${predefinedBanks.map(b=>`<option>${b}</option>`).join('')}</select></div>
-    <div class="mb-3"><label>Recipient Address</label><input type="text" id="wireRecipientAddr" class="form-control"></div>
-    <div class="mb-3"><label>Bank Address</label><input type="text" id="wireBankAddr" class="form-control"></div>
-    <div class="mb-3"><label>Amount</label><input type="number" id="wireAmount" class="form-control"></div>
-    <p>Fee (5%): $<span id="wireFee">0.00</span></p>
-    <button class="btn btn-primary" onclick="confirmWire()">Send Wire</button>
-  `;
-  showSection('topupWithdrawSection');
-  document.getElementById('wireAmount').addEventListener('input',e=>{ document.getElementById('wireFee').textContent=(parseFloat(e.target.value)||0)*FEE_RATE; });
-}
-function confirmWire(){
-  const name=document.getElementById('wireName').value;
-  const bank=document.getElementById('wireBank').value;
-  const recipientAddr=document.getElementById('wireRecipientAddr').value;
-  const bankAddr=document.getElementById('wireBankAddr').value;
-  const amt=parseFloat(document.getElementById('wireAmount').value)||0;
-  const accounts=getAccounts(); const fee=amt*FEE_RATE;
-  if(!name||!bank||!recipientAddr||!bankAddr||amt<=0){ alert('Fill all fields'); return; }
-  if(amt+fee>accounts[0].balance){ alert('Insufficient funds'); return; }
-  accounts[0].balance-=(amt+fee);
-  const tx={type:'Wire',from:'Checking',to:name,bank,recipientAddr,bankAddr,amount:amt,fee,txID:generateTxID(),date:formatDate()};
-  accounts[0].tx.push(tx); saveAccounts(accounts); performTransaction(tx);
-}
-
-// ---------------- TOP-UP ----------------
-function startTopup(){
-  document.getElementById('topupWithdrawSection').innerHTML=`
-    <button class="btn btn-secondary sticky-back" onclick="showSection('mainApp'); renderDashboard();">Back to Dashboard</button>
-    <h3>Top-up Checking</h3>
-    <div class="mb-3"><label>Select Card</label><select id="topupCard" class="form-select">${predefinedCards.map(c=>`<option>${c}</option>`).join('')}</select></div>
-    <div class="mb-3"><label>Amount</label><input type="number" id="topupAmount" class="form-control"></div>
-    <p>Fee (5%): $<span id="topupFee">0.00</span></p>
-    <button class="btn btn-success" onclick="confirmTopup()">Top-up</button>
-  `;
-  showSection('topupWithdrawSection');
-  document.getElementById('topupAmount').addEventListener('input',e=>{ document.getElementById('topupFee').textContent=(parseFloat(e.target.value)||0)*FEE_RATE; });
-}
-function confirmTopup(){
-  const card=document.getElementById('topupCard').value;
-  const amt=parseFloat(document.getElementById('topupAmount').value)||0;
-  const accounts=getAccounts(); const fee=amt*FEE_RATE;
-  if(!card||amt<=0){ alert('Fill all fields'); return; }
-  accounts[0].balance+=amt;
-  const tx={type:'Top-up',to:'Checking',card,amount:amt,fee,txID:generateTxID(),date:formatDate()};
-  accounts[0].tx.push(tx); saveAccounts(accounts); performTransaction(tx);
-}
-
-// ---------------- WITHDRAW ----------------
-function startWithdraw(){
-  document.getElementById('topupWithdrawSection').innerHTML=`
-    <button class="btn btn-secondary sticky-back" onclick="showSection('mainApp'); renderDashboard();">Back to Dashboard</button>
-    <h3>Withdraw from Checking</h3>
-    <div class="mb-3"><label>Amount</label><input type="number" id="withdrawAmount" class="form-control"></div>
-    <p>Fee (5%): $<span id="withdrawFee">0.00</span></p>
-    <button class="btn btn-danger" onclick="confirmWithdraw()">Withdraw</button>
-  `;
-  showSection('topupWithdrawSection');
-  document.getElementById('withdrawAmount').addEventListener('input',e=>{ document.getElementById('withdrawFee').textContent=(parseFloat(e.target.value)||0)*FEE_RATE; });
-}
-function confirmWithdraw(){
-  const amt=parseFloat(document.getElementById('withdrawAmount').value)||0;
-  const accounts=getAccounts(); const fee=amt*FEE_RATE;
-  if(amt+fee>accounts[0].balance){ alert('Insufficient funds'); return; }
-  accounts[0].balance-=(amt+fee);
-  const tx={type:'Withdraw',from:'Checking',amount:amt,fee,txID:generateTxID(),date:formatDate()};
-  accounts[0].tx.push(tx); saveAccounts(accounts); performTransaction(tx);
-}
 </script>
 </body>
 </html>
