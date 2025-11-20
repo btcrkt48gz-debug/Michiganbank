@@ -1,406 +1,288 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>OlaCreditUnion Demo Bank</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <style>
-    :root {
-      --accent-1: #4e54c8;
-      --accent-2: #8f94fb;
-      --accent-3: #667eea;
-      --accent-4: #764ba2;
-    }
-    html, body { height: 100%; margin: 0; font-family: Inter, Arial, sans-serif; }
-    body { background: linear-gradient(135deg, var(--accent-1), var(--accent-2)); color: #222; -webkit-font-smoothing: antialiased; }
-    .section { display: none; padding: 18px 18px 90px; }
-    .section.active { display: block; }
-    .login-card { max-width: 420px; margin: 64px auto; background: #fff; border-radius: 14px; padding: 28px; box-shadow: 0 18px 50px rgba(0,0,0,.25); }
-    .btn-primary { background: linear-gradient(135deg, var(--accent-1), var(--accent-2)); border: 0; color: #fff; box-shadow: 0 8px 30px rgba(0,0,0,.18); border-radius: 10px; padding: 10px 14px; }
-    .btn-success { background: linear-gradient(135deg, #43e97b, #38f9d7); border: 0; color: #fff; border-radius: 10px; padding: 10px 14px; }
-    .btn-danger { background: linear-gradient(135deg, #f5576c, #f093fb); border: 0; color: #fff; border-radius: 10px; padding: 10px 14px; }
-    .navbar { height: 58px; background: #fff; border-radius: 8px; display: flex; align-items: center; justify-content: space-between; padding: 0 12px; box-shadow: 0 6px 18px rgba(0,0,0,.12); }
-    .icon { font-size: 22px; color: var(--accent-4); cursor: pointer; }
-    .profile-icon { font-size: 26px; color: var(--accent-4); cursor: pointer; }
-    .balance-card { background: linear-gradient(135deg, var(--accent-3), var(--accent-4)); color: #fff; border-radius: 14px; padding: 18px; margin: 14px 0; box-shadow: 0 12px 40px rgba(0,0,0,.22); text-align: center; }
-    .card-custom { background: #fff; border-radius: 12px; padding: 14px; box-shadow: 0 8px 28px rgba(0,0,0,.12); cursor: pointer; margin: 8px; }
-    .bottom-nav { position: fixed; left: 0; right: 0; bottom: 14px; margin: auto; display: flex; gap: 18px; justify-content: center; pointer-events: auto; }
-    .bottom-nav button { width: 64px; height: 64px; border-radius: 32px; border: 0; box-shadow: 0 10px 30px rgba(0,0,0,.18); display: flex; align-items: center; justify-content: center; font-size: 20px; cursor: pointer; background: #fff; }
-    input, select, textarea { border-radius: 10px; padding: 10px; border: 1px solid #e6e6e6; box-shadow: inset 0 1px 2px rgba(0,0,0,.03); width: 100%; }
-    label { font-weight: 600; font-size: 14px; color: #333; }
-    .link-like { color: var(--accent-4); cursor: pointer; }
-    .small-muted { font-size: 13px; color: #666; }
-    canvas { width: 100% !important; height: 200px !important; }
-    .trans-list { max-height: 200px; overflow-y: auto; background: #fff; padding: 10px; border-radius: 8px; margin-top: 10px; }
-    .trans-item { border-bottom: 1px solid #eee; padding: 6px 0; font-size: 14px; }
-  </style>
+<meta charset="UTF-8">
+<title>Michigan Bank Demo</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+<style>
+body{font-family:'Segoe UI',sans-serif;background:#f4f6f8;margin:0;}
+.navbar-brand{font-weight:bold;}
+.section{display:none; padding:20px;}
+.section.active{display:block;}
+.card:hover{cursor:pointer; transform:scale(1.02); transition:0.2s;}
+.account-card{background:#fff; border-radius:10px; padding:20px; margin:10px; box-shadow:0 4px 6px rgba(0,0,0,0.1);}
+.action-btn{margin:5px;}
+.success-banner{background:#d4edda;color:#155724;padding:15px;margin:15px 0;border-radius:5px;border:1px solid #c3e6cb;}
+.spinner{display:flex;justify-content:center;align-items:center;height:150px;}
+.spinner div{width:50px;height:50px;margin:10px;border:5px solid #007bff;border-top:5px solid transparent;border-radius:50%;animation:spin 1s linear infinite;}
+@keyframes spin{0%{transform:rotate(0deg);}100%{transform:rotate(360deg);}}
+</style>
 </head>
 <body>
 
-  <!-- LOGIN -->
-  <div id="loginSection" class="section active">
-    <div class="login-card text-center">
-      <h3 class="mb-3" style="font-weight:700;">OlaCreditUnion</h3>
-      <p class="small-muted mb-4">Secure Login</p>
-      <input type="email" id="loginEmail" placeholder="Email" class="mb-3">
-      <input type="password" id="loginPassword" placeholder="Password" class="mb-3">
-      <button class="btn btn-primary w-100" id="loginBtn">Login</button>
-      <div id="loginError" class="text-danger mt-3" style="display:none;">Invalid email or password</div>
-    </div>
+<!-- Navbar / Hamburger -->
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+<div class="container-fluid">
+  <a class="navbar-brand" href="#">Michigan Bank</a>
+  <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menuNav">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div class="collapse navbar-collapse" id="menuNav">
+    <ul class="navbar-nav ms-auto">
+      <li class="nav-item"><a class="nav-link" href="#" onclick="showSection('dashboard')">Dashboard</a></li>
+      <li class="nav-item"><a class="nav-link" href="#" onclick="showSection('checkingTransactions')">Checking</a></li>
+      <li class="nav-item"><a class="nav-link" href="#" onclick="showSection('savingsTransactions')">Savings</a></li>
+      <li class="nav-item"><a class="nav-link" href="#" onclick="logout()">Logout</a></li>
+    </ul>
   </div>
+</div>
+</nav>
 
-  <!-- DASHBOARD -->
-  <div id="dashboardSection" class="section">
-    <div class="navbar mb-3">
-      <i class="bi bi-list icon" id="menuToggle"></i>
-      <i class="bi bi-person-circle profile-icon" id="openProfile"></i>
-    </div>
-    <div class="balance-card">
-      <div id="greeting" style="font-size:18px;font-weight:600;"></div>
-      <div class="small-muted" id="liveTime"></div>
-      <h2 id="overallBalance" style="margin-top:15px;font-weight:700;"></h2>
-      <div class="small-muted">Overall Balance</div>
-    </div>
-    <h5 style="font-weight:700;margin-top:18px;">Accounts</h5>
-    <div class="card-custom" id="checkingCard"><h5>Checking</h5><p id="checkingBalance"></p></div>
-    <div class="card-custom" id="savingsCard"><h5>Savings</h5><p id="savingsBalance"></p></div>
+<!-- Login Page -->
+<div id="loginPage" class="section active">
+<h2 class="text-center mt-5">Welcome to Michigan Bank</h2>
+<div class="row justify-content-center mt-4">
+<div class="col-md-4">
+<form id="loginForm">
+<div class="mb-3"><label>Email</label><input type="email" id="loginEmail" class="form-control" required></div>
+<div class="mb-3"><label>Password</label><input type="password" id="loginPassword" class="form-control" required></div>
+<button type="submit" class="btn btn-primary w-100">Login</button>
+</form>
+<div id="loginError" class="text-danger mt-2"></div>
+<div id="loginLoading" class="spinner" style="display:none;"><div></div></div>
+</div>
+</div>
+</div>
 
-    <h5 style="font-weight:700;margin-top:18px;">Options</h5>
-    <div class="card-custom" id="cardsBtn"><h5><i class="bi bi-credit-card"></i> Cards</h5></div>
-    <div class="card-custom" id="payBillsBtn"><h5><i class="bi bi-receipt"></i> Pay Bills</h5></div>
-    <div class="card-custom" id="cryptoBtn"><h5><i class="bi bi-currency-bitcoin"></i> Crypto</h5></div>
+<!-- Dashboard -->
+<div id="dashboard" class="section">
+<h2 id="greeting"></h2>
+<p id="currentDate"></p>
+<div class="row" id="accountsRow"></div>
+</div>
 
-    <h5 style="font-weight:700;margin-top:18px;">Transactions (Checking)</h5>
-    <div id="checkingTransList" class="trans-list"></div>
+<!-- Checking Transactions -->
+<div id="checkingTransactions" class="section">
+<h3>Checking Account Transactions</h3>
+<p>Balance: $<span id="checkingBalance"></span></p>
+<button class="btn btn-primary action-btn" onclick="goToTransfer('Checking')"><i class="bi bi-arrow-left-right"></i> Transfer</button>
+<button class="btn btn-warning action-btn" onclick="goToWithdraw('Checking')"><i class="bi bi-wallet2"></i> Withdraw</button>
+<button class="btn btn-info action-btn" onclick="goToWire('Checking')"><i class="bi bi-bank"></i> Wire</button>
+<table class="table table-striped mt-3">
+<thead><tr><th>ID</th><th>Type</th><th>To</th><th>Amount</th><th>Date</th></tr></thead>
+<tbody id="checkingTx"></tbody>
+</table>
+</div>
 
-    <h5 style="font-weight:700;margin-top:18px;">Transactions (Savings)</h5>
-    <div id="savingsTransList" class="trans-list"></div>
-  </div>
+<!-- Savings Transactions -->
+<div id="savingsTransactions" class="section">
+<h3>Savings Account Transactions</h3>
+<p>Balance: $<span id="savingsBalance"></span></p>
+<button class="btn btn-primary action-btn" onclick="goToTransfer('Savings')"><i class="bi bi-arrow-left-right"></i> Transfer</button>
+<button class="btn btn-warning action-btn" onclick="goToWithdraw('Savings')"><i class="bi bi-wallet2"></i> Withdraw</button>
+<button class="btn btn-info action-btn" onclick="goToWire('Savings')"><i class="bi bi-bank"></i> Wire</button>
+<table class="table table-striped mt-3">
+<thead><tr><th>ID</th><th>Type</th><th>To</th><th>Amount</th><th>Date</th></tr></thead>
+<tbody id="savingsTx"></tbody>
+</table>
+</div>
 
-  <!-- CARDS SECTION -->
-  <div id="cardsSection" class="section">
-    <h3>Your Cards</h3>
-    <div id="userCardsList"></div>
-    <button class="btn btn-primary w-100 mt-3" id="addCardBtnPage">+ Add Card</button>
-    <div class="mt-4 text-center"><span class="link-like" id="cardsBack">← Back to Dashboard</span></div>
-  </div>
+<!-- Transfer Page -->
+<div id="transferPage" class="section">
+<h3>Transfer from <span id="transferFromAccount"></span></h3>
+<form id="transferForm">
+<div class="mb-3"><label>To Account</label>
+<select id="transferToAccount" class="form-select"></select></div>
+<div class="mb-3"><label>Amount</label><input type="number" id="transferAmount" class="form-control" required></div>
+<button type="submit" class="btn btn-success">Continue</button>
+</form>
+</div>
 
-  <!-- ADD CARD -->
-  <div id="addCardSection" class="section">
-    <h3>Add Card</h3>
-    <label>Card Number</label><input type="text" id="newCardNumber" placeholder="XXXX XXXX XXXX XXXX">
-    <label class="mt-2">Expiry</label><input type="text" id="newCardExpiry" placeholder="MM/YY">
-    <label class="mt-2">CVV</label><input type="text" id="newCardCVV" placeholder="XXX">
-    <button class="btn btn-success w-100 mt-3" id="confirmAddCard">Confirm</button>
-    <div class="mt-4 text-center"><span class="link-like" id="addCardBack">← Back to Cards</span></div>
-  </div>
+<!-- Withdraw Page -->
+<div id="withdrawPage" class="section">
+<h3>Withdraw from <span id="withdrawFromAccount"></span></h3>
+<form id="withdrawForm">
+<div class="mb-3"><label>Amount</label><input type="number" id="withdrawAmount" class="form-control" required></div>
+<button type="submit" class="btn btn-warning">Continue</button>
+</form>
+</div>
 
-  <!-- PAY BILLS -->
-  <div id="payBillsSection" class="section text-center">
-    <h3>Pay Bills</h3>
-    <div class="card-custom billBtn" data-bill="Water Bill">Water Bill</div>
-    <div class="card-custom billBtn" data-bill="Electricity Bill">Electricity Bill</div>
-    <div class="card-custom billBtn" data-bill="Internet Bill">Internet Bill</div>
-    <div class="mt-4 text-center"><span class="link-like" id="payBillsBack">← Back to Dashboard</span></div>
-  </div>
+<!-- Wire Page -->
+<div id="wirePage" class="section">
+<h3>Wire Transfer from <span id="wireFromAccount"></span></h3>
+<form id="wireForm">
+<div class="mb-3"><label>Bank / To</label><input type="text" id="wireTo" class="form-control" required></div>
+<div class="mb-3"><label>Amount</label><input type="number" id="wireAmount" class="form-control" required></div>
+<button type="submit" class="btn btn-info">Continue</button>
+</form>
+</div>
 
-  <!-- BILL PAYMENT -->
-  <div id="billPaySection" class="section">
-    <h3 id="billTitle"></h3>
-    <label>Account / Customer ID</label><input type="text" id="billAccount">
-    <label class="mt-2">Amount</label><input type="number" id="billAmount" placeholder="0.00">
-    <button class="btn btn-success w-100 mt-3" id="payBillBtn">Pay Bill</button>
-    <div class="mt-4 text-center"><span class="link-like" id="billBack">← Back</span></div>
-  </div>
+<!-- Success Page -->
+<div id="successPage" class="section text-center">
+<h3>Transaction Successful!</h3>
+<div id="successDetails" class="card p-3 mt-3"></div>
+<button class="btn btn-primary mt-3" onclick="showSection('dashboard')">Back to Dashboard</button>
+</div>
 
-  <!-- CRYPTO LIST -->
-  <div id="cryptoSection" class="section text-center">
-    <h3 style="font-weight:700;">Crypto Dashboard</h3>
-    <div id="cryptoList" class="mt-3"></div>
-    <div class="mt-4 text-center"><span class="link-like" id="cryptoBack">← Back</span></div>
-  </div>
-
-  <!-- CRYPTO DETAIL -->
-  <div id="cryptoDetailSection" class="section text-center">
-    <h3 id="cryptoTitle"></h3>
-    <canvas id="cryptoChart" width="300" height="150"></canvas>
-    <div class="mt-2">
-      <div>Price: <span id="cryptoPrice"></span></div>
-      <div>Change (24h): <span id="cryptoChange"></span></div>
-    </div>
-    <div class="mt-3" style="display:flex; gap:10px; justify-content:center;">
-      <button class="btn btn-success" id="cryptoBuyBtn">Buy</button>
-      <button class="btn btn-danger" id="cryptoSellBtn">Sell</button>
-    </div>
-    <div class="mt-4"><span class="link-like" id="cryptoDetailBack">← Back to List</span></div>
-  </div>
-
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-  // ========== STATE ==========
-  const LOGIN_EMAIL = "Michiganbank@gmail.com";
-  const LOGIN_PASSWORD = "Bank1&$";
-  let checkingBalance = 5000;
-  let savingsBalance = 3000;
-  // Transaction history (arrays)
-  let checkingTransactions = JSON.parse(localStorage.getItem("checkingTx") || "[]");
-  let savingsTransactions = JSON.parse(localStorage.getItem("savingsTx") || "[]");
+// Hardcoded login
+const demoEmail='Michiganbank@gmail.com';
+const demoPassword='Bank1&$';
 
-  // Crypto config
-  const cryptos = [
-    { id: "bitcoin", name: "Bitcoin", symbol: "BTC", price: 0, change24h: 0, history: [], balance: 0 },
-    { id: "ethereum", name: "Ethereum", symbol: "ETH", price: 0, change24h: 0, history: [], balance: 0 },
-    { id: "litecoin", name: "Litecoin", symbol: "LTC", price: 0, change24h: 0, history: [], balance: 0 },
+// LocalStorage setup
+if(!localStorage.getItem('accounts')){
+  const initAccounts=[
+    {name:'Checking', balance:5000, tx:[]},
+    {name:'Savings', balance:2000, tx:[]}
   ];
-  let selectedCrypto = null;
-  let cryptoChart = null;
+  localStorage.setItem('accounts',JSON.stringify(initAccounts));
+}
 
-  // ========== HELPERS ==========
-  function showSection(id) {
-    document.querySelectorAll(".section").forEach(s => s.classList.remove("active"));
-    document.getElementById(id).classList.add("active");
-  }
+// Utilities
+function getAccounts(){ return JSON.parse(localStorage.getItem('accounts')); }
+function saveAccounts(accts){ localStorage.setItem('accounts',JSON.stringify(accts)); }
+function formatDate(){ const d=new Date(); return d.toLocaleString(); }
+function showSection(id){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  if(id==='dashboard'){ renderDashboard(); }
+  if(id==='checkingTransactions'){ renderAccountTx('Checking'); }
+  if(id==='savingsTransactions'){ renderAccountTx('Savings'); }
+}
 
-  function updateBalances() {
-    document.getElementById("checkingBalance").innerText = "$" + checkingBalance.toFixed(2);
-    document.getElementById("savingsBalance").innerText = "$" + savingsBalance.toFixed(2);
-    document.getElementById("overallBalance").innerText = "$" + (checkingBalance + savingsBalance).toFixed(2);
-  }
+// Login
+document.getElementById('loginForm').addEventListener('submit',e=>{
+  e.preventDefault();
+  const email=document.getElementById('loginEmail').value;
+  const pwd=document.getElementById('loginPassword').value;
+  document.getElementById('loginError').textContent='';
+  document.getElementById('loginLoading').style.display='flex';
+  setTimeout(()=>{
+    document.getElementById('loginLoading').style.display='none';
+    if(email===demoEmail && pwd===demoPassword){ showSection('dashboard'); updateGreeting(); }
+    else{ document.getElementById('loginError').textContent='Invalid email or password'; }
+  },2000);
+});
 
-  function setGreeting() {
-    const h = new Date().getHours();
-    let g = "Hello";
-    if (h < 12) g = "Good Morning";
-    else if (h < 18) g = "Good Afternoon";
-    else g = "Good Evening";
-    document.getElementById("greeting").innerText = g + " David";
-    document.getElementById("liveTime").innerText = new Date().toLocaleTimeString();
-  }
+function updateGreeting(){
+  const hour=new Date().getHours();
+  const greeting=hour<12?'Good Morning':'Good Evening';
+  document.getElementById('greeting').textContent=`${greeting} David`;
+  document.getElementById('currentDate').textContent=`${formatDate()}`;
+}
 
-  function saveTransactions() {
-    localStorage.setItem("checkingTx", JSON.stringify(checkingTransactions));
-    localStorage.setItem("savingsTx", JSON.stringify(savingsTransactions));
-  }
-
-  function renderTransactions() {
-    const chkList = document.getElementById("checkingTransList");
-    chkList.innerHTML = "";
-    checkingTransactions.forEach(tx => {
-      const div = document.createElement("div");
-      div.className = "trans-item";
-      div.innerText = `${tx.date} — ${tx.type}: $${tx.amount.toFixed(2)}`;
-      chkList.appendChild(div);
-    });
-    const savList = document.getElementById("savingsTransList");
-    savList.innerHTML = "";
-    savingsTransactions.forEach(tx => {
-      const div = document.createElement("div");
-      div.className = "trans-item";
-      div.innerText = `${tx.date} — ${tx.type}: $${tx.amount.toFixed(2)}`;
-      savList.appendChild(div);
-    });
-  }
-
-  function addTransaction(account, type, amount) {
-    const tx = { type, amount, date: new Date().toLocaleString() };
-    if(account === "checking") {
-      checkingTransactions.unshift(tx);
-    } else {
-      savingsTransactions.unshift(tx);
-    }
-    saveTransactions();
-    renderTransactions();
-  }
-
-  // ========== LOGIN ==========
-  const loginBtn = document.getElementById("loginBtn");
-  const loginEmail = document.getElementById("loginEmail");
-  const loginPassword = document.getElementById("loginPassword");
-  const loginError = document.getElementById("loginError");
-
-  loginBtn.addEventListener("click", () => {
-    if (loginEmail.value === LOGIN_EMAIL && loginPassword.value === LOGIN_PASSWORD) {
-      loginError.style.display = "none";
-      showSection("dashboardSection");
-      initDashboard();
-      fetchCryptoPrices();
-      setInterval(fetchCryptoPrices, 30000);
-    } else {
-      loginError.style.display = "block";
-    }
+// Dashboard render
+function renderDashboard(){
+  const row=document.getElementById('accountsRow'); row.innerHTML='';
+  const accounts=getAccounts();
+  accounts.forEach(a=>{
+    const col=document.createElement('div'); col.className='col-md-6';
+    col.innerHTML=`<div class="account-card" onclick="showSection('${a.name==='Checking'?'checkingTransactions':'savingsTransactions'}')">
+      <h4>${a.name}</h4>
+      <p>Balance: $${a.balance.toFixed(2)}</p>
+      <p>${formatDate()}</p>
+      </div>`;
+    row.appendChild(col);
   });
+}
 
-  // ========== DASHBOARD INIT ==========
-  function initDashboard() {
-    updateBalances();
-    setGreeting();
-    setInterval(setGreeting, 60000);
-    renderTransactions();
-  }
-
-  // ========== CARDS ==========
-  function loadCards() {
-    const cards = JSON.parse(localStorage.getItem("userCards") || "[]");
-    const container = document.getElementById("userCardsList");
-    container.innerHTML = "";
-    cards.forEach(c => {
-      const div = document.createElement("div");
-      div.className = "card-custom mt-2";
-      div.innerText = `${c.number} | ${c.expiry}`;
-      container.appendChild(div);
-    });
-  }
-  document.getElementById("cardsBtn").addEventListener("click", () => { loadCards(); showSection("cardsSection"); });
-  document.getElementById("addCardBtnPage").addEventListener("click", () => showSection("addCardSection"));
-  document.getElementById("cardsBack").addEventListener("click", () => showSection("dashboardSection"));
-  document.getElementById("addCardBack").addEventListener("click", () => showSection("cardsSection"));
-  document.getElementById("confirmAddCard").addEventListener("click", () => {
-    const num = document.getElementById("newCardNumber").value;
-    const exp = document.getElementById("newCardExpiry").value;
-    const cvv = document.getElementById("newCardCVV").value;
-    if (!num || !exp || !cvv) { alert("Fill all fields"); return; }
-    const arr = JSON.parse(localStorage.getItem("userCards") || "[]");
-    arr.push({ number: num, expiry: exp, cvv });
-    localStorage.setItem("userCards", JSON.stringify(arr));
-    alert("Card added");
-    document.getElementById("newCardNumber").value = "";
-    document.getElementById("newCardExpiry").value = "";
-    document.getElementById("newCardCVV").value = "";
-    loadCards();
-    showSection("cardsSection");
+// Render transactions
+function renderAccountTx(name){
+  const accounts=getAccounts();
+  const acc=accounts.find(a=>a.name===name);
+  document.getElementById(name.toLowerCase()+'Balance').textContent=acc.balance.toFixed(2);
+  const tbody=document.getElementById(name.toLowerCase()+'Tx'); tbody.innerHTML='';
+  acc.tx.forEach(t=>{
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td>${t.id}</td><td>${t.type}</td><td>${t.to}</td><td>$${t.amount}</td><td>${t.date}</td>`;
+    tbody.appendChild(tr);
   });
+}
 
-  // ========== PAY BILLS ==========
-  document.querySelectorAll(".billBtn").forEach(b => {
-    b.addEventListener("click", () => {
-      document.getElementById("billTitle").innerText = b.dataset.bill;
-      showSection("billPaySection");
-    });
-  });
-  document.getElementById("payBillsBack").addEventListener("click", () => showSection("dashboardSection"));
-  document.getElementById("billBack").addEventListener("click", () => showSection("payBillsSection"));
-  document.getElementById("payBillBtn").addEventListener("click", () => {
-    const bill = document.getElementById("billTitle").innerText;
-    const acc = document.getElementById("billAccount").value;
-    const amt = parseFloat(document.getElementById("billAmount").value);
-    if (!acc || !amt || amt <= 0) { alert("Invalid details"); return; }
-    if (checkingBalance < amt) { alert("Not enough money"); return; }
-    checkingBalance -= amt;
-    addTransaction("checking", bill, amt);
-    updateBalances();
-    alert(`${bill} paid: $${amt.toFixed(2)}`);
-    document.getElementById("billAccount").value = "";
-    document.getElementById("billAmount").value = "";
-    showSection("payBillsSection");
-  });
+// Go to Transfer
+function goToTransfer(fromAccount){
+  document.getElementById('transferFromAccount').textContent=fromAccount;
+  const select=document.getElementById('transferToAccount'); select.innerHTML='';
+  const accounts=getAccounts();
+  accounts.filter(a=>a.name!==fromAccount).forEach(a=>{ select.innerHTML+=`<option value="${a.name}">${a.name}</option>`; });
+  showSection('transferPage');
+}
 
-  // ========== CRYPTO / CoinGecko ==========
-  const cryptoListEl = document.getElementById("cryptoList");
-  const cryptoTitle = document.getElementById("cryptoTitle");
-  const cryptoPriceEl = document.getElementById("cryptoPrice");
-  const cryptoChangeEl = document.getElementById("cryptoChange");
+// Transfer submit
+document.getElementById('transferForm').addEventListener('submit',e=>{
+  e.preventDefault();
+  const fromAccName=document.getElementById('transferFromAccount').textContent;
+  const toAccName=document.getElementById('transferToAccount').value;
+  const amt=parseFloat(document.getElementById('transferAmount').value);
+  const accounts=getAccounts();
+  const fromAcc=accounts.find(a=>a.name===fromAccName);
+  const toAcc=accounts.find(a=>a.name===toAccName);
+  if(amt>fromAcc.balance){ alert('Insufficient balance'); return; }
+  fromAcc.balance-=amt; toAcc.balance+=amt;
+  const tx={id:crypto.randomUUID(),type:'Transfer',to:toAccName,amount:amt,date:formatDate()};
+  fromAcc.tx.push(tx); saveAccounts(accounts);
+  showSuccess(tx,fromAcc.balance,fromAccName);
+});
 
-  async function fetchCryptoPrices() {
-    const ids = cryptos.map(c => c.id).join(",");
-    const url = `https://api.coingecko.com/api/v3/simple/price?ids=${ids}&vs_currencies=usd&include_24hr_change=true`;
-    try {
-      const res = await fetch(url);
-      const data = await res.json();
-      cryptos.forEach(c => {
-        c.price = data[c.id].usd;
-        c.change24h = data[c.id].usd_24h_change;
-        c.history.push(c.price);
-        if (c.history.length > 20) c.history.shift();
-      });
-      renderCryptoList();
-      if (selectedCrypto) updateCryptoDetail();
-    } catch (e) {
-      console.error("Crypto fetch error", e);
-    }
-  }
+// Withdraw
+function goToWithdraw(fromAccount){
+  document.getElementById('withdrawFromAccount').textContent=fromAccount;
+  document.getElementById('withdrawAmount').value='';
+  showSection('withdrawPage');
+}
+document.getElementById('withdrawForm').addEventListener('submit',e=>{
+  e.preventDefault();
+  const fromAccName=document.getElementById('withdrawFromAccount').textContent;
+  const amt=parseFloat(document.getElementById('withdrawAmount').value);
+  const accounts=getAccounts();
+  const acc=accounts.find(a=>a.name===fromAccName);
+  if(amt>acc.balance){ alert('Insufficient balance'); return; }
+  acc.balance-=amt;
+  const tx={id:crypto.randomUUID(),type:'Withdraw',to:'Cash',amount:amt,date:formatDate()};
+  acc.tx.push(tx); saveAccounts(accounts);
+  showSuccess(tx,acc.balance,fromAccName);
+});
 
-  function renderCryptoList() {
-    cryptoListEl.innerHTML = "";
-    cryptos.forEach(c => {
-      const div = document.createElement("div");
-      div.className = "card-custom mt-2 d-flex justify-content-between align-items-center";
-      const pct = c.change24h.toFixed(2);
-      const color = c.change24h >= 0 ? "green" : "red";
-      div.innerHTML = `<div><strong>${c.name} (${c.symbol})</strong><br>$${c.price.toFixed(2)}</div>
-                       <div style="color:${color}">${pct}%</div>`;
-      div.addEventListener("click", () => openCryptoDetail(c.id));
-      cryptoListEl.appendChild(div);
-    });
-  }
+// Wire
+function goToWire(fromAccount){
+  document.getElementById('wireFromAccount').textContent=fromAccount;
+  document.getElementById('wireTo').value='';
+  document.getElementById('wireAmount').value='';
+  showSection('wirePage');
+}
+document.getElementById('wireForm').addEventListener('submit',e=>{
+  e.preventDefault();
+  const fromAccName=document.getElementById('wireFromAccount').textContent;
+  const toBank=document.getElementById('wireTo').value;
+  const amt=parseFloat(document.getElementById('wireAmount').value);
+  const accounts=getAccounts();
+  const acc=accounts.find(a=>a.name===fromAccName);
+  if(amt>acc.balance){ alert('Insufficient balance'); return; }
+  acc.balance-=amt;
+  const tx={id:crypto.randomUUID(),type:'Wire',to:toBank,amount:amt,date:formatDate()};
+  acc.tx.push(tx); saveAccounts(accounts);
+  showSuccess(tx,acc.balance,fromAccName);
+});
 
-  function openCryptoDetail(id) {
-    selectedCrypto = cryptos.find(c => c.id === id);
-    cryptoTitle.innerText = `${selectedCrypto.name} (${selectedCrypto.symbol})`;
-    showSection("cryptoDetailSection");
-    const ctx = document.getElementById("cryptoChart").getContext("2d");
-    if (cryptoChart) cryptoChart.destroy();
-    cryptoChart = new Chart(ctx, {
-      type: "line",
-      data: {
-        labels: selectedCrypto.history.map((_, i) => i),
-        datasets: [{
-          label: selectedCrypto.symbol,
-          data: selectedCrypto.history,
-          borderColor: "var(--accent-4)",
-          backgroundColor: "rgba(118,75,162,0.2)",
-          tension: 0.3
-        }]
-      },
-      options: { responsive: true, plugins: { legend: { display: false } } }
-    });
-    updateCryptoDetail();
-  }
+// Show success page
+function showSuccess(tx,balance,fromAccName){
+  const card=document.getElementById('successDetails');
+  card.innerHTML=`<p><strong>Transaction ID:</strong> ${tx.id}</p>
+  <p><strong>Type:</strong> ${tx.type}</p>
+  <p><strong>From:</strong> ${fromAccName}</p>
+  <p><strong>To:</strong> ${tx.to}</p>
+  <p><strong>Amount:</strong> $${tx.amount}</p>
+  <p><strong>Date:</strong> ${tx.date}</p>
+  <p><strong>Remaining Balance:</strong> $${balance.toFixed(2)}</p>`;
+  showSection('successPage');
+}
 
-  function updateCryptoDetail() {
-    if (!selectedCrypto) return;
-    cryptoPriceEl.innerText = "$" + selectedCrypto.price.toFixed(2);
-    const pct = selectedCrypto.change24h.toFixed(2);
-    cryptoChangeEl.innerText = pct + "%";
-    cryptoChangeEl.style.color = selectedCrypto.change24h >= 0 ? "green" : "red";
-    if (cryptoChart) {
-      cryptoChart.data.datasets[0].data = selectedCrypto.history;
-      cryptoChart.update();
-    }
-  }
+// Logout
+function logout(){ showSection('loginPage'); }
 
-  document.getElementById("cryptoBuyBtn").addEventListener("click", () => {
-    const amt = parseFloat(prompt("USD to buy:"));
-    if (!amt || amt <= 0) { alert("Invalid"); return; }
-    if (amt > checkingBalance) { alert("Insufficient checking"); return; }
-    checkingBalance -= amt;
-    const cryptoAmt = amt / selectedCrypto.price;
-    selectedCrypto.balance += cryptoAmt;
-    addTransaction("checking", `Buy ${selectedCrypto.symbol}`, amt);
-    updateBalances();
-    alert(`Bought ${cryptoAmt.toFixed(6)} ${selectedCrypto.symbol}`);
-  });
-
-  document.getElementById("cryptoSellBtn").addEventListener("click", () => {
-    const amt = parseFloat(prompt("USD to sell:"));
-    if (!amt || amt <= 0) { alert("Invalid"); return; }
-    const cryptoAmt = amt / selectedCrypto.price;
-    if (cryptoAmt > selectedCrypto.balance) { alert("Not enough crypto"); return; }
-    selectedCrypto.balance -= cryptoAmt;
-    checkingBalance += amt;
-    addTransaction("checking", `Sell ${selectedCrypto.symbol}`, amt);
-    updateBalances();
-    alert(`Sold ${cryptoAmt.toFixed(6)} ${selectedCrypto.symbol}`);
-  });
-
-  document.getElementById("cryptoBack").addEventListener("click", () => showSection("dashboardSection"));
-  document.getElementById("cryptoDetailBack").addEventListener("click", () => showSection("cryptoSection"));
-
-  // ========== INIT ==========
-  initDashboard();
-  fetchCryptoPrices();
-  setInterval(fetchCryptoPrices, 30000);
 </script>
 </body>
 </html>
