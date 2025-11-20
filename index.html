@@ -1,288 +1,627 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Michigan Bank Demo</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>OlaCreditUnion — Demo Bank</title>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
 <style>
-body{font-family:'Segoe UI',sans-serif;background:#f4f6f8;margin:0;}
-.navbar-brand{font-weight:bold;}
-.section{display:none; padding:20px;}
-.section.active{display:block;}
-.card:hover{cursor:pointer; transform:scale(1.02); transition:0.2s;}
-.account-card{background:#fff; border-radius:10px; padding:20px; margin:10px; box-shadow:0 4px 6px rgba(0,0,0,0.1);}
-.action-btn{margin:5px;}
-.success-banner{background:#d4edda;color:#155724;padding:15px;margin:15px 0;border-radius:5px;border:1px solid #c3e6cb;}
-.spinner{display:flex;justify-content:center;align-items:center;height:150px;}
-.spinner div{width:50px;height:50px;margin:10px;border:5px solid #007bff;border-top:5px solid transparent;border-radius:50%;animation:spin 1s linear infinite;}
-@keyframes spin{0%{transform:rotate(0deg);}100%{transform:rotate(360deg);}}
+  :root{
+    --accent-1: #4e54c8;
+    --accent-2: #8f94fb;
+    --accent-3: #667eea;
+    --accent-4: #764ba2;
+  }
+  html,body{height:100%;margin:0;font-family:Inter, 'Segoe UI', system-ui, Roboto, "Helvetica Neue", Arial;}
+  body{
+    background: linear-gradient(135deg,var(--accent-1),var(--accent-2));
+    color:#222; -webkit-font-smoothing:antialiased;
+  }
+  .section{display:none;padding:18px 18px 90px;}
+  .section.active{display:block;}
+  .login-card{max-width:420px;margin:64px auto;background:#fff;border-radius:14px;padding:28px;box-shadow:0 18px 50px rgba(0,0,0,.25);}
+  .btn-primary{background:linear-gradient(135deg,var(--accent-1),var(--accent-2));border:0;color:#fff;box-shadow:0 8px 30px rgba(0,0,0,.18);border-radius:10px;padding:10px 14px;}
+  .btn-success{background:linear-gradient(135deg,#43e97b,#38f9d7);border:0;color:#fff;border-radius:10px;padding:10px 14px;}
+  .btn-danger{background:linear-gradient(135deg,#f5576c,#f093fb);border:0;color:#fff;border-radius:10px;padding:10px 14px;}
+  .navbar{height:58px;background:#fff;border-radius:8px;display:flex;align-items:center;justify-content:space-between;padding:0 12px;box-shadow:0 6px 18px rgba(0,0,0,.12);}
+  .navbar .icon{font-size:22px;color:var(--accent-4);cursor:pointer}
+  .profile-icon{font-size:26px;color:var(--accent-4);cursor:pointer}
+  .balance-card{background:linear-gradient(135deg,var(--accent-3),var(--accent-4));color:#fff;border-radius:14px;padding:18px;margin:14px 0;box-shadow:0 12px 40px rgba(0,0,0,.22)}
+  .card-custom{background:#fff;border-radius:12px;padding:14px;box-shadow:0 8px 28px rgba(0,0,0,.12);cursor:pointer;margin:8px}
+  .card-custom h5{margin:0;font-size:15px;font-weight:600}
+  .card-custom p{margin:6px 0 0;color:#666}
+  .bottom-nav{position:fixed;left:0;right:0;bottom:14px;margin:auto;display:flex;gap:18px;justify-content:center;pointer-events:auto;}
+  .bottom-nav button{width:64px;height:64px;border-radius:32px;border:0;box-shadow:0 10px 30px rgba(0,0,0,.18);display:flex;align-items:center;justify-content:center;font-size:20px;cursor:pointer}
+  .menu{position:fixed;left:-290px;top:0;height:100%;width:270px;background:#fff;box-shadow:4px 0 30px rgba(0,0,0,.2);padding-top:64px;transition:left .22s;}
+  .menu.show{left:0}
+  .menu a{display:flex;align-items:center;padding:12px 16px;color:#333;text-decoration:none;border-bottom:1px solid #f2f2f2}
+  .menu a i{font-size:18px;margin-right:12px;color:var(--accent-4)}
+  .profile-pic{width:78px;height:78px;border-radius:50%;object-fit:cover;border:3px solid #fff;box-shadow:0 6px 22px rgba(0,0,0,.18)}
+  .success-card{background:#fff;border-radius:12px;padding:16px;box-shadow:0 12px 34px rgba(0,0,0,.14);max-width:560px;margin:18px auto;color:#222}
+  .receipt-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #f0f0f0}
+  .small-muted{font-size:13px;color:#666}
+  .spinner{display:flex;justify-content:center;align-items:center;padding:40px}
+  .spinner .dot{width:48px;height:48px;border-radius:50%;border:6px solid rgba(255,255,255,.18);border-top-color:#fff;animation:spin 1s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  input,select,textarea{border-radius:10px;padding:10px;border:1px solid #e6e6e6;box-shadow:inset 0 1px 2px rgba(0,0,0,.03);width:100%}
+  label{font-weight:600;font-size:14px;color:#333}
+  .link-like{color:var(--accent-4);cursor:pointer}
+  .muted{color:#777;font-size:13px}
+  @media (min-width:900px){.section{max-width:980px;margin:0 auto}}
 </style>
 </head>
 <body>
-
-<!-- Navbar / Hamburger -->
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
-<div class="container-fluid">
-  <a class="navbar-brand" href="#">Michigan Bank</a>
-  <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menuNav">
-    <span class="navbar-toggler-icon"></span>
-  </button>
-  <div class="collapse navbar-collapse" id="menuNav">
-    <ul class="navbar-nav ms-auto">
-      <li class="nav-item"><a class="nav-link" href="#" onclick="showSection('dashboard')">Dashboard</a></li>
-      <li class="nav-item"><a class="nav-link" href="#" onclick="showSection('checkingTransactions')">Checking</a></li>
-      <li class="nav-item"><a class="nav-link" href="#" onclick="showSection('savingsTransactions')">Savings</a></li>
-      <li class="nav-item"><a class="nav-link" href="#" onclick="logout()">Logout</a></li>
-    </ul>
+<!-- PART 1 END: Paste PART 2 below this line (do NOT remove this comment) -->
+<!-- LOGIN PAGE -->
+<div id="loginSection" class="section active">
+  <div class="login-card text-center">
+    <h3 class="mb-3" style="font-weight:700;">OlaCreditUnion</h3>
+    <p class="muted mb-4">Secure Login</p>
+    <input type="email" id="loginEmail" placeholder="Email" class="mb-3">
+    <input type="password" id="loginPassword" placeholder="Password" class="mb-3">
+    <button class="btn btn-primary w-100" id="loginBtn">Login</button>
+    <div id="loginError" class="text-danger mt-3" style="display:none;">Invalid email or password</div>
   </div>
 </div>
-</nav>
 
-<!-- Login Page -->
-<div id="loginPage" class="section active">
-<h2 class="text-center mt-5">Welcome to Michigan Bank</h2>
-<div class="row justify-content-center mt-4">
-<div class="col-md-4">
-<form id="loginForm">
-<div class="mb-3"><label>Email</label><input type="email" id="loginEmail" class="form-control" required></div>
-<div class="mb-3"><label>Password</label><input type="password" id="loginPassword" class="form-control" required></div>
-<button type="submit" class="btn btn-primary w-100">Login</button>
-</form>
-<div id="loginError" class="text-danger mt-2"></div>
-<div id="loginLoading" class="spinner" style="display:none;"><div></div></div>
-</div>
-</div>
-</div>
+<!-- DASHBOARD -->
+<div id="dashboardSection" class="section">
 
-<!-- Dashboard -->
-<div id="dashboard" class="section">
-<h2 id="greeting"></h2>
-<p id="currentDate"></p>
-<div class="row" id="accountsRow"></div>
-</div>
+  <div class="navbar mb-3">
+    <i class="bi bi-list icon" id="menuToggle"></i>
+    <i class="bi bi-person-circle profile-icon" id="openProfile"></i>
+  </div>
 
-<!-- Checking Transactions -->
-<div id="checkingTransactions" class="section">
-<h3>Checking Account Transactions</h3>
-<p>Balance: $<span id="checkingBalance"></span></p>
-<button class="btn btn-primary action-btn" onclick="goToTransfer('Checking')"><i class="bi bi-arrow-left-right"></i> Transfer</button>
-<button class="btn btn-warning action-btn" onclick="goToWithdraw('Checking')"><i class="bi bi-wallet2"></i> Withdraw</button>
-<button class="btn btn-info action-btn" onclick="goToWire('Checking')"><i class="bi bi-bank"></i> Wire</button>
-<table class="table table-striped mt-3">
-<thead><tr><th>ID</th><th>Type</th><th>To</th><th>Amount</th><th>Date</th></tr></thead>
-<tbody id="checkingTx"></tbody>
-</table>
-</div>
+  <div class="balance-card text-center">
+    <div id="greeting" style="font-size:18px;font-weight:600;"></div>
+    <div class="small-muted" id="liveTime"></div>
+    <h2 id="overallBalance" style="margin-top:15px;font-weight:700;"></h2>
+    <div class="small-muted">Overall Balance</div>
+  </div>
 
-<!-- Savings Transactions -->
-<div id="savingsTransactions" class="section">
-<h3>Savings Account Transactions</h3>
-<p>Balance: $<span id="savingsBalance"></span></p>
-<button class="btn btn-primary action-btn" onclick="goToTransfer('Savings')"><i class="bi bi-arrow-left-right"></i> Transfer</button>
-<button class="btn btn-warning action-btn" onclick="goToWithdraw('Savings')"><i class="bi bi-wallet2"></i> Withdraw</button>
-<button class="btn btn-info action-btn" onclick="goToWire('Savings')"><i class="bi bi-bank"></i> Wire</button>
-<table class="table table-striped mt-3">
-<thead><tr><th>ID</th><th>Type</th><th>To</th><th>Amount</th><th>Date</th></tr></thead>
-<tbody id="savingsTx"></tbody>
-</table>
+  <h5 style="font-weight:700;margin-top:18px;">Accounts</h5>
+  <div class="card-custom" id="checkingCard">
+    <h5>Checking Account</h5>
+    <p id="checkingBalance"></p>
+  </div>
+
+  <div class="card-custom" id="savingsCard">
+    <h5>Savings Account</h5>
+    <p id="savingsBalance"></p>
+  </div>
+
+  <h5 style="font-weight:700;margin-top:18px;">More Options</h5>
+
+  <div class="card-custom" id="cardsBtn">
+    <h5><i class="bi bi-credit-card"></i> Cards</h5>
+  </div>
+
+  <div class="card-custom" id="creditScoreBtn">
+    <h5><i class="bi bi-graph-up"></i> Credit Score</h5>
+  </div>
+
+  <div class="card-custom" id="payBillsBtn">
+    <h5><i class="bi bi-receipt"></i> Pay Bills</h5>
+  </div>
 </div>
 
-<!-- Transfer Page -->
-<div id="transferPage" class="section">
-<h3>Transfer from <span id="transferFromAccount"></span></h3>
-<form id="transferForm">
-<div class="mb-3"><label>To Account</label>
-<select id="transferToAccount" class="form-select"></select></div>
-<div class="mb-3"><label>Amount</label><input type="number" id="transferAmount" class="form-control" required></div>
-<button type="submit" class="btn btn-success">Continue</button>
-</form>
+<!-- INTERNAL TRANSFER PAGE (CHECKING <-> SAVINGS) -->
+<div id="internalTransferSection" class="section"></div>
+
+<!-- SEND TO OTHER BANK PAGE -->
+<div id="sendSection" class="section"></div>
+
+<!-- TOP-UP / WITHDRAW SECTION -->
+<div id="topupWithdrawSection" class="section"></div>
+
+<!-- SUCCESS RECEIPT -->
+<div id="successSection" class="section text-center"></div>
+
+<!-- LOADING SCREEN -->
+<div id="loadingSection" class="section text-center">
+  <div class="spinner"><div class="dot"></div></div>
 </div>
 
-<!-- Withdraw Page -->
-<div id="withdrawPage" class="section">
-<h3>Withdraw from <span id="withdrawFromAccount"></span></h3>
-<form id="withdrawForm">
-<div class="mb-3"><label>Amount</label><input type="number" id="withdrawAmount" class="form-control" required></div>
-<button type="submit" class="btn btn-warning">Continue</button>
-</form>
+<!-- CREDIT SCORE PAGE -->
+<div id="creditScoreSection" class="section text-center"></div>
+
+<!-- PAY BILLS PAGE -->
+<div id="payBillsSection" class="section text-center"></div>
+
+<!-- PROFILE PAGE -->
+<div id="profileSection" class="section text-center"></div>
+
+<!-- HAMBURGER MENU -->
+<div class="menu" id="sideMenu">
+  <a id="menuHome"><i class="bi bi-house"></i> Home</a>
+  <a id="menuTransfer"><i class="bi bi-arrow-left-right"></i> Transfer</a>
+  <a id="menuSend"><i class="bi bi-send"></i> Send</a>
+  <a id="menuTopup"><i class="bi bi-plus-circle"></i> Top Up</a>
+  <a id="menuWithdraw"><i class="bi bi-wallet2"></i> Withdraw</a>
+  <a id="menuWire"><i class="bi bi-cash-stack"></i> Wire Transfer</a>
+  <a id="menuProfile"><i class="bi bi-person"></i> Profile</a>
+  <a id="menuLogout"><i class="bi bi-box-arrow-right"></i> Logout</a>
 </div>
 
-<!-- Wire Page -->
-<div id="wirePage" class="section">
-<h3>Wire Transfer from <span id="wireFromAccount"></span></h3>
-<form id="wireForm">
-<div class="mb-3"><label>Bank / To</label><input type="text" id="wireTo" class="form-control" required></div>
-<div class="mb-3"><label>Amount</label><input type="number" id="wireAmount" class="form-control" required></div>
-<button type="submit" class="btn btn-info">Continue</button>
-</form>
+<!-- BOTTOM NAVIGATION -->
+<div class="bottom-nav">
+  <button id="navSend"><i class="bi bi-send"></i></button>
+  <button id="navTopup"><i class="bi bi-plus-lg"></i></button>
+  <button id="navWithdraw"><i class="bi bi-wallet2"></i></button>
 </div>
 
-<!-- Success Page -->
-<div id="successPage" class="section text-center">
-<h3>Transaction Successful!</h3>
-<div id="successDetails" class="card p-3 mt-3"></div>
-<button class="btn btn-primary mt-3" onclick="showSection('dashboard')">Back to Dashboard</button>
+<!-- PART 2 END — WAIT FOR PART 3 -->
+<!-- INTERNAL TRANSFER PAGE -->
+<div id="internalTransferSection" class="section">
+  <h3 style="font-weight:700;">Transfer Between Accounts</h3>
+
+  <label class="mt-3">From</label>
+  <select id="itFrom">
+    <option value="checking">Checking</option>
+    <option value="savings">Savings</option>
+  </select>
+
+  <label class="mt-3">To</label>
+  <select id="itTo">
+    <option value="savings">Savings</option>
+    <option value="checking">Checking</option>
+  </select>
+
+  <label class="mt-3">Amount</label>
+  <input type="number" id="itAmount" placeholder="0.00">
+
+  <div class="mt-4 text-center">
+    <button class="btn btn-primary w-100" id="itSubmit">Transfer</button>
+  </div>
+
+  <div class="mt-4 text-center">
+    <span class="link-like" id="itBack">← Back to Dashboard</span>
+  </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<!-- SEND TO OTHER BANK -->
+<div id="sendSection" class="section">
+  <h3 style="font-weight:700;">Send Money</h3>
+
+  <label class="mt-3">Recipient Bank</label>
+  <input id="sendBank" placeholder="Bank Name">
+
+  <label class="mt-3">Recipient Name</label>
+  <input id="sendName" placeholder="Full Name">
+
+  <label class="mt-3">Recipient Account Number</label>
+  <input id="sendAcc" placeholder="Account Number">
+
+  <label class="mt-3">Amount</label>
+  <input type="number" id="sendAmount" placeholder="0.00">
+
+  <div class="mt-4 text-center">
+    <button class="btn btn-primary w-100" id="sendSubmit">Send</button>
+  </div>
+
+  <div class="mt-4 text-center">
+    <span class="link-like" id="sendBack">← Back to Dashboard</span>
+  </div>
+</div>
+
+<!-- TOP-UP & WITHDRAW MAIN PAGE -->
+<div id="topupWithdrawSection" class="section">
+  <h3 style="font-weight:700;">Top Up</h3>
+
+  <div id="cardList" class="mt-3"></div>
+
+  <button class="btn btn-primary w-100 mt-3" id="addCardBtn">
+    <i class="bi bi-plus-lg"></i> Add Card
+  </button>
+
+  <div id="topupAmountBox" style="display:none;" class="mt-4">
+    <label>Amount</label>
+    <input type="number" id="topupAmount">
+
+    <p class="mt-2 small-muted">Fee: <span id="topupFee">0.00</span></p>
+
+    <button class="btn btn-success w-100 mt-3" id="topupSubmit">Top Up</button>
+  </div>
+
+  <hr class="mt-5 mb-4">
+
+  <h3 style="font-weight:700;">Withdraw</h3>
+
+  <label class="mt-3">Withdraw To</label>
+  <select id="withdrawTo">
+    <option value="card">Linked Card</option>
+    <option value="bank">Linked Bank Account</option>
+  </select>
+
+  <label class="mt-3">Amount</label>
+  <input type="number" id="withdrawAmount">
+
+  <p class="mt-2 small-muted">Fee: <span id="withdrawFee">0.00</span></p>
+
+  <button class="btn btn-danger w-100 mt-3" id="withdrawSubmit">Withdraw</button>
+
+  <div class="mt-4 text-center">
+    <span class="link-like" id="twBack">← Back to Dashboard</span>
+  </div>
+</div>
+
+<!-- WIRE TRANSFER PAGE -->
+<div id="wireSection" class="section">
+  <h3 style="font-weight:700;">Wire Transfer</h3>
+
+  <label class="mt-3">Recipient Bank</label>
+  <input id="wireBank" placeholder="Bank Name">
+
+  <label class="mt-3">Country</label>
+  <select id="wireCountry">
+    <option value="USA">USA</option>
+    <option value="UK">United Kingdom</option>
+    <option value="EU">European Union</option>
+    <option value="CA">Canada</option>
+    <option value="AU">Australia</option>
+  </select>
+
+  <label class="mt-3">Routing / Swift Code</label>
+  <input id="wireCode" placeholder="Will auto-change">
+
+  <label class="mt-3">Recipient Address</label>
+  <input id="wireRecipientAddress" placeholder="Recipient Address">
+
+  <label class="mt-3">Recipient Bank Address</label>
+  <input id="wireBankAddress" placeholder="Bank Address">
+
+  <label class="mt-3">Recipient Name</label>
+  <input id="wireName" placeholder="Full Name">
+
+  <label class="mt-3">Recipient Account Number</label>
+  <input id="wireAcc" placeholder="Account Number">
+
+  <label class="mt-3">Amount</label>
+  <input type="number" id="wireAmount">
+
+  <p class="mt-2 small-muted">Fee: <span id="wireFee">0.00</span></p>
+
+  <button class="btn btn-primary w-100 mt-3" id="wireSubmit">Send Wire</button>
+
+  <div class="mt-4 text-center">
+    <span class="link-like" id="wireBack">← Back to Dashboard</span>
+  </div>
+</div>
+<!-- SUCCESS / RECEIPT SCREEN -->
+<div id="successScreen" style="display:none; padding:25px;">
+    <div style="text-align:center; font-size:32px; margin-bottom:20px;">✅</div>
+    <h2 style="text-align:center; margin-bottom:10px;">Transaction Successful</h2>
+    <div id="successDetails" style="background:#fff; padding:20px; border-radius:12px; box-shadow:0 4px 20px rgba(0,0,0,0.12); font-size:16px; line-height:26px;">
+    </div>
+    <button onclick="returnToDashboard()" style="width:100%; margin-top:25px; padding:15px; border:none; border-radius:10px; background:#4b6bfb; color:#fff; font-size:18px;">
+        Back to Dashboard
+    </button>
+</div>
+
+
+<!-- LOADING SCREEN -->
+<div id="loadingScreen" style="display:none; text-align:center; padding:50px;">
+    <div class="spinner" style="margin:auto; width:60px; height:60px; border:6px solid #ddd; border-top-color:#4b6bfb; border-radius:50%; animation:spin 1s linear infinite;"></div>
+    <h3 style="margin-top:20px;">Processing Transaction...</h3>
+</div>
+
+<style>
+@keyframes spin { 
+    from { transform:rotate(0deg); }
+    to   { transform:rotate(360deg); }
+}
+</style>
+
+
 <script>
-// Hardcoded login
-const demoEmail='Michiganbank@gmail.com';
-const demoPassword='Bank1&$';
+// SHOW LOADING → SUCCESS RECEIPT
+function showLoadingThenSuccess(receiptHTML) {
+    document.getElementById("dashboard").style.display = "none";
+    document.getElementById("transferPage").style.display = "none";
+    document.getElementById("withdrawPage").style.display = "none";
+    document.getElementById("topupPage").style.display = "none";
+    document.getElementById("wirePage").style.display = "none";
 
-// LocalStorage setup
-if(!localStorage.getItem('accounts')){
-  const initAccounts=[
-    {name:'Checking', balance:5000, tx:[]},
-    {name:'Savings', balance:2000, tx:[]}
-  ];
-  localStorage.setItem('accounts',JSON.stringify(initAccounts));
+    document.getElementById("loadingScreen").style.display = "block";
+
+    setTimeout(() => {
+        document.getElementById("loadingScreen").style.display = "none";
+        document.getElementById("successDetails").innerHTML = receiptHTML;
+        document.getElementById("successScreen").style.display = "block";
+    }, 2000);
 }
 
-// Utilities
-function getAccounts(){ return JSON.parse(localStorage.getItem('accounts')); }
-function saveAccounts(accts){ localStorage.setItem('accounts',JSON.stringify(accts)); }
-function formatDate(){ const d=new Date(); return d.toLocaleString(); }
+function returnToDashboard() {
+    document.getElementById("successScreen").style.display = "none";
+    document.getElementById("dashboard").style.display = "block";
+}
+
+
+// CREATE BANK RECEIPT
+function createReceipt(title, amount, fee, total, fromAcc, toAcc, extraInfo = "") {
+    let id = "TX-" + Math.floor(Math.random() * 999999999);
+    let date = new Date().toLocaleString();
+
+    return `
+        <h3>${title}</h3>
+        <p><strong>Transaction ID:</strong> ${id}</p>
+        <p><strong>Date:</strong> ${date}</p>
+        <p><strong>Amount:</strong> $${amount}</p>
+        <p><strong>Fee (5%):</strong> $${fee}</p>
+        <p><strong>Total Deducted:</strong> $${total}</p>
+        <p><strong>From:</strong> ${fromAcc}</p>
+        <p><strong>To:</strong> ${toAcc}</p>
+        ${extraInfo}
+    `;
+}
+
+
+
+// HANDLE INTERNAL TRANSFER
+function completeInternalTransfer() {
+    let amount = parseFloat(document.getElementById("internalTransferAmount").value);
+    if (!amount || amount <= 0) return alert("Enter a valid amount");
+
+    let fee = amount * 0.05;
+    let total = amount + fee;
+
+    let fromAcc = document.getElementById("internalFrom").value;
+    let toAcc = document.getElementById("internalTo").value;
+
+    let receipt = createReceipt("Internal Transfer", amount, fee, total, fromAcc, toAcc);
+
+    showLoadingThenSuccess(receipt);
+}
+
+
+
+// HANDLE TOP-UP
+function completeTopUp() {
+    let amount = parseFloat(document.getElementById("topupAmount").value);
+    if (!amount || amount <= 0) return alert("Enter a valid amount");
+
+    let fee = amount * 0.05;
+    let total = amount + fee;
+
+    let fromCard = document.getElementById("selectedTopupCard").innerText;
+
+    let receipt = createReceipt(
+        "Balance Top-Up",
+        amount,
+        fee,
+        total,
+        fromCard,
+        "Checking"
+    );
+
+    showLoadingThenSuccess(receipt);
+}
+
+
+
+// HANDLE WITHDRAW
+function completeWithdraw() {
+    let amount = parseFloat(document.getElementById("withdrawAmount").value);
+    if (!amount || amount <= 0) return alert("Enter a valid amount");
+
+    let fee = amount * 0.05;
+    let total = amount + fee;
+
+    let receipt = createReceipt(
+        "Withdrawal",
+        amount,
+        fee,
+        total,
+        "Checking",
+        "Linked Bank/Card"
+    );
+
+    showLoadingThenSuccess(receipt);
+}
+
+
+
+// HANDLE WIRE TRANSFER
+function completeWireTransfer() {
+    let amount = parseFloat(document.getElementById("wireAmount").value);
+    if (!amount || amount <= 0) return alert("Enter a valid amount");
+
+    let fee = amount * 0.05;
+    let total = amount + fee;
+
+    let bank = document.getElementById("wireBank").value;
+    let name = document.getElementById("wireName").value;
+    let addr = document.getElementById("wireAddress").value;
+    let bankaddr = document.getElementById("wireBankAddress").value;
+    let swift = document.getElementById("wireSwift").value;
+
+    let extra = `
+        <p><strong>Recipient Name:</strong> ${name}</p>
+        <p><strong>Recipient Address:</strong> ${addr}</p>
+        <p><strong>Bank Name:</strong> ${bank}</p>
+        <p><strong>Bank Address:</strong> ${bankaddr}</p>
+        <p><strong>SWIFT/Routing:</strong> ${swift}</p>
+    `;
+
+    let receipt = createReceipt(
+        "Wire Transfer",
+        amount,
+        fee,
+        total,
+        "Checking",
+        name,
+        extra
+    );
+
+    showLoadingThenSuccess(receipt);
+}
+</script>
+<!-- PROFILE PAGE -->
+<div id="profileSection" class="section">
+  <h3 style="font-weight:700;">Profile</h3>
+  <div style="text-align:center; margin-bottom:20px;">
+    <img src="" id="profilePic" class="profile-pic" alt="Profile Picture">
+    <div class="mt-2">
+      <input type="file" id="uploadProfilePic">
+    </div>
+  </div>
+
+  <label>Name</label>
+  <input type="text" id="profileName">
+
+  <label>Email</label>
+  <input type="email" id="profileEmail" disabled>
+
+  <label>Phone Number</label>
+  <input type="text" id="profilePhone">
+
+  <label>Account Number</label>
+  <input type="text" id="profileAccount" disabled>
+
+  <button class="btn btn-primary w-100 mt-3" id="saveProfileBtn">Save Profile</button>
+
+  <div class="mt-4 text-center">
+    <span class="link-like" id="profileBack">← Back to Dashboard</span>
+  </div>
+</div>
+
+<script>
+// =========================
+// LOGIN CREDENTIALS
+// =========================
+const LOGIN_EMAIL = "Michiganbank@gmail.com";
+const LOGIN_PASSWORD = "Bank1&$";
+
+const loginSection = document.getElementById("loginSection");
+const dashboardSection = document.getElementById("dashboardSection");
+
+document.getElementById("loginBtn").addEventListener("click", ()=>{
+  const email = document.getElementById("loginEmail").value;
+  const pass = document.getElementById("loginPassword").value;
+
+  if(email === LOGIN_EMAIL && pass === LOGIN_PASSWORD){
+    loginSection.classList.remove("active");
+    dashboardSection.classList.add("active");
+    initDashboard();
+  } else {
+    document.getElementById("loginError").style.display="block";
+  }
+});
+
+// =========================
+// DASHBOARD LOGIC
+// =========================
+let checkingBalance = 5000;
+let savingsBalance = 3000;
+
+function initDashboard(){
+  updateBalances();
+  setGreeting();
+  setInterval(setGreeting,60000);
+}
+
+function updateBalances(){
+  document.getElementById("checkingBalance").innerText = "$"+checkingBalance.toFixed(2);
+  document.getElementById("savingsBalance").innerText = "$"+savingsBalance.toFixed(2);
+  document.getElementById("overallBalance").innerText = "$"+(checkingBalance+savingsBalance).toFixed(2);
+}
+
+function setGreeting(){
+  const hour = new Date().getHours();
+  let greet = "Hello";
+  if(hour<12) greet="Good Morning";
+  else if(hour<18) greet="Good Afternoon";
+  else greet="Good Evening";
+  document.getElementById("greeting").innerText = greet + " David";
+  document.getElementById("liveTime").innerText = new Date().toLocaleTimeString();
+}
+
+// =========================
+// HAMBURGER MENU
+// =========================
+const menu = document.getElementById("sideMenu");
+document.getElementById("menuToggle").addEventListener("click",()=>menu.classList.toggle("show"));
+document.getElementById("menuHome").addEventListener("click",()=>showSection("dashboardSection"));
+document.getElementById("menuProfile").addEventListener("click",()=>showSection("profileSection"));
+document.getElementById("menuLogout").addEventListener("click",()=>{
+  location.reload();
+});
+
+// =========================
+// NAVIGATION
+// =========================
 function showSection(id){
-  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-  if(id==='dashboard'){ renderDashboard(); }
-  if(id==='checkingTransactions'){ renderAccountTx('Checking'); }
-  if(id==='savingsTransactions'){ renderAccountTx('Savings'); }
+  let sections = document.querySelectorAll(".section");
+  sections.forEach(s=>s.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+  menu.classList.remove("show");
 }
 
-// Login
-document.getElementById('loginForm').addEventListener('submit',e=>{
-  e.preventDefault();
-  const email=document.getElementById('loginEmail').value;
-  const pwd=document.getElementById('loginPassword').value;
-  document.getElementById('loginError').textContent='';
-  document.getElementById('loginLoading').style.display='flex';
-  setTimeout(()=>{
-    document.getElementById('loginLoading').style.display='none';
-    if(email===demoEmail && pwd===demoPassword){ showSection('dashboard'); updateGreeting(); }
-    else{ document.getElementById('loginError').textContent='Invalid email or password'; }
-  },2000);
+document.getElementById("checkingCard").addEventListener("click",()=>showSection("internalTransferSection"));
+document.getElementById("savingsCard").addEventListener("click",()=>showSection("internalTransferSection"));
+document.getElementById("creditScoreBtn").addEventListener("click",()=>showSection("creditScoreSection"));
+document.getElementById("payBillsBtn").addEventListener("click",()=>showSection("payBillsSection"));
+
+// BOTTOM NAV
+document.getElementById("navSend").addEventListener("click",()=>showSection("sendSection"));
+document.getElementById("navTopup").addEventListener("click",()=>showSection("topupWithdrawSection"));
+document.getElementById("navWithdraw").addEventListener("click",()=>showSection("topupWithdrawSection"));
+
+// BACK BUTTONS
+document.getElementById("itBack")?.addEventListener("click",()=>showSection("dashboardSection"));
+document.getElementById("sendBack")?.addEventListener("click",()=>showSection("dashboardSection"));
+document.getElementById("twBack")?.addEventListener("click",()=>showSection("dashboardSection"));
+document.getElementById("profileBack")?.addEventListener("click",()=>showSection("dashboardSection"));
+document.getElementById("wireBack")?.addEventListener("click",()=>showSection("dashboardSection"));
+
+// =========================
+// INTERNAL TRANSFER BUTTON
+// =========================
+document.getElementById("itSubmit")?.addEventListener("click",()=>{
+  let fromAcc = document.getElementById("itFrom").value;
+  let toAcc = document.getElementById("itTo").value;
+  let amount = parseFloat(document.getElementById("itAmount").value);
+  if(!amount || amount<=0){alert("Enter valid amount"); return;}
+  if(fromAcc===toAcc){alert("Select different accounts"); return;}
+  let fee = amount*0.05;
+  let total = amount + fee;
+  if(fromAcc==="checking" && checkingBalance<total){alert("Insufficient funds"); return;}
+  if(fromAcc==="savings" && savingsBalance<total){alert("Insufficient funds"); return;}
+  if(fromAcc==="checking"){checkingBalance-=total; savingsBalance+=amount;}
+  else{savingsBalance-=total; checkingBalance+=amount;}
+  updateBalances();
+  let receipt=createReceipt("Internal Transfer", amount, fee, total, fromAcc, toAcc);
+  showLoadingThenSuccess(receipt);
 });
 
-function updateGreeting(){
-  const hour=new Date().getHours();
-  const greeting=hour<12?'Good Morning':'Good Evening';
-  document.getElementById('greeting').textContent=`${greeting} David`;
-  document.getElementById('currentDate').textContent=`${formatDate()}`;
-}
-
-// Dashboard render
-function renderDashboard(){
-  const row=document.getElementById('accountsRow'); row.innerHTML='';
-  const accounts=getAccounts();
-  accounts.forEach(a=>{
-    const col=document.createElement('div'); col.className='col-md-6';
-    col.innerHTML=`<div class="account-card" onclick="showSection('${a.name==='Checking'?'checkingTransactions':'savingsTransactions'}')">
-      <h4>${a.name}</h4>
-      <p>Balance: $${a.balance.toFixed(2)}</p>
-      <p>${formatDate()}</p>
-      </div>`;
-    row.appendChild(col);
-  });
-}
-
-// Render transactions
-function renderAccountTx(name){
-  const accounts=getAccounts();
-  const acc=accounts.find(a=>a.name===name);
-  document.getElementById(name.toLowerCase()+'Balance').textContent=acc.balance.toFixed(2);
-  const tbody=document.getElementById(name.toLowerCase()+'Tx'); tbody.innerHTML='';
-  acc.tx.forEach(t=>{
-    const tr=document.createElement('tr');
-    tr.innerHTML=`<td>${t.id}</td><td>${t.type}</td><td>${t.to}</td><td>$${t.amount}</td><td>${t.date}</td>`;
-    tbody.appendChild(tr);
-  });
-}
-
-// Go to Transfer
-function goToTransfer(fromAccount){
-  document.getElementById('transferFromAccount').textContent=fromAccount;
-  const select=document.getElementById('transferToAccount'); select.innerHTML='';
-  const accounts=getAccounts();
-  accounts.filter(a=>a.name!==fromAccount).forEach(a=>{ select.innerHTML+=`<option value="${a.name}">${a.name}</option>`; });
-  showSection('transferPage');
-}
-
-// Transfer submit
-document.getElementById('transferForm').addEventListener('submit',e=>{
-  e.preventDefault();
-  const fromAccName=document.getElementById('transferFromAccount').textContent;
-  const toAccName=document.getElementById('transferToAccount').value;
-  const amt=parseFloat(document.getElementById('transferAmount').value);
-  const accounts=getAccounts();
-  const fromAcc=accounts.find(a=>a.name===fromAccName);
-  const toAcc=accounts.find(a=>a.name===toAccName);
-  if(amt>fromAcc.balance){ alert('Insufficient balance'); return; }
-  fromAcc.balance-=amt; toAcc.balance+=amt;
-  const tx={id:crypto.randomUUID(),type:'Transfer',to:toAccName,amount:amt,date:formatDate()};
-  fromAcc.tx.push(tx); saveAccounts(accounts);
-  showSuccess(tx,fromAcc.balance,fromAccName);
+// =========================
+// PROFILE SAVE & IMAGE
+// =========================
+const profilePic = document.getElementById("profilePic");
+const uploadPic = document.getElementById("uploadProfilePic");
+uploadPic?.addEventListener("change",(e)=>{
+  const reader=new FileReader();
+  reader.onload=function(){profilePic.src=reader.result;}
+  reader.readAsDataURL(e.target.files[0]);
 });
 
-// Withdraw
-function goToWithdraw(fromAccount){
-  document.getElementById('withdrawFromAccount').textContent=fromAccount;
-  document.getElementById('withdrawAmount').value='';
-  showSection('withdrawPage');
-}
-document.getElementById('withdrawForm').addEventListener('submit',e=>{
-  e.preventDefault();
-  const fromAccName=document.getElementById('withdrawFromAccount').textContent;
-  const amt=parseFloat(document.getElementById('withdrawAmount').value);
-  const accounts=getAccounts();
-  const acc=accounts.find(a=>a.name===fromAccName);
-  if(amt>acc.balance){ alert('Insufficient balance'); return; }
-  acc.balance-=amt;
-  const tx={id:crypto.randomUUID(),type:'Withdraw',to:'Cash',amount:amt,date:formatDate()};
-  acc.tx.push(tx); saveAccounts(accounts);
-  showSuccess(tx,acc.balance,fromAccName);
+document.getElementById("saveProfileBtn")?.addEventListener("click",()=>{
+  localStorage.setItem("profileName", document.getElementById("profileName").value);
+  localStorage.setItem("profilePhone", document.getElementById("profilePhone").value);
+  if(profilePic.src) localStorage.setItem("profilePic", profilePic.src);
+  alert("Profile saved");
 });
 
-// Wire
-function goToWire(fromAccount){
-  document.getElementById('wireFromAccount').textContent=fromAccount;
-  document.getElementById('wireTo').value='';
-  document.getElementById('wireAmount').value='';
-  showSection('wirePage');
-}
-document.getElementById('wireForm').addEventListener('submit',e=>{
-  e.preventDefault();
-  const fromAccName=document.getElementById('wireFromAccount').textContent;
-  const toBank=document.getElementById('wireTo').value;
-  const amt=parseFloat(document.getElementById('wireAmount').value);
-  const accounts=getAccounts();
-  const acc=accounts.find(a=>a.name===fromAccName);
-  if(amt>acc.balance){ alert('Insufficient balance'); return; }
-  acc.balance-=amt;
-  const tx={id:crypto.randomUUID(),type:'Wire',to:toBank,amount:amt,date:formatDate()};
-  acc.tx.push(tx); saveAccounts(accounts);
-  showSuccess(tx,acc.balance,fromAccName);
+window.addEventListener("load",()=>{
+  if(localStorage.getItem("profileName")) document.getElementById("profileName").value = localStorage.getItem("profileName");
+  if(localStorage.getItem("profilePhone")) document.getElementById("profilePhone").value = localStorage.getItem("profilePhone");
+  if(localStorage.getItem("profilePic")) profilePic.src = localStorage.getItem("profilePic");
+  document.getElementById("profileEmail").value = LOGIN_EMAIL;
+  document.getElementById("profileAccount").value = "1234567890";
 });
-
-// Show success page
-function showSuccess(tx,balance,fromAccName){
-  const card=document.getElementById('successDetails');
-  card.innerHTML=`<p><strong>Transaction ID:</strong> ${tx.id}</p>
-  <p><strong>Type:</strong> ${tx.type}</p>
-  <p><strong>From:</strong> ${fromAccName}</p>
-  <p><strong>To:</strong> ${tx.to}</p>
-  <p><strong>Amount:</strong> $${tx.amount}</p>
-  <p><strong>Date:</strong> ${tx.date}</p>
-  <p><strong>Remaining Balance:</strong> $${balance.toFixed(2)}</p>`;
-  showSection('successPage');
-}
-
-// Logout
-function logout(){ showSection('loginPage'); }
 
 </script>
+
 </body>
 </html>
