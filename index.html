@@ -33,7 +33,7 @@
   .card-custom p{margin:6px 0 0;color:#666}
   .bottom-nav{position:fixed;left:0;right:0;bottom:14px;margin:auto;display:flex;gap:18px;justify-content:center;pointer-events:auto;}
   .bottom-nav button{width:64px;height:64px;border-radius:32px;border:0;box-shadow:0 10px 30px rgba(0,0,0,.18);display:flex;align-items:center;justify-content:center;font-size:20px;cursor:pointer}
-  .menu{position:fixed;left:-290px;top:0;height:100%;width:270px;background:#fff;box-shadow:4px 0 30px rgba(0,0,0,.2);padding-top:64px;transition:left .22s;}
+  .menu{position:fixed;left:-290px;top:0;height:100%;width:270px;background:#fff;box-shadow:4px 0 30px rgba(0,0,0,.2);padding-top:64px;transition:left .22s;z-index:60}
   .menu.show{left:0}
   .menu a{display:flex;align-items:center;padding:12px 16px;color:#333;text-decoration:none;border-bottom:1px solid #f2f2f2}
   .menu a i{font-size:18px;margin-right:12px;color:var(--accent-4)}
@@ -48,11 +48,14 @@
   label{font-weight:600;font-size:14px;color:#333}
   .link-like{color:var(--accent-4);cursor:pointer}
   .muted{color:#777;font-size:13px}
+  .top-buffer{margin-top:14px}
+  .card-clickable{cursor:pointer}
+  /* small sections widths */
   @media (min-width:900px){.section{max-width:980px;margin:0 auto}}
 </style>
 </head>
 <body>
-<!-- PART 1 END: Paste PART 2 below this line (do NOT remove this comment) -->
+
 <!-- LOGIN PAGE -->
 <div id="loginSection" class="section active">
   <div class="login-card text-center">
@@ -67,7 +70,6 @@
 
 <!-- DASHBOARD -->
 <div id="dashboardSection" class="section">
-
   <div class="navbar mb-3">
     <i class="bi bi-list icon" id="menuToggle"></i>
     <i class="bi bi-person-circle profile-icon" id="openProfile"></i>
@@ -81,78 +83,32 @@
   </div>
 
   <h5 style="font-weight:700;margin-top:18px;">Accounts</h5>
-  <div class="card-custom" id="checkingCard">
+  <div class="card-custom card-clickable" id="checkingCard">
     <h5>Checking Account</h5>
     <p id="checkingBalance"></p>
   </div>
 
-  <div class="card-custom" id="savingsCard">
+  <div class="card-custom card-clickable" id="savingsCard">
     <h5>Savings Account</h5>
     <p id="savingsBalance"></p>
   </div>
 
   <h5 style="font-weight:700;margin-top:18px;">More Options</h5>
 
-  <div class="card-custom" id="cardsBtn">
+  <div class="card-custom card-clickable" id="cardsBtn">
     <h5><i class="bi bi-credit-card"></i> Cards</h5>
   </div>
 
-  <div class="card-custom" id="creditScoreBtn">
+  <div class="card-custom card-clickable" id="creditScoreBtn">
     <h5><i class="bi bi-graph-up"></i> Credit Score</h5>
   </div>
 
-  <div class="card-custom" id="payBillsBtn">
+  <div class="card-custom card-clickable" id="payBillsBtn">
     <h5><i class="bi bi-receipt"></i> Pay Bills</h5>
   </div>
 </div>
 
-<!-- INTERNAL TRANSFER PAGE (CHECKING <-> SAVINGS) -->
-<div id="internalTransferSection" class="section"></div>
-
-<!-- SEND TO OTHER BANK PAGE -->
-<div id="sendSection" class="section"></div>
-
-<!-- TOP-UP / WITHDRAW SECTION -->
-<div id="topupWithdrawSection" class="section"></div>
-
-<!-- SUCCESS RECEIPT -->
-<div id="successSection" class="section text-center"></div>
-
-<!-- LOADING SCREEN -->
-<div id="loadingSection" class="section text-center">
-  <div class="spinner"><div class="dot"></div></div>
-</div>
-
-<!-- CREDIT SCORE PAGE -->
-<div id="creditScoreSection" class="section text-center"></div>
-
-<!-- PAY BILLS PAGE -->
-<div id="payBillsSection" class="section text-center"></div>
-
-<!-- PROFILE PAGE -->
-<div id="profileSection" class="section text-center"></div>
-
-<!-- HAMBURGER MENU -->
-<div class="menu" id="sideMenu">
-  <a id="menuHome"><i class="bi bi-house"></i> Home</a>
-  <a id="menuTransfer"><i class="bi bi-arrow-left-right"></i> Transfer</a>
-  <a id="menuSend"><i class="bi bi-send"></i> Send</a>
-  <a id="menuTopup"><i class="bi bi-plus-circle"></i> Top Up</a>
-  <a id="menuWithdraw"><i class="bi bi-wallet2"></i> Withdraw</a>
-  <a id="menuWire"><i class="bi bi-cash-stack"></i> Wire Transfer</a>
-  <a id="menuProfile"><i class="bi bi-person"></i> Profile</a>
-  <a id="menuLogout"><i class="bi bi-box-arrow-right"></i> Logout</a>
-</div>
-
-<!-- BOTTOM NAVIGATION -->
-<div class="bottom-nav">
-  <button id="navSend"><i class="bi bi-send"></i></button>
-  <button id="navTopup"><i class="bi bi-plus-lg"></i></button>
-  <button id="navWithdraw"><i class="bi bi-wallet2"></i></button>
-</div>
-
-<!-- PART 2 END — WAIT FOR PART 3 -->
-<!-- INTERNAL TRANSFER PAGE -->
+<!-- INTERNAL TRANSFER -->
 <div id="internalTransferSection" class="section">
   <h3 style="font-weight:700;">Transfer Between Accounts</h3>
 
@@ -288,182 +244,79 @@
     <span class="link-like" id="wireBack">← Back to Dashboard</span>
   </div>
 </div>
+
 <!-- SUCCESS / RECEIPT SCREEN -->
-<div id="successScreen" style="display:none; padding:25px;">
+<div id="successSection" class="section text-center">
     <div style="text-align:center; font-size:32px; margin-bottom:20px;">✅</div>
     <h2 style="text-align:center; margin-bottom:10px;">Transaction Successful</h2>
     <div id="successDetails" style="background:#fff; padding:20px; border-radius:12px; box-shadow:0 4px 20px rgba(0,0,0,0.12); font-size:16px; line-height:26px;">
     </div>
-    <button onclick="returnToDashboard()" style="width:100%; margin-top:25px; padding:15px; border:none; border-radius:10px; background:#4b6bfb; color:#fff; font-size:18px;">
+    <button id="successBack" style="width:100%; margin-top:25px; padding:15px; border:none; border-radius:10px; background:#4b6bfb; color:#fff; font-size:18px;">
         Back to Dashboard
     </button>
 </div>
 
-
 <!-- LOADING SCREEN -->
-<div id="loadingScreen" style="display:none; text-align:center; padding:50px;">
-    <div class="spinner" style="margin:auto; width:60px; height:60px; border:6px solid #ddd; border-top-color:#4b6bfb; border-radius:50%; animation:spin 1s linear infinite;"></div>
-    <h3 style="margin-top:20px;">Processing Transaction...</h3>
+<div id="loadingSection" class="section text-center">
+  <div class="spinner"><div class="dot"></div></div>
+  <h3 id="loadingText" style="color:#fff; margin-top:8px;"></h3>
 </div>
 
-<style>
-@keyframes spin { 
-    from { transform:rotate(0deg); }
-    to   { transform:rotate(360deg); }
-}
-</style>
+<!-- CREDIT SCORE PAGE -->
+<div id="creditScoreSection" class="section text-center">
+  <h3 style="font-weight:700;">Credit Score</h3>
+  <div class="success-card mt-3">
+    <h4 id="creditScoreValue" style="margin:0; font-size:42px; color:var(--accent-4)">720</h4>
+    <p class="small-muted">Estimated credit score based on demo data</p>
+    <div class="receipt-row">
+      <div>On-time Payments</div><div>92%</div>
+    </div>
+    <div class="receipt-row">
+      <div>Utilization</div><div>24%</div>
+    </div>
+    <div class="receipt-row">
+      <div>Credit Age</div><div>3 years</div>
+    </div>
+    <div class="mt-3">
+      <button class="btn btn-primary w-100" id="creditImprove">How to Improve</button>
+    </div>
+  </div>
+  <div class="mt-4 text-center">
+    <span class="link-like" id="csBack">← Back to Dashboard</span>
+  </div>
+</div>
 
+<!-- PAY BILLS PAGE -->
+<div id="payBillsSection" class="section text-center">
+  <h3 style="font-weight:700;">Pay Bills</h3>
+  <div class="success-card mt-3">
+    <label>Bill Type</label>
+    <select id="billType">
+      <option value="electricity">Electricity</option>
+      <option value="water">Water</option>
+      <option value="internet">Internet</option>
+      <option value="rent">Rent</option>
+    </select>
 
-<script>
-// SHOW LOADING → SUCCESS RECEIPT
-function showLoadingThenSuccess(receiptHTML) {
-    document.getElementById("dashboard").style.display = "none";
-    document.getElementById("transferPage").style.display = "none";
-    document.getElementById("withdrawPage").style.display = "none";
-    document.getElementById("topupPage").style.display = "none";
-    document.getElementById("wirePage").style.display = "none";
+    <label class="mt-3">Amount</label>
+    <input type="number" id="billAmount" placeholder="0.00">
 
-    document.getElementById("loadingScreen").style.display = "block";
+    <div class="mt-3">
+      <button class="btn btn-primary w-100" id="payBillBtn">Pay Bill</button>
+    </div>
+  </div>
+  <div class="mt-4 text-center">
+    <span class="link-like" id="pbBack">← Back to Dashboard</span>
+  </div>
+</div>
 
-    setTimeout(() => {
-        document.getElementById("loadingScreen").style.display = "none";
-        document.getElementById("successDetails").innerHTML = receiptHTML;
-        document.getElementById("successScreen").style.display = "block";
-    }, 2000);
-}
-
-function returnToDashboard() {
-    document.getElementById("successScreen").style.display = "none";
-    document.getElementById("dashboard").style.display = "block";
-}
-
-
-// CREATE BANK RECEIPT
-function createReceipt(title, amount, fee, total, fromAcc, toAcc, extraInfo = "") {
-    let id = "TX-" + Math.floor(Math.random() * 999999999);
-    let date = new Date().toLocaleString();
-
-    return `
-        <h3>${title}</h3>
-        <p><strong>Transaction ID:</strong> ${id}</p>
-        <p><strong>Date:</strong> ${date}</p>
-        <p><strong>Amount:</strong> $${amount}</p>
-        <p><strong>Fee (5%):</strong> $${fee}</p>
-        <p><strong>Total Deducted:</strong> $${total}</p>
-        <p><strong>From:</strong> ${fromAcc}</p>
-        <p><strong>To:</strong> ${toAcc}</p>
-        ${extraInfo}
-    `;
-}
-
-
-
-// HANDLE INTERNAL TRANSFER
-function completeInternalTransfer() {
-    let amount = parseFloat(document.getElementById("internalTransferAmount").value);
-    if (!amount || amount <= 0) return alert("Enter a valid amount");
-
-    let fee = amount * 0.05;
-    let total = amount + fee;
-
-    let fromAcc = document.getElementById("internalFrom").value;
-    let toAcc = document.getElementById("internalTo").value;
-
-    let receipt = createReceipt("Internal Transfer", amount, fee, total, fromAcc, toAcc);
-
-    showLoadingThenSuccess(receipt);
-}
-
-
-
-// HANDLE TOP-UP
-function completeTopUp() {
-    let amount = parseFloat(document.getElementById("topupAmount").value);
-    if (!amount || amount <= 0) return alert("Enter a valid amount");
-
-    let fee = amount * 0.05;
-    let total = amount + fee;
-
-    let fromCard = document.getElementById("selectedTopupCard").innerText;
-
-    let receipt = createReceipt(
-        "Balance Top-Up",
-        amount,
-        fee,
-        total,
-        fromCard,
-        "Checking"
-    );
-
-    showLoadingThenSuccess(receipt);
-}
-
-
-
-// HANDLE WITHDRAW
-function completeWithdraw() {
-    let amount = parseFloat(document.getElementById("withdrawAmount").value);
-    if (!amount || amount <= 0) return alert("Enter a valid amount");
-
-    let fee = amount * 0.05;
-    let total = amount + fee;
-
-    let receipt = createReceipt(
-        "Withdrawal",
-        amount,
-        fee,
-        total,
-        "Checking",
-        "Linked Bank/Card"
-    );
-
-    showLoadingThenSuccess(receipt);
-}
-
-
-
-// HANDLE WIRE TRANSFER
-function completeWireTransfer() {
-    let amount = parseFloat(document.getElementById("wireAmount").value);
-    if (!amount || amount <= 0) return alert("Enter a valid amount");
-
-    let fee = amount * 0.05;
-    let total = amount + fee;
-
-    let bank = document.getElementById("wireBank").value;
-    let name = document.getElementById("wireName").value;
-    let addr = document.getElementById("wireAddress").value;
-    let bankaddr = document.getElementById("wireBankAddress").value;
-    let swift = document.getElementById("wireSwift").value;
-
-    let extra = `
-        <p><strong>Recipient Name:</strong> ${name}</p>
-        <p><strong>Recipient Address:</strong> ${addr}</p>
-        <p><strong>Bank Name:</strong> ${bank}</p>
-        <p><strong>Bank Address:</strong> ${bankaddr}</p>
-        <p><strong>SWIFT/Routing:</strong> ${swift}</p>
-    `;
-
-    let receipt = createReceipt(
-        "Wire Transfer",
-        amount,
-        fee,
-        total,
-        "Checking",
-        name,
-        extra
-    );
-
-    showLoadingThenSuccess(receipt);
-}
-</script>
 <!-- PROFILE PAGE -->
-<div id="profileSection" class="section">
+<div id="profileSection" class="section text-center">
   <h3 style="font-weight:700;">Profile</h3>
   <div style="text-align:center; margin-bottom:20px;">
     <img src="" id="profilePic" class="profile-pic" alt="Profile Picture">
     <div class="mt-2">
-      <input type="file" id="uploadProfilePic">
+      <input type="file" id="uploadProfilePic" accept="image/*">
     </div>
   </div>
 
@@ -486,47 +339,141 @@ function completeWireTransfer() {
   </div>
 </div>
 
+<!-- HAMBURGER MENU -->
+<div class="menu" id="sideMenu">
+  <a id="menuHome"><i class="bi bi-house"></i> Home</a>
+  <a id="menuTransfer"><i class="bi bi-arrow-left-right"></i> Transfer</a>
+  <a id="menuSend"><i class="bi bi-send"></i> Send</a>
+  <a id="menuTopup"><i class="bi bi-plus-circle"></i> Top Up</a>
+  <a id="menuWithdraw"><i class="bi bi-wallet2"></i> Withdraw</a>
+  <a id="menuWire"><i class="bi bi-cash-stack"></i> Wire Transfer</a>
+  <a id="menuProfile"><i class="bi bi-person"></i> Profile</a>
+  <a id="menuLogout"><i class="bi bi-box-arrow-right"></i> Logout</a>
+</div>
+
+<!-- BOTTOM NAVIGATION -->
+<div class="bottom-nav">
+  <button id="navSend"><i class="bi bi-send"></i></button>
+  <button id="navTopup"><i class="bi bi-plus-lg"></i></button>
+  <button id="navWithdraw"><i class="bi bi-wallet2"></i></button>
+</div>
+
 <script>
-// =========================
-// LOGIN CREDENTIALS
-// =========================
+// ---------------------------
+// DEMO CREDENTIALS
+// ---------------------------
 const LOGIN_EMAIL = "Michiganbank@gmail.com";
 const LOGIN_PASSWORD = "Bank1&$";
 
+// ---------------------------
+// ELEMENT SHORTCUTS
+// ---------------------------
 const loginSection = document.getElementById("loginSection");
 const dashboardSection = document.getElementById("dashboardSection");
+const internalTransferSection = document.getElementById("internalTransferSection");
+const sendSection = document.getElementById("sendSection");
+const topupWithdrawSection = document.getElementById("topupWithdrawSection");
+const wireSection = document.getElementById("wireSection");
+const successSection = document.getElementById("successSection");
+const loadingSection = document.getElementById("loadingSection");
+const creditScoreSection = document.getElementById("creditScoreSection");
+const payBillsSection = document.getElementById("payBillsSection");
+const profileSection = document.getElementById("profileSection");
+const sideMenu = document.getElementById("sideMenu");
 
+// ---------------------------
+// STATE
+// ---------------------------
+let checkingBalance = 5000.00;
+let savingsBalance = 3000.00;
+let selectedTopupCardId = null;
+
+// simple cards store in localStorage
+function getCards(){ return JSON.parse(localStorage.getItem("demo_cards") || "[]"); }
+function saveCards(cards){ localStorage.setItem("demo_cards", JSON.stringify(cards)); }
+
+// ---------------------------
+// UTIL: Show section (hides others)
+// ---------------------------
+function showSection(id){
+  const sections = document.querySelectorAll(".section");
+  sections.forEach(s => s.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+  // close menu if open
+  sideMenu.classList.remove("show");
+}
+
+// ---------------------------
+// LOADING -> SUCCESS flow
+// ---------------------------
+function showLoading(message="Processing..."){
+  // hide everything else
+  const sections = document.querySelectorAll(".section");
+  sections.forEach(s => s.classList.remove("active"));
+  loadingSection.classList.add("active");
+  document.getElementById("loadingText").innerText = message;
+}
+
+function showSuccess(receiptHTML){
+  loadingSection.classList.remove("active");
+  successSection.classList.add("active");
+  document.getElementById("successDetails").innerHTML = receiptHTML;
+}
+
+// ---------------------------
+// RECEIPT CREATION
+// ---------------------------
+function createReceipt(title, amount, fee, total, fromAcc, toAcc, extraInfo = ""){
+  const id = "TX-" + Math.floor(Math.random() * 900000000 + 100000000);
+  const date = new Date().toLocaleString();
+  return `
+    <div style="text-align:left;">
+      <h4 style="margin-bottom:6px">${title}</h4>
+      <p class="small-muted" style="margin:0 0 8px;">Transaction ID: ${id}</p>
+      <p style="margin:6px 0;"><strong>Date:</strong> ${date}</p>
+      <p style="margin:6px 0;"><strong>Amount:</strong> $${Number(amount).toFixed(2)}</p>
+      <p style="margin:6px 0;"><strong>Fee:</strong> $${Number(fee).toFixed(2)}</p>
+      <p style="margin:6px 0;"><strong>Total Deducted:</strong> $${Number(total).toFixed(2)}</p>
+      <p style="margin:6px 0;"><strong>From:</strong> ${fromAcc}</p>
+      <p style="margin:6px 0;"><strong>To:</strong> ${toAcc}</p>
+      ${extraInfo}
+    </div>
+  `;
+}
+
+// ---------------------------
+// LOGIN
+// ---------------------------
 document.getElementById("loginBtn").addEventListener("click", ()=>{
-  const email = document.getElementById("loginEmail").value;
+  const email = document.getElementById("loginEmail").value.trim();
   const pass = document.getElementById("loginPassword").value;
-
   if(email === LOGIN_EMAIL && pass === LOGIN_PASSWORD){
-    loginSection.classList.remove("active");
-    dashboardSection.classList.add("active");
+    document.getElementById("loginError").style.display = "none";
+    showSection("dashboardSection");
     initDashboard();
   } else {
-    document.getElementById("loginError").style.display="block";
+    document.getElementById("loginError").style.display = "block";
   }
 });
 
-// =========================
-// DASHBOARD LOGIC
-// =========================
-let checkingBalance = 5000;
-let savingsBalance = 3000;
-
+// ---------------------------
+// DASHBOARD INIT
+// ---------------------------
 function initDashboard(){
   updateBalances();
   setGreeting();
   setInterval(setGreeting,60000);
+  renderCardsList();
 }
 
+// update balances in UI
 function updateBalances(){
   document.getElementById("checkingBalance").innerText = "$"+checkingBalance.toFixed(2);
   document.getElementById("savingsBalance").innerText = "$"+savingsBalance.toFixed(2);
   document.getElementById("overallBalance").innerText = "$"+(checkingBalance+savingsBalance).toFixed(2);
 }
 
+// greeting & time
 function setGreeting(){
   const hour = new Date().getHours();
   let greet = "Hello";
@@ -537,90 +484,332 @@ function setGreeting(){
   document.getElementById("liveTime").innerText = new Date().toLocaleTimeString();
 }
 
-// =========================
-// HAMBURGER MENU
-// =========================
-const menu = document.getElementById("sideMenu");
-document.getElementById("menuToggle").addEventListener("click",()=>menu.classList.toggle("show"));
-document.getElementById("menuHome").addEventListener("click",()=>showSection("dashboardSection"));
-document.getElementById("menuProfile").addEventListener("click",()=>showSection("profileSection"));
-document.getElementById("menuLogout").addEventListener("click",()=>{
-  location.reload();
+// ---------------------------
+// MENU & NAV
+// ---------------------------
+document.getElementById("menuToggle").addEventListener("click", ()=> sideMenu.classList.toggle("show"));
+document.getElementById("menuHome").addEventListener("click", ()=> showSection("dashboardSection"));
+document.getElementById("menuTransfer").addEventListener("click", ()=> showSection("internalTransferSection"));
+document.getElementById("menuSend").addEventListener("click", ()=> showSection("sendSection"));
+document.getElementById("menuTopup").addEventListener("click", ()=> showSection("topupWithdrawSection"));
+document.getElementById("menuWithdraw").addEventListener("click", ()=> showSection("topupWithdrawSection"));
+document.getElementById("menuWire").addEventListener("click", ()=> showSection("wireSection"));
+document.getElementById("menuProfile").addEventListener("click", ()=> showSection("profileSection"));
+document.getElementById("menuLogout").addEventListener("click", ()=> { location.reload(); });
+
+// open profile icon
+document.getElementById("openProfile").addEventListener("click", ()=> showSection("profileSection"));
+
+// bottom nav
+document.getElementById("navSend").addEventListener("click", ()=> showSection("sendSection"));
+document.getElementById("navTopup").addEventListener("click", ()=> showSection("topupWithdrawSection"));
+document.getElementById("navWithdraw").addEventListener("click", ()=> showSection("topupWithdrawSection"));
+
+// direct card clicks to transfer
+document.getElementById("checkingCard").addEventListener("click", ()=> {
+  showSection("internalTransferSection");
+  document.getElementById("itFrom").value = "checking";
+  document.getElementById("itTo").value = "savings";
+});
+document.getElementById("savingsCard").addEventListener("click", ()=> {
+  showSection("internalTransferSection");
+  document.getElementById("itFrom").value = "savings";
+  document.getElementById("itTo").value = "checking";
 });
 
-// =========================
-// NAVIGATION
-// =========================
-function showSection(id){
-  let sections = document.querySelectorAll(".section");
-  sections.forEach(s=>s.classList.remove("active"));
-  document.getElementById(id).classList.add("active");
-  menu.classList.remove("show");
+// other option buttons
+document.getElementById("cardsBtn").addEventListener("click", ()=> showSection("topupWithdrawSection"));
+document.getElementById("creditScoreBtn").addEventListener("click", ()=> showSection("creditScoreSection"));
+document.getElementById("payBillsBtn").addEventListener("click", ()=> showSection("payBillsSection"));
+
+// back links
+document.getElementById("itBack").addEventListener("click", ()=> showSection("dashboardSection"));
+document.getElementById("sendBack").addEventListener("click", ()=> showSection("dashboardSection"));
+document.getElementById("twBack").addEventListener("click", ()=> showSection("dashboardSection"));
+document.getElementById("profileBack").addEventListener("click", ()=> showSection("dashboardSection"));
+document.getElementById("wireBack").addEventListener("click", ()=> showSection("dashboardSection"));
+document.getElementById("csBack").addEventListener("click", ()=> showSection("dashboardSection"));
+document.getElementById("pbBack").addEventListener("click", ()=> showSection("dashboardSection"));
+
+// success back
+document.getElementById("successBack").addEventListener("click", ()=> {
+  showSection("dashboardSection");
+});
+
+// ---------------------------
+// INTERNAL TRANSFER
+// ---------------------------
+document.getElementById("itSubmit").addEventListener("click", ()=>{
+  const fromAcc = document.getElementById("itFrom").value;
+  const toAcc = document.getElementById("itTo").value;
+  const amount = parseFloat(document.getElementById("itAmount").value);
+  if(!amount || amount <= 0){ alert("Enter valid amount"); return; }
+  if(fromAcc === toAcc){ alert("Select different accounts"); return; }
+  const fee = +(amount * 0.05).toFixed(2);
+  const total = +(amount + fee).toFixed(2);
+  if(fromAcc === "checking" && checkingBalance < total){ alert("Insufficient funds"); return; }
+  if(fromAcc === "savings" && savingsBalance < total){ alert("Insufficient funds"); return; }
+  // perform transfer
+  if(fromAcc === "checking"){
+    checkingBalance = +(checkingBalance - total).toFixed(2);
+    savingsBalance = +(savingsBalance + amount).toFixed(2);
+  } else {
+    savingsBalance = +(savingsBalance - total).toFixed(2);
+    checkingBalance = +(checkingBalance + amount).toFixed(2);
+  }
+  updateBalances();
+  const receipt = createReceipt("Internal Transfer", amount, fee, total, fromAcc.charAt(0).toUpperCase()+fromAcc.slice(1), toAcc.charAt(0).toUpperCase()+toAcc.slice(1));
+  // show loading then success
+  showLoading("Completing transfer...");
+  setTimeout(()=> showSuccess(receipt), 1200);
+});
+
+// ---------------------------
+// SEND TO OTHER BANK
+// ---------------------------
+document.getElementById("sendSubmit").addEventListener("click", ()=>{
+  const bank = document.getElementById("sendBank").value.trim();
+  const name = document.getElementById("sendName").value.trim();
+  const acc = document.getElementById("sendAcc").value.trim();
+  const amount = parseFloat(document.getElementById("sendAmount").value);
+  if(!bank || !name || !acc){ alert("Fill all recipient details"); return; }
+  if(!amount || amount <= 0){ alert("Enter valid amount"); return; }
+  const fee = +(amount * 0.05).toFixed(2);
+  const total = +(amount + fee).toFixed(2);
+  if(checkingBalance < total){ alert("Insufficient funds"); return; }
+  checkingBalance = +(checkingBalance - total).toFixed(2);
+  updateBalances();
+  const extra = `<p><strong>Recipient Bank:</strong> ${bank}</p><p><strong>Recipient Account:</strong> ${acc}</p>`;
+  const receipt = createReceipt("Send Transfer", amount, fee, total, "Checking", name, extra);
+  showLoading("Sending money...");
+  setTimeout(()=> showSuccess(receipt), 1200);
+});
+
+// ---------------------------
+// WIRE TRANSFER
+// ---------------------------
+document.getElementById("wireSubmit").addEventListener("click", ()=>{
+  const bank = document.getElementById("wireBank").value.trim();
+  const country = document.getElementById("wireCountry").value;
+  const code = document.getElementById("wireCode").value.trim();
+  const rAddr = document.getElementById("wireRecipientAddress").value.trim();
+  const bAddr = document.getElementById("wireBankAddress").value.trim();
+  const name = document.getElementById("wireName").value.trim();
+  const acc = document.getElementById("wireAcc").value.trim();
+  const amount = parseFloat(document.getElementById("wireAmount").value);
+  if(!bank || !name || !acc){ alert("Fill recipient bank, name and account number"); return; }
+  if(!amount || amount <= 0){ alert("Enter valid amount"); return; }
+  const fee = +(amount * 0.05).toFixed(2);
+  const total = +(amount + fee).toFixed(2);
+  if(checkingBalance < total){ alert("Insufficient funds"); return; }
+  checkingBalance = +(checkingBalance - total).toFixed(2);
+  updateBalances();
+  const extra = `
+    <p><strong>Recipient Name:</strong> ${name}</p>
+    <p><strong>Recipient Address:</strong> ${rAddr}</p>
+    <p><strong>Bank Name:</strong> ${bank}</p>
+    <p><strong>Bank Address:</strong> ${bAddr}</p>
+    <p><strong>Country:</strong> ${country}</p>
+    <p><strong>SWIFT/Routing:</strong> ${code}</p>
+  `;
+  const receipt = createReceipt("Wire Transfer", amount, fee, total, "Checking", name, extra);
+  showLoading("Sending wire transfer...");
+  setTimeout(()=> showSuccess(receipt), 1500);
+});
+
+// auto-change SWIFT code based on country selection (small demo)
+document.getElementById("wireCountry").addEventListener("change", (e)=>{
+  const v = e.target.value;
+  let code = "";
+  if(v === "USA") code = "ACH / 021000021";
+  else if(v === "UK") code = "GB33BUKB20201555555555";
+  else if(v === "EU") code = "DE89370400440532013000";
+  else if(v === "CA") code = "ROYCCAT2";
+  else if(v === "AU") code = "NATAAU3303";
+  document.getElementById("wireCode").value = code;
+});
+
+// ---------------------------
+// TOP-UP & CARDS
+// ---------------------------
+function renderCardsList(){
+  const list = document.getElementById("cardList");
+  const cards = getCards();
+  list.innerHTML = "";
+  if(cards.length === 0){
+    list.innerHTML = `<div class="card-custom">No cards added yet. Add a card to top up your account.</div>`;
+    document.getElementById("topupAmountBox").style.display = "none";
+    return;
+  }
+  cards.forEach(c=>{
+    const div = document.createElement("div");
+    div.className = "card-custom";
+    div.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center">
+      <div>
+        <h5 style="margin:0;">${c.brand} •••• ${c.last4}</h5>
+        <p class="small-muted" style="margin:4px 0 0;">Expiry ${c.exp}</p>
+      </div>
+      <div>
+        <button class="btn btn-primary" data-cardid="${c.id}" onclick="selectTopupCard('${c.id}')">Use</button>
+        <button class="btn btn-danger ms-2" data-delete="${c.id}" onclick="removeCard('${c.id}')">Delete</button>
+      </div>
+    </div>`;
+    list.appendChild(div);
+  });
+  // show topup box if one selected
+  if(selectedTopupCardId){
+    document.getElementById("topupAmountBox").style.display = "block";
+  }
 }
 
-document.getElementById("checkingCard").addEventListener("click",()=>showSection("internalTransferSection"));
-document.getElementById("savingsCard").addEventListener("click",()=>showSection("internalTransferSection"));
-document.getElementById("creditScoreBtn").addEventListener("click",()=>showSection("creditScoreSection"));
-document.getElementById("payBillsBtn").addEventListener("click",()=>showSection("payBillsSection"));
+window.selectTopupCard = function(cardId){
+  selectedTopupCardId = cardId;
+  const cards = getCards();
+  const c = cards.find(x=>x.id === cardId);
+  document.getElementById("selectedTopupCard")?.remove?.();
+  const box = document.getElementById("topupAmountBox");
+  if(!box) return;
+  // display selected card above input
+  let plac = document.getElementById("selectedTopupCard");
+  if(!plac){
+    plac = document.createElement("div");
+    plac.id = "selectedTopupCard";
+    plac.style.marginBottom = "10px";
+    box.insertBefore(plac, box.firstChild);
+  }
+  plac.innerText = `${c.brand} •••• ${c.last4}`;
+  box.style.display = "block";
+};
 
-// BOTTOM NAV
-document.getElementById("navSend").addEventListener("click",()=>showSection("sendSection"));
-document.getElementById("navTopup").addEventListener("click",()=>showSection("topupWithdrawSection"));
-document.getElementById("navWithdraw").addEventListener("click",()=>showSection("topupWithdrawSection"));
+window.removeCard = function(cardId){
+  if(!confirm("Delete this card?")) return;
+  let cards = getCards();
+  cards = cards.filter(c=>c.id !== cardId);
+  saveCards(cards);
+  if(selectedTopupCardId === cardId) { selectedTopupCardId = null; document.getElementById("topupAmountBox").style.display = "none"; }
+  renderCardsList();
+};
 
-// BACK BUTTONS
-document.getElementById("itBack")?.addEventListener("click",()=>showSection("dashboardSection"));
-document.getElementById("sendBack")?.addEventListener("click",()=>showSection("dashboardSection"));
-document.getElementById("twBack")?.addEventListener("click",()=>showSection("dashboardSection"));
-document.getElementById("profileBack")?.addEventListener("click",()=>showSection("dashboardSection"));
-document.getElementById("wireBack")?.addEventListener("click",()=>showSection("dashboardSection"));
-
-// =========================
-// INTERNAL TRANSFER BUTTON
-// =========================
-document.getElementById("itSubmit")?.addEventListener("click",()=>{
-  let fromAcc = document.getElementById("itFrom").value;
-  let toAcc = document.getElementById("itTo").value;
-  let amount = parseFloat(document.getElementById("itAmount").value);
-  if(!amount || amount<=0){alert("Enter valid amount"); return;}
-  if(fromAcc===toAcc){alert("Select different accounts"); return;}
-  let fee = amount*0.05;
-  let total = amount + fee;
-  if(fromAcc==="checking" && checkingBalance<total){alert("Insufficient funds"); return;}
-  if(fromAcc==="savings" && savingsBalance<total){alert("Insufficient funds"); return;}
-  if(fromAcc==="checking"){checkingBalance-=total; savingsBalance+=amount;}
-  else{savingsBalance-=total; checkingBalance+=amount;}
-  updateBalances();
-  let receipt=createReceipt("Internal Transfer", amount, fee, total, fromAcc, toAcc);
-  showLoadingThenSuccess(receipt);
+// add card button
+document.getElementById("addCardBtn").addEventListener("click", ()=>{
+  const brand = prompt("Card Brand (e.g. VISA, MasterCard)");
+  if(!brand) return;
+  const last4 = prompt("Last 4 digits");
+  if(!last4 || last4.length !== 4) { alert("Enter 4 digits"); return; }
+  const exp = prompt("Expiry (MM/YY)");
+  const id = "card-" + Math.floor(Math.random()*900000+100000);
+  const cards = getCards();
+  cards.push({ id, brand, last4, exp });
+  saveCards(cards);
+  renderCardsList();
 });
 
-// =========================
-// PROFILE SAVE & IMAGE
-// =========================
+// topup submit
+document.getElementById("topupSubmit").addEventListener("click", ()=>{
+  const amount = parseFloat(document.getElementById("topupAmount").value);
+  if(!amount || amount <= 0) { alert("Enter valid amount"); return; }
+  if(!selectedTopupCardId){ alert("Select a card"); return; }
+  const fee = +(amount * 0.05).toFixed(2);
+  const total = +(amount + fee).toFixed(2);
+  // for topup we add amount to checking (deduct from card - demo)
+  checkingBalance = +(checkingBalance + amount).toFixed(2);
+  updateBalances();
+  const card = getCards().find(c=>c.id === selectedTopupCardId);
+  const receipt = createReceipt("Top Up", amount, fee, total, `${card.brand} •••• ${card.last4}`, "Checking");
+  showLoading("Processing top-up...");
+  setTimeout(()=> showSuccess(receipt), 1100);
+});
+
+// ---------------------------
+// WITHDRAW
+// ---------------------------
+document.getElementById("withdrawSubmit").addEventListener("click", ()=>{
+  const amount = parseFloat(document.getElementById("withdrawAmount").value);
+  if(!amount || amount <= 0) { alert("Enter valid amount"); return; }
+  const fee = +(amount * 0.05).toFixed(2);
+  const total = +(amount + fee).toFixed(2);
+  if(checkingBalance < total){ alert("Insufficient funds"); return; }
+  checkingBalance = +(checkingBalance - total).toFixed(2);
+  updateBalances();
+  const receipt = createReceipt("Withdrawal", amount, fee, total, "Checking", "Linked Card/Bank");
+  showLoading("Processing withdrawal...");
+  setTimeout(()=> showSuccess(receipt), 1100);
+});
+
+// ---------------------------
+// PAY BILLS
+// ---------------------------
+document.getElementById("payBillBtn").addEventListener("click", ()=>{
+  const type = document.getElementById("billType").value;
+  const amount = parseFloat(document.getElementById("billAmount").value);
+  if(!amount || amount <= 0){ alert("Enter valid amount"); return; }
+  const fee = +(amount * 0.02).toFixed(2); // smaller fee for bills
+  const total = +(amount + fee).toFixed(2);
+  if(checkingBalance < total){ alert("Insufficient funds"); return; }
+  checkingBalance = +(checkingBalance - total).toFixed(2);
+  updateBalances();
+  const receipt = createReceipt("Bill Payment", amount, fee, total, "Checking", type.charAt(0).toUpperCase() + type.slice(1));
+  showLoading("Paying bill...");
+  setTimeout(()=> showSuccess(receipt), 900);
+});
+
+// ---------------------------
+// CREDIT SCORE HELP
+// ---------------------------
+document.getElementById("creditImprove").addEventListener("click", ()=>{
+  alert("Tips: pay bills on time, reduce utilization below 30%, and keep accounts open longer.");
+});
+
+// ---------------------------
+// PROFILE: image & save
+// ---------------------------
 const profilePic = document.getElementById("profilePic");
 const uploadPic = document.getElementById("uploadProfilePic");
-uploadPic?.addEventListener("change",(e)=>{
-  const reader=new FileReader();
-  reader.onload=function(){profilePic.src=reader.result;}
+
+uploadPic.addEventListener("change", (e)=>{
+  const reader = new FileReader();
+  reader.onload = function(){ profilePic.src = reader.result; localStorage.setItem("profilePic", reader.result); }
   reader.readAsDataURL(e.target.files[0]);
 });
 
-document.getElementById("saveProfileBtn")?.addEventListener("click",()=>{
+document.getElementById("saveProfileBtn").addEventListener("click", ()=>{
   localStorage.setItem("profileName", document.getElementById("profileName").value);
   localStorage.setItem("profilePhone", document.getElementById("profilePhone").value);
-  if(profilePic.src) localStorage.setItem("profilePic", profilePic.src);
   alert("Profile saved");
 });
 
-window.addEventListener("load",()=>{
+// ---------------------------
+// PAGE LOAD: hydrate
+// ---------------------------
+window.addEventListener("load", ()=>{
+  // hydrate profile
   if(localStorage.getItem("profileName")) document.getElementById("profileName").value = localStorage.getItem("profileName");
   if(localStorage.getItem("profilePhone")) document.getElementById("profilePhone").value = localStorage.getItem("profilePhone");
   if(localStorage.getItem("profilePic")) profilePic.src = localStorage.getItem("profilePic");
   document.getElementById("profileEmail").value = LOGIN_EMAIL;
   document.getElementById("profileAccount").value = "1234567890";
+
+  // sample demo card
+  if(getCards().length === 0){
+    const demo = [{ id: "card-1111", brand: "VISA", last4: "4242", exp: "12/28" }];
+    saveCards(demo);
+  }
+  renderCardsList();
+  updateBalances();
+  setGreeting();
 });
 
+// ---------------------------
+// Accessibility: make entire .card-custom clickable by keyboard too
+// ---------------------------
+document.addEventListener("keydown", (e)=>{
+  if(e.key === "Enter"){
+    const active = document.activeElement;
+    if(active && active.classList && active.classList.contains("card-custom")){
+      active.click();
+    }
+  }
+});
 </script>
 
 </body>
