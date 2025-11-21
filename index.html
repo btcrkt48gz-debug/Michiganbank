@@ -1081,11 +1081,18 @@
       
       if(type === "send"){
         const {cryptoAmt, toWallet} = cryptoTxData;
-        const q = query(collection(db,"users"), where("cryptoWallets."+currentCryptoDetail, "==", toWallet));
-        const recipSnap = await getDocs(q);
-        if(recipSnap.empty) throw new Error("Wallet not found");
-        const recipientUid = recipSnap.docs[0].id;
+        const allUsersSnap = await getDocs(collection(db,"users"));
+        let recipientUid = null;
+        allUsersSnap.forEach(userDoc => {
+          const wallets = userDoc.data().cryptoWallets || {};
+          if(wallets[currentCryptoDetail] === toWallet){
+            recipientUid = userDoc.id;
+          }
+        });
+        if(!recipientUid) throw new Error("Wallet not found");
+        const recipSnap = await getDoc(doc(db,"users",recipientUid));
         
+        const recipientData = recipSnap.data();
         await runTransaction(db, async (transaction) => {
           const senderDoc = await transaction.get(doc(db,"users",uid));
           const recipientDoc = await transaction.get(doc(db,"users",recipientUid));
@@ -1449,7 +1456,6 @@
     document.getElementById("checkingBal").innerText = "$"+(currentUser.checkingBalance || 0).toFixed(2);
     document.getElementById("savingsBal").innerText = "$"+(currentUser.savingsBalance || 0).toFixed(2);
     const holdings = currentUser.cryptoHoldings || {bitcoin: 0, ethereum: 0, litecoin: 0};
-    document.getElementById("cryptoHoldings").innerText = `BTC: ${(holdings.bitcoin || 0).toFixed(4)} | ETH: ${(holdings.ethereum || 0).toFixed(4)} | LTC: ${(holdings.litecoin || 0).toFixed(4)}`;
     const btcPrice = cryptoPrices.bitcoin?.usd || 0;
     const ethPrice = cryptoPrices.ethereum?.usd || 0;
     const ltcPrice = cryptoPrices.litecoin?.usd || 0;
@@ -1461,6 +1467,7 @@
     const totalBTC = totalBankUSD / (btcPrice || 1);
     document.getElementById("overallBalance").innerText = "$"+totalBankUSD.toFixed(2);
     document.getElementById("overallBalanceUSD").innerText = totalBTC.toFixed(4)+" BTC";
+    document.getElementById("cryptoHoldings").innerHTML = `<div>BTC: ${(holdings.bitcoin || 0).toFixed(4)} | $${btcValue.toFixed(2)}</div><div>ETH: ${(holdings.ethereum || 0).toFixed(4)} | $${ethValue.toFixed(2)}</div><div>LTC: ${(holdings.litecoin || 0).toFixed(4)} | $${ltcValue.toFixed(2)}</div>`;
     setGreeting();
   }
 
