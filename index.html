@@ -272,11 +272,18 @@
       <h5 id="sendCryptoTitle">Send Bitcoin</h5>
       <label>Recipient Wallet Address</label>
       <input id="sendCryptoRecipient" class="mb-2 form-control" placeholder="0x..."/>
-      <label>Amount (Crypto)</label>
-      <input id="sendCryptoAmount" type="number" class="mb-2 form-control" placeholder="0.00" step="0.0001"/>
+      <div style="display:flex;gap:8px;margin-bottom:12px;">
+        <button id="sendCryptoToggle" class="btn btn-sm btn-outline-secondary" style="flex:1;">Crypto Amount</button>
+        <button id="sendCryptoToggleUSD" class="btn btn-sm btn-outline-secondary" style="flex:1;">USD Amount</button>
+      </div>
+      <label id="sendCryptoInputLabel">Amount (Crypto)</label>
+      <div style="display:flex;gap:8px;margin-bottom:12px;">
+        <input id="sendCryptoAmount" type="number" class="form-control" placeholder="0.00" step="0.0001" style="flex:1;"/>
+        <button id="sendCryptoMax" class="btn btn-outline-secondary" style="min-width:50px;">Max</button>
+      </div>
       <div style="background:#f5f5f5;padding:12px;border-radius:8px;margin-bottom:12px;">
         <div style="display:flex;justify-content:space-between;">
-          <span class="muted">USD Value:</span><span id="sendCryptoUsdValue" style="font-weight:600;">$0.00</span>
+          <span class="muted" id="sendCryptoConvertLabel">USD Value:</span><span id="sendCryptoUsdValue" style="font-weight:600;">$0.00</span>
         </div>
       </div>
       <label>Enter PIN</label>
@@ -291,11 +298,18 @@
   <div id="buyCryptoDetailSection" class="section">
     <div class="card-custom">
       <h5 id="buyCryptoTitle">Buy Bitcoin</h5>
-      <label>Amount (USD)</label>
-      <input id="buyCryptoAmount" type="number" class="mb-2 form-control" placeholder="0.00"/>
+      <div style="display:flex;gap:8px;margin-bottom:12px;">
+        <button id="buyCryptoToggle" class="btn btn-sm btn-outline-secondary" style="flex:1;">USD Amount</button>
+        <button id="buyCryptoToggleCrypto" class="btn btn-sm btn-outline-secondary" style="flex:1;">Crypto Amount</button>
+      </div>
+      <label id="buyCryptoInputLabel">Amount (USD)</label>
+      <div style="display:flex;gap:8px;margin-bottom:12px;">
+        <input id="buyCryptoAmount" type="number" class="form-control" placeholder="0.00" style="flex:1;"/>
+        <button id="buyCryptoMax" class="btn btn-outline-secondary" style="min-width:50px;">Max</button>
+      </div>
       <div style="background:#f5f5f5;padding:12px;border-radius:8px;margin-bottom:12px;">
         <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
-          <span class="muted">You Will Get:</span><span id="buyCryptoCryptoAmount" style="font-weight:600;">0 BTC</span>
+          <span class="muted" id="buyCryptoConvertLabel">You Will Get:</span><span id="buyCryptoCryptoAmount" style="font-weight:600;">0 BTC</span>
         </div>
         <div style="display:flex;justify-content:space-between;">
           <span class="muted">Fee (2%):</span><span id="buyCryptoFee" style="font-weight:600;">$0.00</span>
@@ -313,11 +327,18 @@
   <div id="sellCryptoDetailSection" class="section">
     <div class="card-custom">
       <h5 id="sellCryptoTitle">Sell Bitcoin</h5>
-      <label>Amount (Crypto)</label>
-      <input id="sellCryptoAmount" type="number" class="mb-2 form-control" placeholder="0.00" step="0.0001"/>
+      <div style="display:flex;gap:8px;margin-bottom:12px;">
+        <button id="sellCryptoToggle" class="btn btn-sm btn-outline-secondary" style="flex:1;">Crypto Amount</button>
+        <button id="sellCryptoToggleUSD" class="btn btn-sm btn-outline-secondary" style="flex:1;">USD Amount</button>
+      </div>
+      <label id="sellCryptoInputLabel">Amount (Crypto)</label>
+      <div style="display:flex;gap:8px;margin-bottom:12px;">
+        <input id="sellCryptoAmount" type="number" class="form-control" placeholder="0.00" step="0.0001" style="flex:1;"/>
+        <button id="sellCryptoMax" class="btn btn-outline-secondary" style="min-width:50px;">Max</button>
+      </div>
       <div style="background:#f5f5f5;padding:12px;border-radius:8px;margin-bottom:12px;">
         <div style="display:flex;justify-content:space-between;">
-          <span class="muted">USD You Will Get:</span><span id="sellCryptoUsdAmount" style="font-weight:600;">$0.00</span>
+          <span class="muted" id="sellCryptoConvertLabel">USD You Will Get:</span><span id="sellCryptoUsdAmount" style="font-weight:600;">$0.00</span>
         </div>
       </div>
       <label>Enter PIN</label>
@@ -595,6 +616,9 @@
   document.getElementById("copyLitecoinWallet").addEventListener("click", ()=> navigator.clipboard.writeText(cryptoWallets.litecoin || ""));
   
   let currentCryptoAction = null;
+  let sendCryptoMode = "crypto";
+  let buyCryptoMode = "usd";
+  let sellCryptoMode = "crypto";
   function openSendCryptoPage(cryptoType){
     currentCryptoAction = {type: "send", crypto: cryptoType};
     const symbol = {bitcoin: "BTC", ethereum: "ETH", litecoin: "LTC"}[cryptoType];
@@ -1105,8 +1129,8 @@
             const account = filterAccount === "checking" ? udata.checkingAcc : udata.savingsAcc;
             if(tx.from !== account && tx.to !== account) return;
           }
-          const amt = (tx.amount || 0).toFixed(2);
-          const fee = (tx.fee || 0).toFixed(2);
+          const amt = (parseFloat(tx.amount) || 0).toFixed(2);
+          const fee = (parseFloat(tx.fee) || 0).toFixed(2);
           const status = tx.status || "Success";
           const type = tx.type || "Unknown";
           const from = tx.from || "—";
