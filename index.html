@@ -100,8 +100,9 @@
     <div class="balance-card text-center">
       <div id="greeting" style="font-size:18px;font-weight:700"></div>
       <div class="muted" id="liveTime"></div>
-      <h2 id="overallBalance" style="margin-top:12px;font-weight:800"></h2>
-      <div class="muted">Overall Balance (USD)</div>
+      <h2 id="overallBalance" style="margin-top:12px;font-weight:800;margin-bottom:4px;"></h2>
+      <div class="muted" id="overallBalanceUSD" style="font-size:13px;"></div>
+      <div class="muted" id="overallBalanceLabel" style="font-size:12px;margin-top:8px;">Overall Balance</div>
       <div class="mt-3">
         <span id="acctMasked" class="masked"></span>
         <i class="bi bi-clipboard copy-btn" id="copyAcct" title="Copy account"></i>
@@ -705,144 +706,6 @@
     document.getElementById("sellCryptoUsdAmount").innerText = "$" + (cryptoAmt * price).toFixed(2);
   });
   
-  document.getElementById("sendCryptoSubmitDetail").addEventListener("click", async ()=> {
-    try{
-      if(!currentCryptoAction || currentCryptoAction.type !== "send") return;
-      showError("sendCryptoDetailError", "");
-      const cryptoType = currentCryptoAction.crypto;
-      const cryptoKey = cryptoType;
-      const toWallet = document.getElementById("sendCryptoRecipient").value.trim();
-      const amt = parseFloat(document.getElementById("sendCryptoAmount").value);
-      const pin = document.getElementById("sendCryptoPinDetail").value.trim();
-      
-      if(!toWallet || !amt || amt <= 0 || isNaN(amt)) { showError("sendCryptoDetailError", "Fill all fields"); return; }
-      if(!toWallet.startsWith("0x")) { showError("sendCryptoDetailError", "Invalid wallet"); return; }
-      
-      const uid = auth.currentUser.uid;
-      const snap = await getDoc(doc(db,"users",uid));
-      const udata = snap.data();
-      if(udata.transactionPin !== pin){ showError("sendCryptoDetailError", "Wrong PIN"); return; }
-      if((udata.cryptoHoldings[cryptoKey] || 0) < amt){ showError("sendCryptoDetailError", "Insufficient"); return; }
-      
-      const q = query(collection(db,"users"), where("cryptoWallets."+cryptoKey, "==", toWallet));
-      const recipSnap = await getDocs(q);
-      if(recipSnap.empty){ showError("sendCryptoDetailError", "Wallet not found"); return; }
-      
-      const recipientUid = recipSnap.docs[0].id;
-      const txid = genTxID();
-      const senderRef = doc(db,"users",uid);
-      const recipientRef = doc(db,"users",recipientUid);
-      
-      await runTransaction(db, async (transaction) => {
-        const senderDoc = await transaction.get(senderRef);
-        const recipientDoc = await transaction.get(recipientRef);
-        const senderData = senderDoc.data();
-        if((senderData.cryptoHoldings[cryptoKey] || 0) < amt) throw new Error("Insufficient");
-        transaction.update(senderRef, {
-          cryptoHoldings: {
-            ...senderData.cryptoHoldings,
-            [cryptoKey]: (senderData.cryptoHoldings[cryptoKey] || 0) - amt
-          }
-        });
-        const recData = recipientDoc.data();
-        transaction.update(recipientRef, {
-          cryptoHoldings: {
-            ...recData.cryptoHoldings,
-            [cryptoKey]: (recData.cryptoHoldings[cryptoKey] || 0) + amt
-          }
-        });
-      });
-      
-      await recordTransaction(uid, {type: "Send Crypto", amount: amt, fee: 0, total: amt, from: cryptoWallets[cryptoKey], to: toWallet, status: "Success", txid});
-      await recordTransaction(recipientUid, {type: "Received Crypto", amount: amt, fee: 0, total: amt, from: cryptoWallets[cryptoKey], to: toWallet, status: "Success", txid});
-      
-      await loadDashboardUI();
-      showReceipt({type: "Send "+cryptoType, amount: amt, from: cryptoWallets[cryptoKey], to: toWallet, txid});
-    }catch(e){ showError("sendCryptoDetailError", e.message); }
-  });
-  
-  document.getElementById("buyCryptoSubmitDetail").addEventListener("click", async ()=> {
-    try{
-      if(!currentCryptoAction || currentCryptoAction.type !== "buy") return;
-      showError("buyCryptoDetailError", "");
-      const cryptoType = currentCryptoAction.crypto;
-      const cryptoKey = cryptoType;
-      const usdAmt = parseFloat(document.getElementById("buyCryptoAmount").value);
-      const pin = document.getElementById("buyCryptoPinDetail").value.trim();
-      
-      if(!usdAmt || usdAmt <= 0 || isNaN(usdAmt)) { showError("buyCryptoDetailError", "Enter amount"); return; }
-      
-      const uid = auth.currentUser.uid;
-      const snap = await getDoc(doc(db,"users",uid));
-      const udata = snap.data();
-      if(udata.transactionPin !== pin){ showError("buyCryptoDetailError", "Wrong PIN"); return; }
-      
-      const fee = (usdAmt * 0.02).toFixed(2);
-      const total = parseFloat(usdAmt) + parseFloat(fee);
-      if((udata.checkingBalance || 0) < total){ showError("buyCryptoDetailError", "Insufficient USD"); return; }
-      
-      const price = cryptoPrices[cryptoKey]?.usd || 1;
-      const cryptoAmt = (usdAmt / price);
-      const txid = genTxID();
-      
-      await runTransaction(db, async (transaction) => {
-        const userDoc = await transaction.get(doc(db,"users",uid));
-        const userData = userDoc.data();
-        if((userData.checkingBalance || 0) < total) throw new Error("Insufficient");
-        transaction.update(doc(db,"users",uid), {
-          checkingBalance: (userData.checkingBalance || 0) - total,
-          cryptoHoldings: {
-            ...userData.cryptoHoldings,
-            [cryptoKey]: (userData.cryptoHoldings[cryptoKey] || 0) + cryptoAmt
-          }
-        });
-      });
-      
-      await recordTransaction(uid, {type: "Buy Crypto", amount: usdAmt, fee: parseFloat(fee), total, from: udata.checkingAcc, to: cryptoType, status: "Success", txid});
-      await loadDashboardUI();
-      showReceipt({type: "Buy "+cryptoType, amount: cryptoAmt.toFixed(4), fee: parseFloat(fee), txid});
-    }catch(e){ showError("buyCryptoDetailError", e.message); }
-  });
-  
-  document.getElementById("sellCryptoSubmitDetail").addEventListener("click", async ()=> {
-    try{
-      if(!currentCryptoAction || currentCryptoAction.type !== "sell") return;
-      showError("sellCryptoDetailError", "");
-      const cryptoType = currentCryptoAction.crypto;
-      const cryptoKey = cryptoType;
-      const cryptoAmt = parseFloat(document.getElementById("sellCryptoAmount").value);
-      const pin = document.getElementById("sellCryptoPinDetail").value.trim();
-      
-      if(!cryptoAmt || cryptoAmt <= 0 || isNaN(cryptoAmt)) { showError("sellCryptoDetailError", "Enter amount"); return; }
-      
-      const uid = auth.currentUser.uid;
-      const snap = await getDoc(doc(db,"users",uid));
-      const udata = snap.data();
-      if(udata.transactionPin !== pin){ showError("sellCryptoDetailError", "Wrong PIN"); return; }
-      if((udata.cryptoHoldings[cryptoKey] || 0) < cryptoAmt){ showError("sellCryptoDetailError", "Insufficient"); return; }
-      
-      const price = cryptoPrices[cryptoKey]?.usd || 0;
-      const usdAmt = (cryptoAmt * price);
-      const txid = genTxID();
-      
-      await runTransaction(db, async (transaction) => {
-        const userDoc = await transaction.get(doc(db,"users",uid));
-        const userData = userDoc.data();
-        if((userData.cryptoHoldings[cryptoKey] || 0) < cryptoAmt) throw new Error("Insufficient");
-        transaction.update(doc(db,"users",uid), {
-          checkingBalance: (userData.checkingBalance || 0) + usdAmt,
-          cryptoHoldings: {
-            ...userData.cryptoHoldings,
-            [cryptoKey]: (userData.cryptoHoldings[cryptoKey] || 0) - cryptoAmt
-          }
-        });
-      });
-      
-      await recordTransaction(uid, {type: "Sell Crypto", amount: cryptoAmt, fee: 0, total: usdAmt, from: cryptoType, to: udata.checkingAcc, status: "Success", txid});
-      await loadDashboardUI();
-      showReceipt({type: "Sell "+cryptoType, amount: usdAmt.toFixed(2), txid});
-    }catch(e){ showError("sellCryptoDetailError", e.message); }
-  });
   
   // Wallet copy buttons
   document.getElementById("copyBitcoinWallet").addEventListener("click", ()=> {
@@ -859,14 +722,22 @@
   // Buy/Send/Sell handlers
   let currentCryptoDetail = null;
   
+  let sendCryptoInputMode = "crypto";
+  let buyCryptoInputMode = "usd";
+  let sellCryptoInputMode = "crypto";
+  
   const buyBtns = [document.getElementById("buyCryptoFromDetail"), document.getElementById("buyCryptoFromDetail2"), document.getElementById("buyCryptoFromDetail3")];
   buyBtns.forEach(btn=> btn.addEventListener("click", ()=>{
     currentCryptoDetail = btn.dataset.crypto;
+    buyCryptoInputMode = "usd";
+    document.getElementById("buyCryptoToggle").classList.add("active");
+    document.getElementById("buyCryptoToggleCrypto").classList.remove("active");
     const crypto = currentCryptoDetail;
-    const symbol = {bitcoin: "BTC", ethereum: "ETH", litecoin: "LTC"}[crypto];
     document.getElementById("buyCryptoTitle").innerText = "Buy "+crypto.charAt(0).toUpperCase()+crypto.slice(1);
     document.getElementById("buyCryptoAmount").value = "";
     document.getElementById("buyCryptoPinDetail").value = "";
+    document.getElementById("buyCryptoInputLabel").innerText = "Amount (USD)";
+    document.getElementById("buyCryptoCryptoAmount").innerText = "0 "+{bitcoin:"BTC",ethereum:"ETH",litecoin:"LTC"}[crypto];
     showError("buyCryptoDetailError", "");
     showSection("buyCryptoDetailSection");
   }));
@@ -874,12 +745,15 @@
   const sendBtns = [document.getElementById("sendCryptoFromDetail"), document.getElementById("sendCryptoFromDetail2"), document.getElementById("sendCryptoFromDetail3")];
   sendBtns.forEach(btn=> btn.addEventListener("click", ()=>{
     currentCryptoDetail = btn.dataset.crypto;
+    sendCryptoInputMode = "crypto";
+    document.getElementById("sendCryptoToggle").classList.add("active");
+    document.getElementById("sendCryptoToggleUSD").classList.remove("active");
     const crypto = currentCryptoDetail;
-    const symbol = {bitcoin: "BTC", ethereum: "ETH", litecoin: "LTC"}[crypto];
     document.getElementById("sendCryptoTitle").innerText = "Send "+crypto.charAt(0).toUpperCase()+crypto.slice(1);
     document.getElementById("sendCryptoRecipient").value = "";
     document.getElementById("sendCryptoAmount").value = "";
     document.getElementById("sendCryptoPinDetail").value = "";
+    document.getElementById("sendCryptoInputLabel").innerText = "Amount (Crypto)";
     showError("sendCryptoDetailError", "");
     showSection("sendCryptoDetailSection");
   }));
@@ -887,42 +761,301 @@
   const sellBtns = [document.getElementById("sellCryptoFromDetail"), document.getElementById("sellCryptoFromDetail2"), document.getElementById("sellCryptoFromDetail3")];
   sellBtns.forEach(btn=> btn.addEventListener("click", ()=>{
     currentCryptoDetail = btn.dataset.crypto;
+    sellCryptoInputMode = "crypto";
+    document.getElementById("sellCryptoToggle").classList.add("active");
+    document.getElementById("sellCryptoToggleUSD").classList.remove("active");
     const crypto = currentCryptoDetail;
     document.getElementById("sellCryptoTitle").innerText = "Sell "+crypto.charAt(0).toUpperCase()+crypto.slice(1);
     document.getElementById("sellCryptoAmount").value = "";
     document.getElementById("sellCryptoPinDetail").value = "";
+    document.getElementById("sellCryptoInputLabel").innerText = "Amount (Crypto)";
     showError("sellCryptoDetailError", "");
     showSection("sellCryptoDetailSection");
   }));
+  
+  // TOGGLE BUTTONS
+  document.getElementById("sendCryptoToggle").addEventListener("click", ()=> {
+    sendCryptoInputMode = "crypto";
+    document.getElementById("sendCryptoToggle").classList.add("active");
+    document.getElementById("sendCryptoToggleUSD").classList.remove("active");
+    document.getElementById("sendCryptoInputLabel").innerText = "Amount (Crypto)";
+    document.getElementById("sendCryptoAmount").placeholder = "0.0000";
+    document.getElementById("sendCryptoAmount").step = "0.0001";
+    document.getElementById("sendCryptoAmount").value = "";
+    document.getElementById("sendCryptoConvertLabel").innerText = "USD Value:";
+    document.getElementById("sendCryptoUsdValue").innerText = "$0.00";
+  });
+  
+  document.getElementById("sendCryptoToggleUSD").addEventListener("click", ()=> {
+    sendCryptoInputMode = "usd";
+    document.getElementById("sendCryptoToggleUSD").classList.add("active");
+    document.getElementById("sendCryptoToggle").classList.remove("active");
+    document.getElementById("sendCryptoInputLabel").innerText = "Amount (USD)";
+    document.getElementById("sendCryptoAmount").placeholder = "0.00";
+    document.getElementById("sendCryptoAmount").step = "0.01";
+    document.getElementById("sendCryptoAmount").value = "";
+    document.getElementById("sendCryptoConvertLabel").innerText = "Crypto Amount:";
+    document.getElementById("sendCryptoUsdValue").innerText = "0 "+{bitcoin:"BTC",ethereum:"ETH",litecoin:"LTC"}[currentCryptoDetail || "bitcoin"];
+  });
+  
+  document.getElementById("buyCryptoToggle").addEventListener("click", ()=> {
+    buyCryptoInputMode = "usd";
+    document.getElementById("buyCryptoToggle").classList.add("active");
+    document.getElementById("buyCryptoToggleCrypto").classList.remove("active");
+    document.getElementById("buyCryptoInputLabel").innerText = "Amount (USD)";
+    document.getElementById("buyCryptoAmount").placeholder = "0.00";
+    document.getElementById("buyCryptoAmount").step = "0.01";
+    document.getElementById("buyCryptoAmount").value = "";
+    document.getElementById("buyCryptoConvertLabel").innerText = "You Will Get:";
+  });
+  
+  document.getElementById("buyCryptoToggleCrypto").addEventListener("click", ()=> {
+    buyCryptoInputMode = "crypto";
+    document.getElementById("buyCryptoToggleCrypto").classList.add("active");
+    document.getElementById("buyCryptoToggle").classList.remove("active");
+    document.getElementById("buyCryptoInputLabel").innerText = "Amount (Crypto)";
+    document.getElementById("buyCryptoAmount").placeholder = "0.0000";
+    document.getElementById("buyCryptoAmount").step = "0.0001";
+    document.getElementById("buyCryptoAmount").value = "";
+    document.getElementById("buyCryptoConvertLabel").innerText = "Cost in USD:";
+  });
+  
+  document.getElementById("sellCryptoToggle").addEventListener("click", ()=> {
+    sellCryptoInputMode = "crypto";
+    document.getElementById("sellCryptoToggle").classList.add("active");
+    document.getElementById("sellCryptoToggleUSD").classList.remove("active");
+    document.getElementById("sellCryptoInputLabel").innerText = "Amount (Crypto)";
+    document.getElementById("sellCryptoAmount").placeholder = "0.0000";
+    document.getElementById("sellCryptoAmount").step = "0.0001";
+    document.getElementById("sellCryptoAmount").value = "";
+    document.getElementById("sellCryptoConvertLabel").innerText = "USD You Will Get:";
+  });
+  
+  document.getElementById("sellCryptoToggleUSD").addEventListener("click", ()=> {
+    sellCryptoInputMode = "usd";
+    document.getElementById("sellCryptoToggleUSD").classList.add("active");
+    document.getElementById("sellCryptoToggle").classList.remove("active");
+    document.getElementById("sellCryptoInputLabel").innerText = "Amount (USD)";
+    document.getElementById("sellCryptoAmount").placeholder = "0.00";
+    document.getElementById("sellCryptoAmount").step = "0.01";
+    document.getElementById("sellCryptoAmount").value = "";
+    document.getElementById("sellCryptoConvertLabel").innerText = "Crypto Amount:";
+  });
+  
+  // MAX BUTTONS
+  document.getElementById("sendCryptoMax").addEventListener("click", ()=> {
+    const holding = (currentUser.cryptoHoldings || {})[currentCryptoDetail] || 0;
+    const price = cryptoPrices[currentCryptoDetail]?.usd || 1;
+    if(sendCryptoInputMode === "crypto"){
+      document.getElementById("sendCryptoAmount").value = holding.toFixed(4);
+    } else {
+      document.getElementById("sendCryptoAmount").value = (holding * price).toFixed(2);
+    }
+    document.getElementById("sendCryptoAmount").dispatchEvent(new Event("input"));
+  });
+  
+  document.getElementById("buyCryptoMax").addEventListener("click", ()=> {
+    const usdBalance = currentUser.checkingBalance || 0;
+    const price = cryptoPrices[currentCryptoDetail]?.usd || 1;
+    if(buyCryptoInputMode === "usd"){
+      document.getElementById("buyCryptoAmount").value = (usdBalance * 0.98).toFixed(2);
+    } else {
+      document.getElementById("buyCryptoAmount").value = ((usdBalance * 0.98) / price).toFixed(4);
+    }
+    document.getElementById("buyCryptoAmount").dispatchEvent(new Event("input"));
+  });
+  
+  document.getElementById("sellCryptoMax").addEventListener("click", ()=> {
+    const holding = (currentUser.cryptoHoldings || {})[currentCryptoDetail] || 0;
+    const price = cryptoPrices[currentCryptoDetail]?.usd || 1;
+    if(sellCryptoInputMode === "crypto"){
+      document.getElementById("sellCryptoAmount").value = holding.toFixed(4);
+    } else {
+      document.getElementById("sellCryptoAmount").value = (holding * price).toFixed(2);
+    }
+    document.getElementById("sellCryptoAmount").dispatchEvent(new Event("input"));
+  });
   
   // Back buttons
   document.getElementById("buyCryptoDetailBack").addEventListener("click", ()=> loadCryptoDetail(currentCryptoDetail));
   document.getElementById("sendCryptoDetailBack").addEventListener("click", ()=> loadCryptoDetail(currentCryptoDetail));
   document.getElementById("sellCryptoDetailBack").addEventListener("click", ()=> loadCryptoDetail(currentCryptoDetail));
   
-  // Conversions
+  // LIVE CONVERSIONS
   document.getElementById("buyCryptoAmount").addEventListener("input", ()=>{
     const amt = parseFloat(document.getElementById("buyCryptoAmount").value) || 0;
-    const price = cryptoPrices[currentCryptoDetail]?.usd || 0;
-    const cryptoAmt = price > 0 ? (amt / price).toFixed(4) : 0;
-    const fee = (amt * 0.02).toFixed(2);
+    const price = cryptoPrices[currentCryptoDetail]?.usd || 1;
     const symbol = {bitcoin: "BTC", ethereum: "ETH", litecoin: "LTC"}[currentCryptoDetail];
-    document.getElementById("buyCryptoCryptoAmount").innerText = cryptoAmt + " " + symbol;
-    document.getElementById("buyCryptoFee").innerText = "$" + fee;
+    if(buyCryptoInputMode === "usd"){
+      const cryptoAmt = (amt / price).toFixed(4);
+      const fee = (amt * 0.02).toFixed(2);
+      document.getElementById("buyCryptoCryptoAmount").innerText = cryptoAmt + " " + symbol;
+      document.getElementById("buyCryptoFee").innerText = "$" + fee;
+    } else {
+      const usdCost = (amt * price).toFixed(2);
+      const fee = (usdCost * 0.02).toFixed(2);
+      document.getElementById("buyCryptoCryptoAmount").innerText = "$" + usdCost;
+      document.getElementById("buyCryptoFee").innerText = "$" + fee;
+    }
   });
   
   document.getElementById("sendCryptoAmount").addEventListener("input", ()=>{
     const amt = parseFloat(document.getElementById("sendCryptoAmount").value) || 0;
-    const price = cryptoPrices[currentCryptoDetail]?.usd || 0;
-    const usdValue = (amt * price).toFixed(2);
-    document.getElementById("sendCryptoUsdValue").innerText = "$" + usdValue;
+    const price = cryptoPrices[currentCryptoDetail]?.usd || 1;
+    const symbol = {bitcoin: "BTC", ethereum: "ETH", litecoin: "LTC"}[currentCryptoDetail];
+    if(sendCryptoInputMode === "crypto"){
+      const usdValue = (amt * price).toFixed(2);
+      document.getElementById("sendCryptoUsdValue").innerText = "$" + usdValue;
+    } else {
+      const cryptoAmt = (amt / price).toFixed(4);
+      document.getElementById("sendCryptoUsdValue").innerText = cryptoAmt + " " + symbol;
+    }
   });
   
   document.getElementById("sellCryptoAmount").addEventListener("input", ()=>{
     const amt = parseFloat(document.getElementById("sellCryptoAmount").value) || 0;
-    const price = cryptoPrices[currentCryptoDetail]?.usd || 0;
-    const usdValue = (amt * price).toFixed(2);
-    document.getElementById("sellCryptoUsdAmount").innerText = "$" + usdValue;
+    const price = cryptoPrices[currentCryptoDetail]?.usd || 1;
+    const symbol = {bitcoin: "BTC", ethereum: "ETH", litecoin: "LTC"}[currentCryptoDetail];
+    if(sellCryptoInputMode === "crypto"){
+      const usdValue = (amt * price).toFixed(2);
+      document.getElementById("sellCryptoUsdAmount").innerText = "$" + usdValue;
+    } else {
+      const cryptoAmt = (amt / price).toFixed(4);
+      document.getElementById("sellCryptoUsdAmount").innerText = cryptoAmt + " " + symbol;
+    }
+  });
+  
+  // SUBMIT HANDLERS
+  document.getElementById("sendCryptoSubmitDetail").addEventListener("click", async ()=> {
+    try{
+      showError("sendCryptoDetailError", "");
+      const toWallet = document.getElementById("sendCryptoRecipient").value.trim();
+      let cryptoAmt = parseFloat(document.getElementById("sendCryptoAmount").value);
+      const pin = document.getElementById("sendCryptoPinDetail").value.trim();
+      const price = cryptoPrices[currentCryptoDetail]?.usd || 1;
+      
+      if(sendCryptoInputMode === "usd") cryptoAmt = cryptoAmt / price;
+      if(!toWallet || !cryptoAmt || cryptoAmt <= 0 || isNaN(cryptoAmt)) { showError("sendCryptoDetailError", "Fill all fields"); return; }
+      if(!toWallet.startsWith("0x")) { showError("sendCryptoDetailError", "Invalid wallet"); return; }
+      
+      const uid = auth.currentUser.uid;
+      const snap = await getDoc(doc(db,"users",uid));
+      const udata = snap.data();
+      if(udata.transactionPin !== pin){ showError("sendCryptoDetailError", "Wrong PIN"); return; }
+      if((udata.cryptoHoldings[currentCryptoDetail] || 0) < cryptoAmt){ showError("sendCryptoDetailError", "Insufficient"); return; }
+      
+      const q = query(collection(db,"users"), where("cryptoWallets."+currentCryptoDetail, "==", toWallet));
+      const recipSnap = await getDocs(q);
+      if(recipSnap.empty){ showError("sendCryptoDetailError", "Wallet not found"); return; }
+      
+      const recipientUid = recipSnap.docs[0].id;
+      const txid = genTxID();
+      
+      await runTransaction(db, async (transaction) => {
+        const senderDoc = await transaction.get(doc(db,"users",uid));
+        const recipientDoc = await transaction.get(doc(db,"users",recipientUid));
+        const senderData = senderDoc.data();
+        if((senderData.cryptoHoldings[currentCryptoDetail] || 0) < cryptoAmt) throw new Error("Insufficient");
+        transaction.update(doc(db,"users",uid), {
+          cryptoHoldings: {
+            ...senderData.cryptoHoldings,
+            [currentCryptoDetail]: (senderData.cryptoHoldings[currentCryptoDetail] || 0) - cryptoAmt
+          }
+        });
+        const recData = recipientDoc.data();
+        transaction.update(doc(db,"users",recipientUid), {
+          cryptoHoldings: {
+            ...recData.cryptoHoldings,
+            [currentCryptoDetail]: (recData.cryptoHoldings[currentCryptoDetail] || 0) + cryptoAmt
+          }
+        });
+      });
+      
+      await recordTransaction(uid, {type: "Send Crypto", amount: cryptoAmt, fee: 0, total: cryptoAmt, from: cryptoWallets[currentCryptoDetail], to: toWallet, status: "Success", txid});
+      await recordTransaction(recipientUid, {type: "Received Crypto", amount: cryptoAmt, fee: 0, total: cryptoAmt, from: cryptoWallets[currentCryptoDetail], to: toWallet, status: "Success", txid});
+      
+      await loadDashboardUI();
+      showReceipt({type: "Send "+currentCryptoDetail, amount: cryptoAmt.toFixed(4), from: cryptoWallets[currentCryptoDetail], to: toWallet, txid});
+    }catch(e){ showError("sendCryptoDetailError", e.message); }
+  });
+  
+  document.getElementById("buyCryptoSubmitDetail").addEventListener("click", async ()=> {
+    try{
+      showError("buyCryptoDetailError", "");
+      let inputAmt = parseFloat(document.getElementById("buyCryptoAmount").value);
+      const pin = document.getElementById("buyCryptoPinDetail").value.trim();
+      const price = cryptoPrices[currentCryptoDetail]?.usd || 1;
+      
+      let usdAmt = buyCryptoInputMode === "usd" ? inputAmt : inputAmt * price;
+      if(!usdAmt || usdAmt <= 0 || isNaN(usdAmt)) { showError("buyCryptoDetailError", "Enter amount"); return; }
+      
+      const uid = auth.currentUser.uid;
+      const snap = await getDoc(doc(db,"users",uid));
+      const udata = snap.data();
+      if(udata.transactionPin !== pin){ showError("buyCryptoDetailError", "Wrong PIN"); return; }
+      
+      const fee = (usdAmt * 0.02);
+      const total = usdAmt + fee;
+      if((udata.checkingBalance || 0) < total){ showError("buyCryptoDetailError", "Insufficient USD"); return; }
+      
+      const cryptoAmt = usdAmt / price;
+      const txid = genTxID();
+      
+      await runTransaction(db, async (transaction) => {
+        const userDoc = await transaction.get(doc(db,"users",uid));
+        const userData = userDoc.data();
+        if((userData.checkingBalance || 0) < total) throw new Error("Insufficient");
+        transaction.update(doc(db,"users",uid), {
+          checkingBalance: (userData.checkingBalance || 0) - total,
+          cryptoHoldings: {
+            ...userData.cryptoHoldings,
+            [currentCryptoDetail]: (userData.cryptoHoldings[currentCryptoDetail] || 0) + cryptoAmt
+          }
+        });
+      });
+      
+      await recordTransaction(uid, {type: "Buy Crypto", amount: usdAmt, fee: fee, total: total, from: udata.checkingAcc, to: currentCryptoDetail, status: "Success", txid});
+      await loadDashboardUI();
+      showReceipt({type: "Buy "+currentCryptoDetail, amount: cryptoAmt.toFixed(4), fee: fee.toFixed(2), txid});
+    }catch(e){ showError("buyCryptoDetailError", e.message); }
+  });
+  
+  document.getElementById("sellCryptoSubmitDetail").addEventListener("click", async ()=> {
+    try{
+      showError("sellCryptoDetailError", "");
+      let inputAmt = parseFloat(document.getElementById("sellCryptoAmount").value);
+      const pin = document.getElementById("sellCryptoPinDetail").value.trim();
+      const price = cryptoPrices[currentCryptoDetail]?.usd || 1;
+      
+      let cryptoAmt = sellCryptoInputMode === "crypto" ? inputAmt : inputAmt / price;
+      if(!cryptoAmt || cryptoAmt <= 0 || isNaN(cryptoAmt)) { showError("sellCryptoDetailError", "Enter amount"); return; }
+      
+      const uid = auth.currentUser.uid;
+      const snap = await getDoc(doc(db,"users",uid));
+      const udata = snap.data();
+      if(udata.transactionPin !== pin){ showError("sellCryptoDetailError", "Wrong PIN"); return; }
+      if((udata.cryptoHoldings[currentCryptoDetail] || 0) < cryptoAmt){ showError("sellCryptoDetailError", "Insufficient"); return; }
+      
+      const usdAmt = cryptoAmt * price;
+      const txid = genTxID();
+      
+      await runTransaction(db, async (transaction) => {
+        const userDoc = await transaction.get(doc(db,"users",uid));
+        const userData = userDoc.data();
+        if((userData.cryptoHoldings[currentCryptoDetail] || 0) < cryptoAmt) throw new Error("Insufficient");
+        transaction.update(doc(db,"users",uid), {
+          checkingBalance: (userData.checkingBalance || 0) + usdAmt,
+          cryptoHoldings: {
+            ...userData.cryptoHoldings,
+            [currentCryptoDetail]: (userData.cryptoHoldings[currentCryptoDetail] || 0) - cryptoAmt
+          }
+        });
+      });
+      
+      await recordTransaction(uid, {type: "Sell Crypto", amount: cryptoAmt, fee: 0, total: usdAmt, from: currentCryptoDetail, to: udata.checkingAcc, status: "Success", txid});
+      await loadDashboardUI();
+      showReceipt({type: "Sell "+currentCryptoDetail, amount: usdAmt.toFixed(2), txid});
+    }catch(e){ showError("sellCryptoDetailError", e.message); }
   });
 
   let priceChart = null;
@@ -1208,7 +1341,17 @@
     document.getElementById("savingsBal").innerText = "$"+(currentUser.savingsBalance || 0).toFixed(2);
     const holdings = currentUser.cryptoHoldings || {bitcoin: 0, ethereum: 0, litecoin: 0};
     document.getElementById("cryptoHoldings").innerText = `BTC: ${(holdings.bitcoin || 0).toFixed(4)} | ETH: ${(holdings.ethereum || 0).toFixed(4)} | LTC: ${(holdings.litecoin || 0).toFixed(4)}`;
-    document.getElementById("overallBalance").innerText = "$"+(((currentUser.checkingBalance||0)+(currentUser.savingsBalance||0))).toFixed(2);
+    const btcPrice = cryptoPrices.bitcoin?.usd || 0;
+    const ethPrice = cryptoPrices.ethereum?.usd || 0;
+    const ltcPrice = cryptoPrices.litecoin?.usd || 0;
+    const btcValue = (holdings.bitcoin || 0) * btcPrice;
+    const ethValue = (holdings.ethereum || 0) * ethPrice;
+    const ltcValue = (holdings.litecoin || 0) * ltcPrice;
+    const totalCryptoUSD = btcValue + ethValue + ltcValue;
+    const totalUSD = (currentUser.checkingBalance||0)+(currentUser.savingsBalance||0)+totalCryptoUSD;
+    const totalBTC = totalUSD / (btcPrice || 1);
+    document.getElementById("overallBalance").innerText = totalBTC.toFixed(4)+" BTC";
+    document.getElementById("overallBalanceUSD").innerText = "$"+totalUSD.toFixed(2);
     setGreeting();
   }
 
@@ -1595,4 +1738,4 @@
   });
   </script>
 </body>
-</html>
+</htmlr>
