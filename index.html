@@ -124,6 +124,7 @@
     <h5 style="font-weight:700;margin-top:12px">Transactions</h5>
     <div class="d-grid gap-2">
       <button class="btn btn-light card-custom text-start" id="sendBtn"><i class="bi bi-send me-2"></i> Send Money</button>
+      <button class="btn btn-light card-custom text-start" id="transferBtn"><i class="bi bi-arrow-left-right me-2"></i> Transfer Accounts</button>
       <button class="btn btn-light card-custom text-start" id="topupBtn"><i class="bi bi-plus-circle me-2"></i> Top Up</button>
       <button class="btn btn-light card-custom text-start" id="withdrawBtn"><i class="bi bi-arrow-down-circle me-2"></i> Withdraw</button>
       <button class="btn btn-light card-custom text-start" id="wireBtn"><i class="bi bi-globe me-2"></i> Wire Transfer</button>
@@ -146,6 +147,39 @@
         <p class="muted text-center">Loading transactions...</p>
       </div>
       <div class="mt-3"><span class="link-like" id="transactionsBack">← Back to Dashboard</span></div>
+    </div>
+  </div>
+
+  <!-- TRANSACTION DETAILS MODAL -->
+  <div id="txDetailsModal" style="display:none; position:fixed; left:0; right:0; top:0; bottom:0; background:rgba(0,0,0,.5); z-index:45; justify-content:center; align-items:center; overflow-y:auto;">
+    <div style="background:#fff;padding:20px;border-radius:12px;max-width:520px;width:92%;margin:auto;my:20px;">
+      <h4 id="txDetailsTitle" style="margin-bottom:20px;font-weight:700;text-align:center;">Transaction Details</h4>
+      <div id="txDetailsBody" style="background:#f5f5f5;padding:16px;border-radius:8px;margin-bottom:20px;"></div>
+      <button onclick="document.getElementById('txDetailsModal').style.display='none'" class="btn btn-primary w-100">Close</button>
+    </div>
+  </div>
+
+  <!-- TRANSFER BETWEEN ACCOUNTS -->
+  <div id="transferSection" class="section">
+    <div class="card-custom">
+      <h5>Transfer Between Accounts</h5>
+      <label>From</label>
+      <select id="transferFrom" class="mb-2 form-control">
+        <option value="checking">Checking Account</option>
+        <option value="savings">Savings Account</option>
+      </select>
+      <label>To</label>
+      <select id="transferTo" class="mb-2 form-control">
+        <option value="savings">Savings Account</option>
+        <option value="checking">Checking Account</option>
+      </select>
+      <label>Amount (USD)</label>
+      <input id="transferAmount" type="number" class="mb-2 form-control" placeholder="0.00"/>
+      <label>Enter PIN</label>
+      <input id="transferPin" type="password" class="mb-2 form-control" placeholder="PIN"/>
+      <button id="transferSubmit" class="btn btn-primary w-100">Transfer</button>
+      <div class="mt-2"><span class="link-like" id="transferBack">← Back</span></div>
+      <div id="transferError" class="error mt-2" style="display:none"></div>
     </div>
   </div>
 
@@ -190,6 +224,9 @@
           <span class="muted">You Own:</span><span id="bitcoinHolding" style="font-weight:600;"></span>
         </div>
         <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
+          <span class="muted"></span><span id="bitcoinHoldingUSD" style="font-weight:600;font-size:13px;color:#777;"></span>
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
           <span class="muted">Wallet Address:</span>
           <div style="display:flex;gap:6px;align-items:center;">
             <span id="bitcoinWallet" style="font-weight:600;font-size:12px;"></span>
@@ -220,6 +257,9 @@
           <span class="muted">You Own:</span><span id="ethereumHolding" style="font-weight:600;"></span>
         </div>
         <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
+          <span class="muted"></span><span id="ethereumHoldingUSD" style="font-weight:600;font-size:13px;color:#777;"></span>
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
           <span class="muted">Wallet Address:</span>
           <div style="display:flex;gap:6px;align-items:center;">
             <span id="ethereumWallet" style="font-weight:600;font-size:12px;"></span>
@@ -248,6 +288,9 @@
         </div>
         <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
           <span class="muted">You Own:</span><span id="litecoinHolding" style="font-weight:600;"></span>
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
+          <span class="muted"></span><span id="litecoinHoldingUSD" style="font-weight:600;font-size:13px;color:#777;"></span>
         </div>
         <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
           <span class="muted">Wallet Address:</span>
@@ -460,28 +503,32 @@
   <!-- CRYPTO CONFIRMATION -->
   <div id="cryptoConfirmModal" style="display:none; position:fixed; left:0; right:0; top:0; bottom:0; background:rgba(0,0,0,.5); z-index:45; justify-content:center; align-items:center;">
     <div style="background:#fff;padding:20px;border-radius:12px;max-width:520px;width:92%;">
-      <h4 style="text-align:center;margin-bottom:20px;font-weight:700;">Confirm Crypto Transfer</h4>
-      <div style="background:#f5f5f5;padding:16px;border-radius:8px;margin-bottom:20px;">
+      <h4 id="confirmCryptoTitle" style="text-align:center;margin-bottom:20px;font-weight:700;">Confirm Transaction</h4>
+      <div style="background:#f5f5f5;padding:16px;border-radius:8px;margin-bottom:20px;" id="confirmCryptoDetails">
         <div style="display:flex;justify-content:space-between;margin-bottom:12px;">
           <span class="muted">Amount:</span>
-          <span id="confirmAmount" style="font-weight:600;"></span>
+          <span id="confirmCryptoAmount" style="font-weight:600;"></span>
         </div>
-        <div style="display:flex;justify-content:space-between;margin-bottom:12px;">
-          <span class="muted">Crypto Type:</span>
-          <span id="confirmCrypto" style="font-weight:600;"></span>
+        <div style="display:flex;justify-content:space-between;margin-bottom:12px;" id="confirmCryptoTypeDiv">
+          <span class="muted">Crypto:</span>
+          <span id="confirmCryptoType" style="font-weight:600;"></span>
         </div>
-        <div style="display:flex;justify-content:space-between;margin-bottom:12px;">
-          <span class="muted">From Wallet:</span>
-          <span id="confirmFrom" style="font-weight:600;font-size:12px;"></span>
+        <div style="display:flex;justify-content:space-between;margin-bottom:12px;" id="confirmFromDiv">
+          <span class="muted">From:</span>
+          <span id="confirmCryptoFrom" style="font-weight:600;font-size:12px;"></span>
         </div>
-        <div style="display:flex;justify-content:space-between;">
-          <span class="muted">To Wallet:</span>
-          <span id="confirmTo" style="font-weight:600;font-size:12px;"></span>
+        <div style="display:flex;justify-content:space-between;" id="confirmToDiv">
+          <span class="muted">To:</span>
+          <span id="confirmCryptoTo" style="font-weight:600;font-size:12px;"></span>
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-top:12px;" id="confirmFeeDiv" style="display:none;">
+          <span class="muted">Fee:</span>
+          <span id="confirmCryptoFee" style="font-weight:600;"></span>
         </div>
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
         <button id="cancelCryptoConfirm" class="btn btn-danger">Cancel</button>
-        <button id="confirmCryptoTransfer" class="btn btn-primary">Confirm</button>
+        <button id="confirmCryptoTransfer" class="btn btn-success">Confirm</button>
       </div>
     </div>
   </div>
@@ -620,6 +667,7 @@
   let sendCryptoMode = "crypto";
   let buyCryptoMode = "usd";
   let sellCryptoMode = "crypto";
+  let sendCryptoData = null;
   function openSendCryptoPage(cryptoType){
     currentCryptoAction = {type: "send", crypto: cryptoType};
     const symbol = {bitcoin: "BTC", ethereum: "ETH", litecoin: "LTC"}[cryptoType];
@@ -926,6 +974,8 @@
   });
   
   // SUBMIT HANDLERS
+  let cryptoTxData = null;
+  
   document.getElementById("sendCryptoSubmitDetail").addEventListener("click", async ()=> {
     try{
       showError("sendCryptoDetailError", "");
@@ -944,38 +994,18 @@
       if(udata.transactionPin !== pin){ showError("sendCryptoDetailError", "Wrong PIN"); return; }
       if((udata.cryptoHoldings[currentCryptoDetail] || 0) < cryptoAmt){ showError("sendCryptoDetailError", "Insufficient"); return; }
       
-      const q = query(collection(db,"users"), where("cryptoWallets."+currentCryptoDetail, "==", toWallet));
-      const recipSnap = await getDocs(q);
-      if(recipSnap.empty){ showError("sendCryptoDetailError", "Wallet not found"); return; }
+      const symbol = {bitcoin:"BTC",ethereum:"ETH",litecoin:"LTC"}[currentCryptoDetail];
+      document.getElementById("confirmCryptoTitle").innerText = "Confirm Send";
+      document.getElementById("confirmCryptoAmount").innerText = cryptoAmt.toFixed(4)+" "+symbol;
+      document.getElementById("confirmCryptoTypeDiv").style.display = "none";
+      document.getElementById("confirmFromDiv").style.display = "flex";
+      document.getElementById("confirmToDiv").style.display = "flex";
+      document.getElementById("confirmFeeDiv").style.display = "none";
+      document.getElementById("confirmCryptoFrom").innerText = cryptoWallets[currentCryptoDetail];
+      document.getElementById("confirmCryptoTo").innerText = toWallet;
       
-      const recipientUid = recipSnap.docs[0].id;
-      const txid = genTxID();
-      
-      await runTransaction(db, async (transaction) => {
-        const senderDoc = await transaction.get(doc(db,"users",uid));
-        const recipientDoc = await transaction.get(doc(db,"users",recipientUid));
-        const senderData = senderDoc.data();
-        if((senderData.cryptoHoldings[currentCryptoDetail] || 0) < cryptoAmt) throw new Error("Insufficient");
-        transaction.update(doc(db,"users",uid), {
-          cryptoHoldings: {
-            ...senderData.cryptoHoldings,
-            [currentCryptoDetail]: (senderData.cryptoHoldings[currentCryptoDetail] || 0) - cryptoAmt
-          }
-        });
-        const recData = recipientDoc.data();
-        transaction.update(doc(db,"users",recipientUid), {
-          cryptoHoldings: {
-            ...recData.cryptoHoldings,
-            [currentCryptoDetail]: (recData.cryptoHoldings[currentCryptoDetail] || 0) + cryptoAmt
-          }
-        });
-      });
-      
-      await recordTransaction(uid, {type: "Send Crypto", amount: cryptoAmt, fee: 0, total: cryptoAmt, from: cryptoWallets[currentCryptoDetail], to: toWallet, status: "Success", txid});
-      await recordTransaction(recipientUid, {type: "Received Crypto", amount: cryptoAmt, fee: 0, total: cryptoAmt, from: cryptoWallets[currentCryptoDetail], to: toWallet, status: "Success", txid});
-      
-      await loadDashboardUI();
-      showReceipt({type: "Send "+currentCryptoDetail, amount: cryptoAmt.toFixed(4), from: cryptoWallets[currentCryptoDetail], to: toWallet, txid});
+      cryptoTxData = {type: "send", uid, cryptoAmt, toWallet, pin, price};
+      document.getElementById("cryptoConfirmModal").style.display = "flex";
     }catch(e){ showError("sendCryptoDetailError", e.message); }
   });
   
@@ -999,24 +1029,17 @@
       if((udata.checkingBalance || 0) < total){ showError("buyCryptoDetailError", "Insufficient USD"); return; }
       
       const cryptoAmt = usdAmt / price;
-      const txid = genTxID();
+      const symbol = {bitcoin:"BTC",ethereum:"ETH",litecoin:"LTC"}[currentCryptoDetail];
+      document.getElementById("confirmCryptoTitle").innerText = "Confirm Buy";
+      document.getElementById("confirmCryptoAmount").innerText = cryptoAmt.toFixed(4)+" "+symbol;
+      document.getElementById("confirmCryptoTypeDiv").style.display = "none";
+      document.getElementById("confirmFromDiv").style.display = "none";
+      document.getElementById("confirmToDiv").style.display = "none";
+      document.getElementById("confirmFeeDiv").style.display = "flex";
+      document.getElementById("confirmCryptoFee").innerText = "$"+fee.toFixed(2);
       
-      await runTransaction(db, async (transaction) => {
-        const userDoc = await transaction.get(doc(db,"users",uid));
-        const userData = userDoc.data();
-        if((userData.checkingBalance || 0) < total) throw new Error("Insufficient");
-        transaction.update(doc(db,"users",uid), {
-          checkingBalance: (userData.checkingBalance || 0) - total,
-          cryptoHoldings: {
-            ...userData.cryptoHoldings,
-            [currentCryptoDetail]: (userData.cryptoHoldings[currentCryptoDetail] || 0) + cryptoAmt
-          }
-        });
-      });
-      
-      await recordTransaction(uid, {type: "Buy Crypto", amount: usdAmt, fee: fee, total: total, from: udata.checkingAcc, to: currentCryptoDetail, status: "Success", txid});
-      await loadDashboardUI();
-      showReceipt({type: "Buy "+currentCryptoDetail, amount: cryptoAmt.toFixed(4), fee: fee.toFixed(2), txid});
+      cryptoTxData = {type: "buy", uid, usdAmt, cryptoAmt, fee, total, udata, price};
+      document.getElementById("cryptoConfirmModal").style.display = "flex";
     }catch(e){ showError("buyCryptoDetailError", e.message); }
   });
   
@@ -1037,25 +1060,89 @@
       if((udata.cryptoHoldings[currentCryptoDetail] || 0) < cryptoAmt){ showError("sellCryptoDetailError", "Insufficient"); return; }
       
       const usdAmt = cryptoAmt * price;
+      const symbol = {bitcoin:"BTC",ethereum:"ETH",litecoin:"LTC"}[currentCryptoDetail];
+      document.getElementById("confirmCryptoTitle").innerText = "Confirm Sell";
+      document.getElementById("confirmCryptoAmount").innerText = "$"+usdAmt.toFixed(2);
+      document.getElementById("confirmCryptoTypeDiv").style.display = "none";
+      document.getElementById("confirmFromDiv").style.display = "none";
+      document.getElementById("confirmToDiv").style.display = "none";
+      document.getElementById("confirmFeeDiv").style.display = "none";
+      
+      cryptoTxData = {type: "sell", uid, cryptoAmt, usdAmt, udata, price};
+      document.getElementById("cryptoConfirmModal").style.display = "flex";
+    }catch(e){ showError("sellCryptoDetailError", e.message); }
+  });
+  
+  document.getElementById("confirmCryptoTransfer").addEventListener("click", async ()=> {
+    try{
+      if(!cryptoTxData) return;
+      const {type, uid, udata} = cryptoTxData;
       const txid = genTxID();
       
-      await runTransaction(db, async (transaction) => {
-        const userDoc = await transaction.get(doc(db,"users",uid));
-        const userData = userDoc.data();
-        if((userData.cryptoHoldings[currentCryptoDetail] || 0) < cryptoAmt) throw new Error("Insufficient");
-        transaction.update(doc(db,"users",uid), {
-          checkingBalance: (userData.checkingBalance || 0) + usdAmt,
-          cryptoHoldings: {
-            ...userData.cryptoHoldings,
-            [currentCryptoDetail]: (userData.cryptoHoldings[currentCryptoDetail] || 0) - cryptoAmt
-          }
+      if(type === "send"){
+        const {cryptoAmt, toWallet} = cryptoTxData;
+        const q = query(collection(db,"users"), where("cryptoWallets."+currentCryptoDetail, "==", toWallet));
+        const recipSnap = await getDocs(q);
+        if(recipSnap.empty) throw new Error("Wallet not found");
+        const recipientUid = recipSnap.docs[0].id;
+        
+        await runTransaction(db, async (transaction) => {
+          const senderDoc = await transaction.get(doc(db,"users",uid));
+          const recipientDoc = await transaction.get(doc(db,"users",recipientUid));
+          const senderData = senderDoc.data();
+          if((senderData.cryptoHoldings[currentCryptoDetail] || 0) < cryptoAmt) throw new Error("Insufficient");
+          transaction.update(doc(db,"users",uid), {
+            cryptoHoldings: {...senderData.cryptoHoldings, [currentCryptoDetail]: (senderData.cryptoHoldings[currentCryptoDetail] || 0) - cryptoAmt}
+          });
+          const recData = recipientDoc.data();
+          transaction.update(doc(db,"users",recipientUid), {
+            cryptoHoldings: {...recData.cryptoHoldings, [currentCryptoDetail]: (recData.cryptoHoldings[currentCryptoDetail] || 0) + cryptoAmt}
+          });
         });
-      });
+        await recordTransaction(uid, {type: "Send Crypto", amount: cryptoAmt, fee: 0, total: cryptoAmt, from: cryptoWallets[currentCryptoDetail], to: toWallet, status: "Success", txid});
+        await recordTransaction(recipientUid, {type: "Received Crypto", amount: cryptoAmt, fee: 0, total: cryptoAmt, from: cryptoWallets[currentCryptoDetail], to: toWallet, status: "Success", txid});
+        showReceipt({type: "Send "+currentCryptoDetail, amount: cryptoAmt.toFixed(4), from: cryptoWallets[currentCryptoDetail], to: toWallet, txid});
+      } else if(type === "buy"){
+        const {usdAmt, cryptoAmt, fee, total} = cryptoTxData;
+        const snap = await getDoc(doc(db,"users",uid));
+        const userData = snap.data();
+        await runTransaction(db, async (transaction) => {
+          const userDoc = await transaction.get(doc(db,"users",uid));
+          const ud = userDoc.data();
+          if((ud.checkingBalance || 0) < total) throw new Error("Insufficient");
+          transaction.update(doc(db,"users",uid), {
+            checkingBalance: (ud.checkingBalance || 0) - total,
+            cryptoHoldings: {...ud.cryptoHoldings, [currentCryptoDetail]: (ud.cryptoHoldings[currentCryptoDetail] || 0) + cryptoAmt}
+          });
+        });
+        await recordTransaction(uid, {type: "Buy Crypto", amount: usdAmt, fee: fee, total: total, from: userData.checkingAcc, to: currentCryptoDetail, status: "Success", txid});
+        showReceipt({type: "Buy "+currentCryptoDetail, amount: cryptoAmt.toFixed(4), fee: fee.toFixed(2), txid});
+      } else if(type === "sell"){
+        const {cryptoAmt, usdAmt} = cryptoTxData;
+        const snap = await getDoc(doc(db,"users",uid));
+        const userData = snap.data();
+        await runTransaction(db, async (transaction) => {
+          const userDoc = await transaction.get(doc(db,"users",uid));
+          const ud = userDoc.data();
+          if((ud.cryptoHoldings[currentCryptoDetail] || 0) < cryptoAmt) throw new Error("Insufficient");
+          transaction.update(doc(db,"users",uid), {
+            checkingBalance: (ud.checkingBalance || 0) + usdAmt,
+            cryptoHoldings: {...ud.cryptoHoldings, [currentCryptoDetail]: (ud.cryptoHoldings[currentCryptoDetail] || 0) - cryptoAmt}
+          });
+        });
+        await recordTransaction(uid, {type: "Sell Crypto", amount: cryptoAmt, fee: 0, total: usdAmt, from: currentCryptoDetail, to: userData.checkingAcc, status: "Success", txid});
+        showReceipt({type: "Sell "+currentCryptoDetail, amount: usdAmt.toFixed(2), txid});
+      }
       
-      await recordTransaction(uid, {type: "Sell Crypto", amount: cryptoAmt, fee: 0, total: usdAmt, from: currentCryptoDetail, to: udata.checkingAcc, status: "Success", txid});
       await loadDashboardUI();
-      showReceipt({type: "Sell "+currentCryptoDetail, amount: usdAmt.toFixed(2), txid});
-    }catch(e){ showError("sellCryptoDetailError", e.message); }
+      document.getElementById("cryptoConfirmModal").style.display = "none";
+      cryptoTxData = null;
+    }catch(e){ alert("Error: "+e.message); }
+  });
+  
+  document.getElementById("cancelCryptoConfirm").addEventListener("click", ()=> {
+    document.getElementById("cryptoConfirmModal").style.display = "none";
+    cryptoTxData = null;
   });
 
   let priceChart = null;
@@ -1088,9 +1175,11 @@
       const holding = (currentUser.cryptoHoldings || {})[cryptoKey] || 0;
       const wallet = cryptoWallets[cryptoKey] || genWalletAddress();
       const price = cryptoPrices[cryptoKey]?.usd || 0;
+      const usdValue = holding * price;
       
       document.getElementById(cryptoKey+"LivePrice").innerText = "$"+price.toFixed(2);
       document.getElementById(cryptoKey+"Holding").innerText = holding.toFixed(4)+" "+symbol;
+      document.getElementById(cryptoKey+"HoldingUSD").innerText = "$"+usdValue.toFixed(2);
       document.getElementById(cryptoKey+"Wallet").innerText = wallet.slice(0,10)+"..."+wallet.slice(-8);
       
       if(cryptoType === "bitcoin") showSection("bitcoinDetailSection");
@@ -1268,11 +1357,18 @@
           const type = tx.type || "Unknown";
           const from = tx.from || "—";
           const to = tx.to || "—";
-          html += `<div style="border-bottom:1px solid #eee;padding:12px 0;font-size:14px;">
+          const date = tx.createdAt?.toDate ? new Date(tx.createdAt.toDate()).toLocaleDateString() : "—";
+          const time = tx.createdAt?.toDate ? new Date(tx.createdAt.toDate()).toLocaleTimeString() : "—";
+          let displayAmt = "$"+amt;
+          if(type.includes("Crypto")){
+            const cryptoAmt = amt;
+            displayAmt = cryptoAmt + " (approx $"+amt+")";
+          }
+          html += `<div style="border-bottom:1px solid #eee;padding:12px 0;font-size:14px;cursor:pointer;" onclick="showTxDetails('${tx.id}','${type}','${amt}','${fee}','${from}','${to}','${date}','${time}')">
             <div style="font-weight:600;margin-bottom:4px;">${type}</div>
             <div class="muted">From: ${from} → To: ${to}</div>
             <div style="margin-top:4px;display:flex;justify-content:space-between;">
-              <span style="color:#222;">$${amt}</span>
+              <span style="color:#222;">${displayAmt}</span>
               <span class="muted">${status}</span>
             </div>
             ${fee > 0 ? `<div class="muted">Fee: $${fee}</div>` : ''}
@@ -1286,6 +1382,19 @@
       document.getElementById("transactionsList").innerHTML = `<p class="error">Error loading: ${err.message}</p>`;
       showSection("transactionsSection");
     }
+  }
+  
+  function showTxDetails(id, type, amt, fee, from, to, date, time){
+    let html = `<p><strong>Type:</strong> ${type}</p>`;
+    html += `<p><strong>Amount:</strong> $${parseFloat(amt).toFixed(2)}</p>`;
+    if(parseFloat(fee) > 0) html += `<p><strong>Fee:</strong> $${parseFloat(fee).toFixed(2)}</p>`;
+    html += `<p><strong>From:</strong> ${from}</p>`;
+    html += `<p><strong>To:</strong> ${to}</p>`;
+    html += `<p><strong>Date:</strong> ${date}</p>`;
+    html += `<p><strong>Time:</strong> ${time}</p>`;
+    document.getElementById("txDetailsTitle").innerText = type;
+    document.getElementById("txDetailsBody").innerHTML = html;
+    document.getElementById("txDetailsModal").style.display = "flex";
   }
 
   document.getElementById("signupBtn").addEventListener("click", async ()=>{
@@ -1348,10 +1457,10 @@
     const ethValue = (holdings.ethereum || 0) * ethPrice;
     const ltcValue = (holdings.litecoin || 0) * ltcPrice;
     const totalCryptoUSD = btcValue + ethValue + ltcValue;
-    const totalUSD = (currentUser.checkingBalance||0)+(currentUser.savingsBalance||0)+totalCryptoUSD;
-    const totalBTC = totalUSD / (btcPrice || 1);
-    document.getElementById("overallBalance").innerText = totalBTC.toFixed(4)+" BTC";
-    document.getElementById("overallBalanceUSD").innerText = "$"+totalUSD.toFixed(2);
+    const totalBankUSD = (currentUser.checkingBalance||0)+(currentUser.savingsBalance||0);
+    const totalBTC = totalBankUSD / (btcPrice || 1);
+    document.getElementById("overallBalance").innerText = "$"+totalBankUSD.toFixed(2);
+    document.getElementById("overallBalanceUSD").innerText = totalBTC.toFixed(4)+" BTC";
     setGreeting();
   }
 
@@ -1379,11 +1488,65 @@
   document.getElementById("topupBack").addEventListener("click", ()=> showSection("dashboardSection"));
   document.getElementById("withdrawBack").addEventListener("click", ()=> showSection("dashboardSection"));
   document.getElementById("wireBack").addEventListener("click", ()=> showSection("dashboardSection"));
+  document.getElementById("transferBack").addEventListener("click", ()=> showSection("dashboardSection"));
 
   document.getElementById("sendBtn").addEventListener("click", ()=> showSection("sendSection"));
+  document.getElementById("transferBtn").addEventListener("click", ()=> showSection("transferSection"));
   document.getElementById("topupBtn").addEventListener("click", ()=> showSection("topupSection"));
   document.getElementById("withdrawBtn").addEventListener("click", ()=> showSection("withdrawSection"));
   document.getElementById("wireBtn").addEventListener("click", ()=> showSection("wireSection"));
+  
+  document.getElementById("transferSubmit").addEventListener("click", async ()=>{
+    try{
+      showError("transferError", "");
+      const from = document.getElementById("transferFrom").value;
+      const to = document.getElementById("transferTo").value;
+      if(from === to){ showError("transferError", "Select different accounts"); return; }
+      const amt = parseFloat(document.getElementById("transferAmount").value);
+      const pin = document.getElementById("transferPin").value.trim();
+      if(!amt || amt <= 0 || isNaN(amt)) { showError("transferError", "Valid amount"); return; }
+      
+      const uid = auth.currentUser.uid;
+      const snap = await getDoc(doc(db,"users",uid));
+      const udata = snap.data();
+      if(udata.transactionPin !== pin){ showError("transferError", "Wrong PIN"); return; }
+      
+      const fromBal = from === "checking" ? (udata.checkingBalance || 0) : (udata.savingsBalance || 0);
+      if(fromBal < amt){ showError("transferError", "Insufficient balance"); return; }
+      
+      const txid = genTxID();
+      const fromAcc = from === "checking" ? udata.checkingAcc : udata.savingsAcc;
+      const toAcc = to === "checking" ? udata.checkingAcc : udata.savingsAcc;
+      
+      await runTransaction(db, async (transaction) => {
+        const userDoc = await transaction.get(doc(db,"users",uid));
+        const userData = userDoc.data();
+        const cBal = userData.checkingBalance || 0;
+        const sBal = userData.savingsBalance || 0;
+        const fromBalance = from === "checking" ? cBal : sBal;
+        if(fromBalance < amt) throw new Error("Insufficient");
+        
+        const updates = {};
+        if(from === "checking"){
+          updates.checkingBalance = cBal - amt;
+          updates.savingsBalance = sBal + amt;
+        } else {
+          updates.checkingBalance = cBal + amt;
+          updates.savingsBalance = sBal - amt;
+        }
+        transaction.update(doc(db,"users",uid), updates);
+      });
+      
+      await recordTransaction(uid, {
+        type: "Transfer", amount: amt, fee: 0, total: amt,
+        from: fromAcc, to: toAcc, status: "Success", txid: txid
+      });
+      await loadDashboardUI();
+      document.getElementById("transferAmount").value="";
+      document.getElementById("transferPin").value="";
+      showReceipt({type: "Transfer", amount: amt, from: from, to: to, txid: txid});
+    }catch(err){ showError("transferError", err.message); }
+  });
 
   document.getElementById("wireAmount").addEventListener("input", ()=>{
     const amt = parseFloat(document.getElementById("wireAmount").value) || 0;
