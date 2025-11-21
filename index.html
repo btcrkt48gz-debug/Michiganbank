@@ -224,7 +224,7 @@
   // ---------- Firebase imports ----------
   import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
   import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
-  import { getFirestore, doc, setDoc, getDoc, updateDoc, collection, addDoc, serverTimestamp, query, where, getDocs } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+  import { getFirestore, doc, setDoc, getDoc, updateDoc, collection, addDoc, serverTimestamp, query, where, getDocs, runTransaction } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
   // ---------- Firebase config (your project) ----------
   const firebaseConfig = {
@@ -303,6 +303,9 @@
   });
 
   // ---------- SIGNUP ----------
+  // SECURITY NOTE (DEMO ONLY): Transaction PINs are stored in plaintext for demo purposes.
+  // In production, PINs should be hashed using bcrypt or similar before storage,
+  // and validation should happen server-side (Cloud Functions) to prevent client tampering.
   signupBtn.addEventListener("click", async ()=>{
     try{
       showError("signupError","");
@@ -455,12 +458,29 @@
       const uid = auth.currentUser.uid;
       const amt = parseFloat(document.getElementById("topupAmount").value);
       const pin = document.getElementById("topupPin").value.trim();
-      if(!amt || amt <= 0) { showError("topupError","Enter a valid amount"); return; }
-      const snap = await getDoc(doc(db,"users",uid)); const udata = snap.data();
+      if(!amt || amt <= 0 || isNaN(amt)) { showError("topupError","Enter a valid amount"); return; }
+      
+      // Verify PIN first (read-only check)
+      const snap = await getDoc(doc(db,"users",uid)); 
+      const udata = snap.data();
       if(udata.transactionPin !== pin){ showError("topupError","Incorrect PIN"); return; }
 
-      const newChecking = (udata.checkingBalance || 0) + amt;
-      await updateUserBalances(uid,newChecking,udata.savingsBalance || 0);
+      const txid = genTxID();
+      const userRef = doc(db,"users",uid);
+      
+      // Use transaction to prevent race conditions
+      await runTransaction(db, async (transaction) => {
+        const userDoc = await transaction.get(userRef);
+        if (!userDoc.exists()) throw new Error("User not found");
+        
+        const userData = userDoc.data();
+        const newChecking = (userData.checkingBalance || 0) + amt;
+        
+        transaction.update(userRef, {
+          checkingBalance: newChecking
+        });
+      });
+      
       await recordTransaction(uid, {
         type: "Top-up",
         amount: amt,
@@ -470,13 +490,13 @@
         to: udata.checkingAcc,
         status: "Success",
         message: "Top-up completed",
-        txid: genTxID()
+        txid: txid
       });
       await loadDashboardUI();
       // show receipt
       showReceipt({
         type:"Top-up", amount:amt, fee:0, total:amt,
-        from:"External", to:udata.checkingAcc, status:"Success", txid: genTxID()
+        from:"External", to:udata.checkingAcc, status:"Success", txid: txid
       });
     }catch(err){ showError("topupError", err.message); }
   });
@@ -489,13 +509,32 @@
       const uid = auth.currentUser.uid;
       const amt = parseFloat(document.getElementById("withdrawAmount").value);
       const pin = document.getElementById("withdrawPin").value.trim();
-      if(!amt || amt <= 0) { showError("withdrawError","Enter a valid amount"); return; }
-      const snap = await getDoc(doc(db,"users",uid)); const udata = snap.data();
+      if(!amt || amt <= 0 || isNaN(amt)) { showError("withdrawError","Enter a valid amount"); return; }
+      
+      // Verify PIN first
+      const snap = await getDoc(doc(db,"users",uid)); 
+      const udata = snap.data();
       if(udata.transactionPin !== pin){ showError("withdrawError","Incorrect PIN"); return; }
-      if((udata.checkingBalance || 0) < amt){ showError("withdrawError","Insufficient funds"); return; }
 
-      const newChecking = (udata.checkingBalance || 0) - amt;
-      await updateUserBalances(uid,newChecking, udata.savingsBalance || 0);
+      const txid = genTxID();
+      const userRef = doc(db,"users",uid);
+      
+      // Use transaction to prevent race conditions
+      await runTransaction(db, async (transaction) => {
+        const userDoc = await transaction.get(userRef);
+        if (!userDoc.exists()) throw new Error("User not found");
+        
+        const userData = userDoc.data();
+        const currentBalance = userData.checkingBalance || 0;
+        
+        if(currentBalance < amt) throw new Error("Insufficient funds");
+        
+        const newChecking = currentBalance - amt;
+        transaction.update(userRef, {
+          checkingBalance: newChecking
+        });
+      });
+      
       await recordTransaction(uid, {
         type: "Withdraw",
         amount: amt,
@@ -505,12 +544,12 @@
         to: "External",
         status: "Success",
         message: "Withdrawal completed",
-        txid: genTxID()
+        txid: txid
       });
       await loadDashboardUI();
       showReceipt({
         type:"Withdraw", amount:amt, fee:0, total:amt,
-        from:udata.checkingAcc, to:"External", status:"Success", txid: genTxID()
+        from:udata.checkingAcc, to:"External", status:"Success", txid: txid
       });
     }catch(err){ showError("withdrawError", err.message); }
   });
@@ -524,13 +563,22 @@
       const toAcc = document.getElementById("sendTo").value.trim();
       const amt = parseFloat(document.getElementById("sendAmount").value);
       const pin = document.getElementById("sendPin").value.trim();
-      if(!toAcc || !amt || amt <= 0){ showError("sendError","Enter recipient and amount"); return; }
-      const snap = await getDoc(doc(db,"users",uid)); const udata = snap.data();
+      if(!toAcc || !amt || amt <= 0 || isNaN(amt)){ showError("sendError","Enter valid recipient and amount"); return; }
+      
+      // Verify PIN and get sender data
+      const snap = await getDoc(doc(db,"users",uid)); 
+      const udata = snap.data();
       if(udata.transactionPin !== pin){ showError("sendError","Incorrect PIN"); return; }
+      
+      // Prevent sending to yourself
+      if(toAcc === udata.checkingAcc || toAcc === udata.savingsAcc){ 
+        showError("sendError","Cannot send money to yourself"); 
+        return; 
+      }
+      
       // fee (demo 1%)
       const fee = parseFloat((amt * 0.01).toFixed(2));
       const total = amt + fee;
-      if((udata.checkingBalance || 0) < total){ showError("sendError","Insufficient funds including fee"); return; }
 
       // Find recipient by checkingAcc or savingsAcc
       const q1 = query(collection(db,"users"), where("checkingAcc","==",toAcc));
@@ -544,15 +592,41 @@
 
       if(!recipientUid){ showError("sendError","Recipient not found (demo users only)"); return; }
 
-      // Update balances transactionally (simple approach)
-      const recipientDoc = await getDoc(doc(db,"users",recipientUid));
-      const rdata = recipientDoc.data();
+      const txidSend = genTxID();
+      const txidReceive = genTxID();
+      
+      const senderRef = doc(db,"users",uid);
+      const recipientRef = doc(db,"users",recipientUid);
+      
+      // Use Firestore transaction to update BOTH users atomically
+      await runTransaction(db, async (transaction) => {
+        const senderDoc = await transaction.get(senderRef);
+        const recipientDoc = await transaction.get(recipientRef);
+        
+        if (!senderDoc.exists() || !recipientDoc.exists()) {
+          throw new Error("User not found");
+        }
+        
+        const senderData = senderDoc.data();
+        const recipientData = recipientDoc.data();
+        
+        // Validate sender has enough funds
+        const senderBalance = senderData.checkingBalance || 0;
+        if(senderBalance < total){
+          throw new Error("Insufficient funds including fee");
+        }
+        
+        // Update both balances in single atomic transaction
+        transaction.update(senderRef, {
+          checkingBalance: senderBalance - total
+        });
+        
+        transaction.update(recipientRef, {
+          checkingBalance: (recipientData.checkingBalance || 0) + amt
+        });
+      });
 
-      await updateUserBalances(uid, (udata.checkingBalance || 0) - total, udata.savingsBalance || 0);
-      // Credit recipient to checking
-      await updateUserBalances(recipientUid, (rdata.checkingBalance||0) + amt, rdata.savingsBalance||0);
-
-      // Record both transactions
+      // Record both transactions (after successful transfer)
       await recordTransaction(uid, {
         type:"Send",
         amount: amt,
@@ -561,7 +635,7 @@
         to: toAcc,
         status:"Success",
         message:`Sent to ${toAcc}`,
-        txid: genTxID()
+        txid: txidSend
       });
       await recordTransaction(recipientUid, {
         type:"Receive",
@@ -572,11 +646,11 @@
         to: toAcc,
         status:"Success",
         message:`Received from ${udata.checkingAcc}`,
-        txid: genTxID()
+        txid: txidReceive
       });
 
       await loadDashboardUI();
-      showReceipt({ type:"Send", amount:amt, fee, total, from:udata.checkingAcc, to:toAcc, status:"Success", txid:genTxID() });
+      showReceipt({ type:"Send", amount:amt, fee, total, from:udata.checkingAcc, to:toAcc, status:"Success", txid:txidSend });
     }catch(err){ showError("sendError", err.message); }
   });
 
@@ -601,15 +675,34 @@
       const country = document.getElementById("wireCountry").value;
       const amt = parseFloat(document.getElementById("wireAmount").value);
       const pin = document.getElementById("wirePin").value.trim();
-      if(!bank||!name||!acc||!amt){ showError("wireError","Fill all fields"); return; }
-      const snap = await getDoc(doc(db,"users",uid)); const udata = snap.data();
+      if(!bank||!name||!acc||!amt||amt <= 0 || isNaN(amt)){ showError("wireError","Fill all fields with valid values"); return; }
+      
+      // Verify PIN
+      const snap = await getDoc(doc(db,"users",uid)); 
+      const udata = snap.data();
       if(udata.transactionPin !== pin){ showError("wireError","Incorrect PIN"); return; }
+      
       const fee = parseFloat((amt * 0.05).toFixed(2));
       const total = amt + fee;
-      if((udata.checkingBalance||0) < total){ showError("wireError","Insufficient funds including fee"); return; }
 
-      const newChecking = (udata.checkingBalance||0) - total;
-      await updateUserBalances(uid,newChecking,udata.savingsBalance||0);
+      const txid = genTxID();
+      const userRef = doc(db,"users",uid);
+      
+      // Use transaction to prevent race conditions
+      await runTransaction(db, async (transaction) => {
+        const userDoc = await transaction.get(userRef);
+        if (!userDoc.exists()) throw new Error("User not found");
+        
+        const userData = userDoc.data();
+        const currentBalance = userData.checkingBalance || 0;
+        
+        if(currentBalance < total) throw new Error("Insufficient funds including fee");
+        
+        transaction.update(userRef, {
+          checkingBalance: currentBalance - total
+        });
+      });
+      
       await recordTransaction(uid, {
         type: "Wire Transfer",
         amount: amt,
@@ -619,10 +712,10 @@
         to: `${name} | ${bank} | ${acc} | ${country}`,
         status: "Success",
         message: `Wire sent to ${name} (${bank}, ${country})`,
-        txid: genTxID()
+        txid: txid
       });
       await loadDashboardUI();
-      showReceipt({ type:"Wire Transfer", amount:amt, fee, total, from:udata.checkingAcc, to:acc, status:"Success", message:`Bank: ${bank} | Country: ${country}`, txid: genTxID() });
+      showReceipt({ type:"Wire Transfer", amount:amt, fee, total, from:udata.checkingAcc, to:acc, status:"Success", message:`Bank: ${bank} | Country: ${country}`, txid: txid });
     }catch(err){ showError("wireError", err.message); }
   });
 
