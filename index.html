@@ -3,84 +3,85 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>OlaCreditUnion — Demo Bank (Fixed SPA)</title>
-
-  <!-- Bootstrap + Icons -->
+  <title>OlaCreditUnion — Demo Bank</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
-
   <style>
-    :root{
-      --accent-1:#4e54c8; --accent-2:#8f94fb; --accent-3:#667eea; --accent-4:#764ba2;
-    }
-    html,body{height:100%;margin:0;font-family:Inter,system-ui,Roboto,Arial;}
-    body{background:linear-gradient(135deg,var(--accent-1),var(--accent-2));color:#222;-webkit-font-smoothing:antialiased;}
-    .section{display:none;padding:18px 18px 110px;}
-    .section.active{display:block;}
-    .login-card{max-width:480px;margin:48px auto;background:#fff;border-radius:14px;padding:26px;box-shadow:0 18px 50px rgba(0,0,0,.15);}
-    .btn-primary{background:linear-gradient(135deg,var(--accent-1),var(--accent-2));border:0;color:#fff;border-radius:10px;padding:10px 14px;}
-    .btn-success{background:linear-gradient(135deg,#43e97b,#38f9d7);border:0;color:#fff;border-radius:10px;padding:10px 14px;}
-    .navbar{height:58px;background:#fff;border-radius:8px;display:flex;align-items:center;justify-content:space-between;padding:0 12px;box-shadow:0 6px 18px rgba(0,0,0,.12);}
-    .balance-card{background:linear-gradient(135deg,var(--accent-3),var(--accent-4));color:#fff;border-radius:14px;padding:18px;margin:14px 0;box-shadow:0 12px 40px rgba(0,0,0,.18)}
-    .card-custom{background:#fff;border-radius:12px;padding:14px;box-shadow:0 8px 28px rgba(0,0,0,.12);cursor:pointer;margin:8px}
-    .card-custom:active{transform:scale(.99)}
-    .bottom-nav{position:fixed;left:0;right:0;bottom:14px;margin:auto;display:flex;gap:18px;justify-content:center;pointer-events:auto;z-index:20}
-    .bottom-nav button{width:64px;height:64px;border-radius:32px;border:0;box-shadow:0 10px 30px rgba(0,0,0,.16);display:flex;align-items:center;justify-content:center;font-size:20px;cursor:pointer;background:white}
-    .bottom-nav button:active{transform:scale(.95)}
-    input,select,textarea{border-radius:10px;padding:10px;border:1px solid #e6e6e6;width:100%}
-    label{font-weight:600;font-size:14px;color:#333}
-    .muted{color:#777;font-size:13px}
-    .masked{letter-spacing:2px;font-weight:600}
-    .copy-btn{cursor:pointer;margin-left:8px}
-    .receipt-card{background:#fff;border-radius:12px;padding:18px;box-shadow:0 10px 28px rgba(0,0,0,.12);max-width:720px;margin:20px auto}
-    .error{color:#d9534f}
-    @media (min-width:900px){.section{max-width:980px;margin:0 auto}}
+    :root{ --accent-1:#4e54c8; --accent-2:#8f94fb; --accent-3:#667eea; --accent-4:#764ba2; }
+    html,body{ height:100%; margin:0; font-family:Inter,system-ui,Roboto,Arial; }
+    body{ background:linear-gradient(135deg,var(--accent-1),var(--accent-2)); color:#222; -webkit-font-smoothing:antialiased; }
+    .section{ display:none; padding:18px 18px 110px; }
+    .section.active{ display:block; }
+    .login-card{ max-width:480px; margin:48px auto; background:#fff; border-radius:14px; padding:26px; box-shadow:0 18px 50px rgba(0,0,0,.15); }
+    .btn-primary{ background:linear-gradient(135deg,var(--accent-1),var(--accent-2)); border:0; color:#fff; border-radius:10px; padding:10px 14px; cursor:pointer; }
+    .btn-success{ background:linear-gradient(135deg,#43e97b,#38f9d7); border:0; color:#fff; border-radius:10px; padding:10px 14px; cursor:pointer; }
+    .btn-danger{ background:linear-gradient(135deg,#f5576c,#f093fb); border:0; color:#fff; border-radius:10px; padding:10px 14px; cursor:pointer; }
+    .navbar{ height:58px; background:#fff; border-radius:8px; display:flex; align-items:center; justify-content:space-between; padding:0 12px; box-shadow:0 6px 18px rgba(0,0,0,.12); }
+    .balance-card{ background:linear-gradient(135deg,var(--accent-3),var(--accent-4)); color:#fff; border-radius:14px; padding:18px; margin:14px 0; box-shadow:0 12px 40px rgba(0,0,0,.18); }
+    .card-custom{ background:#fff; border-radius:12px; padding:14px; box-shadow:0 8px 28px rgba(0,0,0,.12); cursor:pointer; margin:8px; }
+    .card-custom:active{ transform:scale(.99); }
+    input,select,textarea{ border-radius:10px; padding:10px; border:1px solid #e6e6e6; width:100%; }
+    label{ font-weight:600; font-size:14px; color:#333; }
+    .muted{ color:#777; font-size:13px; }
+    .masked{ letter-spacing:2px; font-weight:600; }
+    .copy-btn{ cursor:pointer; margin-left:8px; }
+    .error{ color:#d9534f; font-size:14px; }
+    .link-like{ cursor:pointer; color:var(--accent-4); text-decoration:underline; }
+    .menu-overlay{ display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,.5); z-index:100; }
+    .menu-overlay.open{ display:block; }
+    .menu-panel{ display:none; position:fixed; top:0; left:0; width:280px; height:100%; background:#fff; z-index:101; box-shadow:4px 0 12px rgba(0,0,0,.2); }
+    .menu-panel.open{ display:flex; flex-direction:column; padding:20px; gap:12px; }
+    .menu-item{ padding:12px; border-radius:8px; cursor:pointer; background:#f5f5f5; text-align:center; font-weight:600; }
+    .menu-item:hover{ background:var(--accent-1); color:#fff; }
+    @media (min-width:900px){ .section{ max-width:980px; margin:0 auto; } }
   </style>
 </head>
 <body>
 
-  <!-- AUTH (Login / Signup) -->
+  <!-- MENU OVERLAY -->
+  <div id="menuOverlay" class="menu-overlay"></div>
+
+  <!-- HAMBURGER MENU -->
+  <div id="menuPanel" class="menu-panel">
+    <div style="font-weight:700;margin-bottom:20px;font-size:18px;">Menu</div>
+    <div id="profileMenuItem" class="menu-item"><i class="bi bi-person me-2"></i>Profile</div>
+    <div id="logoutMenuItem" class="menu-item"><i class="bi bi-box-arrow-right me-2"></i>Logout</div>
+  </div>
+
+  <!-- LOGIN/SIGNUP -->
   <div id="authSection" class="section active">
     <div class="login-card text-center">
       <h3 style="font-weight:700;margin-bottom:6px;">OlaCreditUnion — Demo</h3>
-      <p class="muted">Sign in or create an account</p>
-
+      <p class="muted">Sign in or create account</p>
       <div id="authTabs" class="mb-3">
         <button id="showLogin" class="btn btn-sm btn-light me-2">Login</button>
         <button id="showSignup" class="btn btn-sm btn-light">Sign up</button>
       </div>
-
-      <!-- LOGIN -->
-      <div id="loginBox">
+      <form id="loginBox" onsubmit="return false">
         <input id="loginEmail" placeholder="Email" class="mb-2 form-control" />
         <input id="loginPassword" type="password" placeholder="Password" class="mb-2 form-control" />
-        <button id="loginBtn" class="btn btn-primary w-100 mb-2">Login</button>
+        <input id="loginPin" type="password" placeholder="Transaction PIN (4 digits)" class="mb-2 form-control" />
+        <button id="loginBtn" type="button" class="btn btn-primary w-100 mb-2">Login</button>
         <div id="loginError" class="error" style="display:none"></div>
-      </div>
-
-      <!-- SIGNUP -->
-      <div id="signupBox" style="display:none">
+      </form>
+      <form id="signupBox" style="display:none" onsubmit="return false">
         <input id="signupName" placeholder="Full name" class="mb-2 form-control" />
         <input id="signupEmail" placeholder="Email" class="mb-2 form-control" />
         <input id="signupPassword" type="password" placeholder="Password" class="mb-2 form-control" />
         <input id="signupPin" type="password" placeholder="Transaction PIN (4 digits)" class="mb-2 form-control" maxlength="6"/>
-        <button id="signupBtn" class="btn btn-success w-100 mb-2">Create account</button>
+        <button id="signupBtn" type="button" class="btn btn-success w-100 mb-2">Create account</button>
         <div id="signupError" class="error" style="display:none"></div>
-      </div>
-
-      <div class="mt-2 muted">This is a simulation for learning — no real money moves.</div>
+      </form>
+      <div class="mt-2 muted">Demo app. No real money moves.</div>
     </div>
   </div>
 
   <!-- DASHBOARD -->
   <div id="dashboardSection" class="section">
     <div class="navbar mb-3">
-      <i class="bi bi-list" id="menuToggle" style="font-size:22px;color:var(--accent-4);cursor:pointer"></i>
-      <div style="display:flex;align-items:center;gap:12px">
-        <img id="topProfilePic" src="" style="width:36px;height:36px;border-radius:18px;object-fit:cover" />
-      </div>
+      <i id="menuToggle" class="bi bi-list" style="font-size:22px;color:var(--accent-4);cursor:pointer"></i>
+      <img id="topProfilePic" src="" style="width:36px;height:36px;border-radius:18px;object-fit:cover" />
     </div>
-
     <div class="balance-card text-center">
       <div id="greeting" style="font-size:18px;font-weight:700"></div>
       <div class="muted" id="liveTime"></div>
@@ -88,21 +89,18 @@
       <div class="muted">Overall Balance (USD)</div>
       <div class="mt-3">
         <span id="acctMasked" class="masked"></span>
-        <i class="bi bi-clipboard copy-btn" id="copyAcct" title="Copy account number"></i>
+        <i class="bi bi-clipboard copy-btn" id="copyAcct" title="Copy account"></i>
       </div>
     </div>
-
     <h5 style="font-weight:700;margin-top:12px">Accounts</h5>
-    <div class="card-custom" id="checkingCard">
+    <div class="card-custom">
       <h5>Checking</h5>
       <p id="checkingBal" style="font-weight:700"></p>
     </div>
-
-    <div class="card-custom" id="savingsCard">
+    <div class="card-custom">
       <h5>Savings</h5>
       <p id="savingsBal" style="font-weight:700"></p>
     </div>
-
     <h5 style="font-weight:700;margin-top:12px">Transactions</h5>
     <div class="d-grid gap-2">
       <button class="btn btn-light card-custom text-start" id="sendBtn"><i class="bi bi-send me-2"></i> Send Money</button>
@@ -110,10 +108,26 @@
       <button class="btn btn-light card-custom text-start" id="withdrawBtn"><i class="bi bi-arrow-down-circle me-2"></i> Withdraw</button>
       <button class="btn btn-light card-custom text-start" id="wireBtn"><i class="bi bi-globe me-2"></i> Wire Transfer</button>
     </div>
+  </div>
 
-    <div class="mt-3">
-      <button id="openProfileBtn" class="btn btn-sm btn-light">Open Profile</button>
-      <button id="logoutBtn" class="btn btn-sm btn-light ms-2">Logout</button>
+  <!-- PROFILE -->
+  <div id="profileSection" class="section">
+    <div class="card-custom">
+      <h5>Profile Settings</h5>
+      <div style="text-align:center;margin-bottom:16px">
+        <img id="profilePic" src="" style="width:100px;height:100px;border-radius:50px;object-fit:cover;margin-bottom:12px;">
+      </div>
+      <label>Upload Photo</label>
+      <input id="uploadProfile" type="file" accept="image/*" class="mb-2 form-control"/>
+      <label>Full Name</label>
+      <input id="profileName" class="mb-2 form-control" placeholder="Your name"/>
+      <label>Email</label>
+      <input id="profileEmail" class="mb-2 form-control" disabled/>
+      <label>Change Transaction PIN (leave blank to keep)</label>
+      <input id="profileNewPin" type="password" class="mb-2 form-control" placeholder="New PIN (4+ digits)"/>
+      <button id="saveProfileBtn" class="btn btn-primary w-100">Save Changes</button>
+      <div id="profileMsg" class="mt-2" style="display:none;color:green;text-align:center;font-weight:600"></div>
+      <div class="mt-2"><span class="link-like" id="profileBack">← Back to Dashboard</span></div>
     </div>
   </div>
 
@@ -121,14 +135,14 @@
   <div id="sendSection" class="section">
     <div class="card-custom">
       <h5>Send Money</h5>
-      <label>To account number</label>
-      <input id="sendTo" class="mb-2 form-control" placeholder="Recipient account number"/>
+      <label>To account</label>
+      <input id="sendTo" class="mb-2 form-control" placeholder="Account number"/>
       <label>Amount (USD)</label>
       <input id="sendAmount" type="number" class="mb-2 form-control" placeholder="0.00"/>
       <label>Enter PIN</label>
-      <input id="sendPin" type="password" class="mb-2 form-control" placeholder="Your transaction PIN"/>
+      <input id="sendPin" type="password" class="mb-2 form-control" placeholder="PIN"/>
       <button id="sendSubmit" class="btn btn-primary w-100">Send</button>
-      <div class="mt-2"><span class="link-like" id="sendBack">← Back to Dashboard</span></div>
+      <div class="mt-2"><span class="link-like" id="sendBack">← Back</span></div>
       <div id="sendError" class="error mt-2" style="display:none"></div>
     </div>
   </div>
@@ -140,9 +154,9 @@
       <label>Amount (USD)</label>
       <input id="topupAmount" type="number" class="mb-2 form-control" placeholder="0.00"/>
       <label>Enter PIN</label>
-      <input id="topupPin" type="password" class="mb-2 form-control" placeholder="Your transaction PIN"/>
+      <input id="topupPin" type="password" class="mb-2 form-control" placeholder="PIN"/>
       <button id="topupSubmit" class="btn btn-success w-100">Top Up</button>
-      <div class="mt-2"><span class="link-like" id="topupBack">← Back to Dashboard</span></div>
+      <div class="mt-2"><span class="link-like" id="topupBack">← Back</span></div>
       <div id="topupError" class="error mt-2" style="display:none"></div>
     </div>
   </div>
@@ -154,9 +168,9 @@
       <label>Amount (USD)</label>
       <input id="withdrawAmount" type="number" class="mb-2 form-control" placeholder="0.00"/>
       <label>Enter PIN</label>
-      <input id="withdrawPin" type="password" class="mb-2 form-control" placeholder="Your transaction PIN"/>
+      <input id="withdrawPin" type="password" class="mb-2 form-control" placeholder="PIN"/>
       <button id="withdrawSubmit" class="btn btn-danger w-100">Withdraw</button>
-      <div class="mt-2"><span class="link-like" id="withdrawBack">← Back to Dashboard</span></div>
+      <div class="mt-2"><span class="link-like" id="withdrawBack">← Back</span></div>
       <div id="withdrawError" class="error mt-2" style="display:none"></div>
     </div>
   </div>
@@ -165,72 +179,42 @@
   <div id="wireSection" class="section">
     <div class="card-custom">
       <h5>Wire Transfer</h5>
-      <label>Recipient Country</label>
+      <label>Country</label>
       <select id="wireCountry" class="mb-2 form-control">
-        <option value="USA">USA</option><option value="UK">United Kingdom</option>
-        <option value="EU">European Union</option><option value="CA">Canada</option>
-        <option value="AU">Australia</option>
+        <option>USA</option><option>UK</option><option>Canada</option>
       </select>
-      <label>Recipient Bank</label>
+      <label>Bank</label>
       <input id="wireBank" class="mb-2 form-control" placeholder="Bank name"/>
-      <label>Recipient Name</label>
-      <input id="wireName" class="mb-2 form-control" placeholder="Full name"/>
-      <label>Recipient Account Number</label>
-      <input id="wireAcc" class="mb-2 form-control" placeholder="Account number"/>
+      <label>Recipient</label>
+      <input id="wireName" class="mb-2 form-control" placeholder="Name"/>
+      <label>Account</label>
+      <input id="wireAcc" class="mb-2 form-control" placeholder="Account"/>
       <label>Amount (USD)</label>
       <input id="wireAmount" type="number" class="mb-2 form-control" placeholder="0.00"/>
-      <p class="muted">Fee (demo 5%): <span id="wireFee">0.00</span> — Total: <span id="wireTotal">0.00</span></p>
+      <p class="muted">Fee (5%): $<span id="wireFee">0.00</span> | Total: $<span id="wireTotal">0.00</span></p>
       <label>Enter PIN</label>
-      <input id="wirePin" type="password" class="mb-2 form-control"/>
+      <input id="wirePin" type="password" class="mb-2 form-control" placeholder="PIN"/>
       <button id="wireSubmit" class="btn btn-primary w-100">Send Wire</button>
-      <div class="mt-2"><span class="link-like" id="wireBack">← Back to Dashboard</span></div>
+      <div class="mt-2"><span class="link-like" id="wireBack">← Back</span></div>
       <div id="wireError" class="error mt-2" style="display:none"></div>
     </div>
   </div>
 
-  <!-- PROFILE -->
-  <div id="profileSection" class="section">
-    <div class="card-custom text-center">
-      <h5>Profile</h5>
-      <img id="profilePic" src="" style="width:90px;height:90px;border-radius:46px;object-fit:cover;margin-bottom:10px;">
-      <input id="uploadProfile" type="file" accept="image/*" class="mb-2 form-control"/>
-      <label>Name</label>
-      <input id="profileName" class="mb-2 form-control"/>
-      <label>Email</label>
-      <input id="profileEmail" class="mb-2 form-control" disabled/>
-      <label>Change Transaction PIN</label>
-      <input id="profilePin" type="password" class="mb-2 form-control" placeholder="Enter new PIN (min 4 digits)"/>
-      <button id="saveProfile" class="btn btn-primary w-100">Save Profile & PIN</button>
-      <div class="mt-2"><span class="link-like" id="profileBackLink">← Back to Dashboard</span></div>
-      <div id="profileMsg" class="mt-2" style="display:none;color:green"></div>
-    </div>
-  </div>
-
-  <!-- RECEIPT / SUCCESS -->
+  <!-- RECEIPT -->
   <div id="receiptModal" style="display:none; position:fixed; left:0; right:0; top:0; bottom:0; background:rgba(0,0,0,.5); z-index:40; justify-content:center; align-items:center;">
     <div style="background:#fff;padding:20px;border-radius:12px;max-width:520px;width:92%;">
       <div style="text-align:center;font-size:28px;margin-bottom:6px;">✅</div>
-      <h4 id="receiptTitle" style="text-align:center;margin-bottom:6px;">Transaction</h4>
+      <h4 id="receiptTitle" style="text-align:center;margin-bottom:6px;">Success</h4>
       <div id="receiptBody" style="font-size:15px;line-height:1.6;color:#222;"></div>
-      <button id="closeReceiptBtn" class="btn btn-primary w-100 mt-3">Back to Dashboard</button>
+      <button id="closeReceiptBtn" class="btn btn-primary w-100 mt-3">Back</button>
     </div>
   </div>
 
-  <!-- Bottom navigation (only visible on dashboard) -->
-  <div id="bottomNav" class="bottom-nav" style="display:none;">
-    <button id="navSend"><i class="bi bi-send"></i></button>
-    <button id="navTop"><i class="bi bi-plus-lg"></i></button>
-    <button id="navWithdrawBtn"><i class="bi bi-wallet2"></i></button>
-  </div>
-
-  <!-- Firebase + App Logic -->
   <script type="module">
-  // ---------- Firebase imports ----------
   import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
   import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
-  import { getFirestore, doc, setDoc, getDoc, updateDoc, collection, addDoc, serverTimestamp, query, where, getDocs } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+  import { getFirestore, doc, setDoc, getDoc, updateDoc, collection, addDoc, serverTimestamp, query, where, getDocs, runTransaction } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
-  // ---------- Firebase config ----------
   const firebaseConfig = {
     apiKey: "AIzaSyAjy5sgZPMFsklKkSOMyC1HCvQ4-qNKP-M",
     authDomain: "fir-bank-c659f.firebaseapp.com",
@@ -245,45 +229,49 @@
   const auth = getAuth(app);
   const db = getFirestore(app);
 
-  // ---------- Helpers ----------
-  function genAccountNumber(){ return String(Math.floor(1000000000 + Math.random()*9000000000)); } // 10-digit
+  function genAccountNumber(){ return String(Math.floor(1000000000 + Math.random()*9000000000)); }
   function maskAcc(a){ if(!a) return ""; return a.slice(0,4) + " **** " + a.slice(-4); }
   function genTxID(){ return "TX-"+Math.floor(100000000 + Math.random()*900000000); }
   function showSection(id){
     document.querySelectorAll(".section").forEach(s=>s.classList.remove("active"));
     document.getElementById(id).classList.add("active");
-    document.getElementById("bottomNav").style.display = (id==="dashboardSection") ? "flex" : "none";
+    closeMenu();
     window.scrollTo(0,0);
   }
-  function showError(elId,msg){ const e=document.getElementById(elId); if(!e) return; e.innerText=msg; e.style.display = msg? "block":"none"; }
-
-  // ---------- UI elements ----------
-  const showLogin = document.getElementById("showLogin");
-  const showSignup = document.getElementById("showSignup");
-  showLogin.onclick = ()=>{ document.getElementById("loginBox").style.display="block"; document.getElementById("signupBox").style.display="none"; };
-  showSignup.onclick = ()=>{ document.getElementById("signupBox").style.display="block"; document.getElementById("loginBox").style.display="none"; };
+  function showError(elId,msg){ 
+    const e=document.getElementById(elId); 
+    if(!e) return;
+    e.innerText=msg; 
+    e.style.display = msg? "block":"none"; 
+  }
+  function openMenu(){
+    document.getElementById("menuOverlay").classList.add("open");
+    document.getElementById("menuPanel").classList.add("open");
+  }
+  function closeMenu(){
+    document.getElementById("menuOverlay").classList.remove("open");
+    document.getElementById("menuPanel").classList.remove("open");
+  }
 
   let currentUser = null;
 
-  // ---------- Auth state ----------
   onAuthStateChanged(auth, async (u)=>{
     if(u){
       const userDocRef = doc(db,"users",u.uid);
       const snap = await getDoc(userDocRef);
       if(!snap.exists()){
-        // create a minimal user doc (shouldn't often happen)
         await setDoc(userDocRef,{
           name: u.email.split("@")[0],
           email: u.email,
-          checkingBalance: 0,
-          savingsBalance: 0,
+          checkingBalance: 5000,
+          savingsBalance: 3000,
           checkingAcc: genAccountNumber(),
           savingsAcc: genAccountNumber(),
           transactionPin: "",
           profilePic: ""
         });
       }
-      await loadDashboardUI(); // populates UI from Firestore
+      await loadDashboardUI();
       showSection("dashboardSection");
     } else {
       currentUser = null;
@@ -291,115 +279,22 @@
     }
   });
 
-  // ---------- Signup ----------
-  document.getElementById("signupBtn").addEventListener("click", async ()=>{
-    try{
-      showError("signupError","");
-      const name = document.getElementById("signupName").value.trim();
-      const email = document.getElementById("signupEmail").value.trim();
-      const password = document.getElementById("signupPassword").value;
-      const pin = document.getElementById("signupPin").value.trim();
-
-      if(!name || !email || !password || !pin){ showError("signupError","All fields are required"); return; }
-      if(pin.length < 4){ showError("signupError","PIN must be at least 4 digits"); return; }
-
-      const cred = await createUserWithEmailAndPassword(auth,email,password);
-      const uid = cred.user.uid;
-
-      const checkingAcc = genAccountNumber();
-      const savingsAcc = genAccountNumber();
-      await setDoc(doc(db,"users",uid),{
-        name, email, checkingBalance:0, savingsBalance:0,
-        checkingAcc, savingsAcc, transactionPin: pin, profilePic: ""
-      });
-
-      alert("Account created — please login.");
-      document.getElementById("signupName").value="";
-      document.getElementById("signupEmail").value="";
-      document.getElementById("signupPassword").value="";
-      document.getElementById("signupPin").value="";
-      document.getElementById("loginBox").style.display="block";
-      document.getElementById("signupBox").style.display="none";
-    }catch(err){
-      showError("signupError", err.message);
-    }
-  });
-
-  // ---------- Login (no PIN required) ----------
-  document.getElementById("loginBtn").addEventListener("click", async ()=>{
-    try{
-      showError("loginError","");
-      const email = document.getElementById("loginEmail").value.trim();
-      const password = document.getElementById("loginPassword").value;
-      if(!email || !password){ showError("loginError","Email and password required"); return; }
-
-      await signInWithEmailAndPassword(auth,email,password);
-      // onAuthStateChanged will load the dashboard
-    }catch(err){
-      showError("loginError","Incorrect email or password");
-    }
-  });
-
-  // ---------- Load Dashboard UI ----------
-  async function loadDashboardUI(){
-    if(!auth.currentUser) return;
-    const uid = auth.currentUser.uid;
-    const snap = await getDoc(doc(db,"users",uid));
-    if(!snap.exists()) return;
-    currentUser = snap.data();
-    currentUser.uid = uid;
-
-    // fill UI
-    document.getElementById("topProfilePic").src = currentUser.profilePic || "https://via.placeholder.com/80";
-    document.getElementById("profilePic").src = currentUser.profilePic || "https://via.placeholder.com/80";
-    document.getElementById("profileName").value = currentUser.name || "";
-    document.getElementById("profileEmail").value = currentUser.email || "";
-    document.getElementById("profileAcct").value = currentUser.checkingAcc || "";
-    document.getElementById("acctMasked").innerText = maskAcc(currentUser.checkingAcc || "");
-    document.getElementById("checkingBal").innerText = "$"+((currentUser.checkingBalance||0)).toFixed(2);
-    document.getElementById("savingsBal").innerText = "$"+((currentUser.savingsBalance||0)).toFixed(2);
-    document.getElementById("overallBalance").innerText = "$"+(((currentUser.checkingBalance||0)+(currentUser.savingsBalance||0))).toFixed(2);
-    setGreeting();
-  }
-
-  // ---------- Copy account ----------
-  document.getElementById("copyAcct").onclick = () => {
-    if(!currentUser) return alert("Not signed in");
-    navigator.clipboard.writeText(currentUser.checkingAcc || "").then(()=>alert("Account number copied"));
+  document.getElementById("showLogin").onclick = ()=>{ 
+    document.getElementById("loginBox").style.display="block"; 
+    document.getElementById("signupBox").style.display="none"; 
+  };
+  document.getElementById("showSignup").onclick = ()=>{ 
+    document.getElementById("signupBox").style.display="block"; 
+    document.getElementById("loginBox").style.display="none"; 
   };
 
-  // ---------- Live clock & greeting ----------
-  function setGreeting(){ if(!currentUser) return;
-    const h = new Date().getHours();
-    let g = "Hello"; if(h<12) g="Good morning"; else if(h<18) g="Good afternoon"; else g="Good evening";
-    document.getElementById("greeting").innerText = `${g}, ${currentUser.name || ""}`;
-    document.getElementById("liveTime").innerText = new Date().toLocaleTimeString();
-  }
-  setInterval(()=>{ if(currentUser) setGreeting(); },1000);
+  // MENU
+  document.getElementById("menuToggle").addEventListener("click", openMenu);
+  document.getElementById("menuOverlay").addEventListener("click", closeMenu);
+  document.getElementById("profileMenuItem").addEventListener("click", ()=> showSection("profileSection"));
+  document.getElementById("logoutMenuItem").addEventListener("click", async ()=> { await signOut(auth); });
 
-  // ---------- Navigation helpers ----------
-  document.getElementById("sendBack").addEventListener("click", ()=> showSection("dashboardSection"));
-  document.getElementById("topupBack").addEventListener("click", ()=> showSection("dashboardSection"));
-  document.getElementById("withdrawBack").addEventListener("click", ()=> showSection("dashboardSection"));
-  document.getElementById("wireBack").addEventListener("click", ()=> showSection("dashboardSection"));
-  document.getElementById("profileBackLink").addEventListener("click", ()=> showSection("dashboardSection"));
-
-  // bottom nav buttons
-  document.getElementById("navSend").addEventListener("click", ()=> showSection("sendSection"));
-  document.getElementById("navTop").addEventListener("click", ()=> showSection("topupSection"));
-  document.getElementById("navWithdrawBtn").addEventListener("click", ()=> showSection("withdrawSection"));
-
-  // transaction cards
-  document.getElementById("sendBtn").addEventListener("click", ()=> showSection("sendSection"));
-  document.getElementById("topupBtn").addEventListener("click", ()=> showSection("topupSection"));
-  document.getElementById("withdrawBtn").addEventListener("click", ()=> showSection("withdrawSection"));
-  document.getElementById("wireBtn").addEventListener("click", ()=> showSection("wireSection"));
-
-  // open profile / logout
-  document.getElementById("openProfileBtn").addEventListener("click", ()=> showSection("profileSection"));
-  document.getElementById("logoutBtn").addEventListener("click", async ()=> { await signOut(auth); });
-
-  // ---------- Upload profile picture (DataURL stored in user doc for demo) ----------
+  // PROFILE
   document.getElementById("uploadProfile").addEventListener("change", (e)=>{
     const f = e.target.files[0];
     if(!f) return;
@@ -408,189 +303,267 @@
     r.readAsDataURL(f);
   });
 
-  document.getElementById("saveProfile").addEventListener("click", async ()=>{
-    if(!auth.currentUser) return alert("Sign in first");
+  document.getElementById("saveProfileBtn").addEventListener("click", async ()=>{
     try{
+      if(!auth.currentUser) return alert("Sign in first");
       const uid = auth.currentUser.uid;
       const name = document.getElementById("profileName").value.trim();
-      const newPin = document.getElementById("profilePin").value.trim();
+      const newPin = document.getElementById("profileNewPin").value.trim();
       const pic = document.getElementById("profilePic").src || "";
       const updates = { name, profilePic: pic };
       if(newPin){
-        if(newPin.length < 4){ document.getElementById("profileMsg").style.display="block"; document.getElementById("profileMsg").innerText="PIN must be at least 4 digits"; return; }
+        if(newPin.length < 4){ document.getElementById("profileMsg").style.display="block"; document.getElementById("profileMsg").innerText="PIN must be 4+ digits"; return; }
         updates.transactionPin = newPin;
       }
       await updateDoc(doc(db,"users",uid), updates);
       document.getElementById("profileMsg").style.display="block";
-      document.getElementById("profileMsg").innerText="Profile updated";
+      document.getElementById("profileMsg").innerText="Profile saved!";
       setTimeout(()=>{ document.getElementById("profileMsg").style.display="none"; },2500);
-      document.getElementById("profilePin").value="";
+      document.getElementById("profileNewPin").value="";
       await loadDashboardUI();
-    }catch(err){
-      alert("Save failed: "+err.message);
-    }
+    }catch(err){ alert("Save failed: "+err.message); }
   });
 
-  // ---------- Transaction helpers ----------
+  document.getElementById("profileBack").addEventListener("click", ()=> showSection("dashboardSection"));
+
+  document.getElementById("signupBtn").addEventListener("click", async ()=>{
+    try{
+      showError("signupError","");
+      const name = document.getElementById("signupName").value.trim();
+      const email = document.getElementById("signupEmail").value.trim();
+      const password = document.getElementById("signupPassword").value;
+      const pin = document.getElementById("signupPin").value.trim();
+      if(!name || !email || !password || !pin){ showError("signupError","All required"); return; }
+      if(pin.length < 4){ showError("signupError","PIN 4+ digits"); return; }
+      const cred = await createUserWithEmailAndPassword(auth,email,password);
+      const checkingAcc = genAccountNumber();
+      const savingsAcc = genAccountNumber();
+      await setDoc(doc(db,"users",cred.user.uid),{
+        name, email, checkingBalance:5000, savingsBalance:3000,
+        checkingAcc, savingsAcc, transactionPin: pin, profilePic: ""
+      });
+      alert("Account created! Login now.");
+      document.getElementById("signupName").value="";
+      document.getElementById("signupEmail").value="";
+      document.getElementById("signupPassword").value="";
+      document.getElementById("signupPin").value="";
+      document.getElementById("loginBox").style.display="block";
+      document.getElementById("signupBox").style.display="none";
+    }catch(err){ showError("signupError", err.message); }
+  });
+
+  document.getElementById("loginBtn").addEventListener("click", async ()=>{
+    try{
+      showError("loginError","");
+      const email = document.getElementById("loginEmail").value.trim();
+      const password = document.getElementById("loginPassword").value;
+      const pin = document.getElementById("loginPin").value.trim();
+      if(!email || !password || !pin){ showError("loginError","All required"); return; }
+      const cred = await signInWithEmailAndPassword(auth,email,password);
+      const snap = await getDoc(doc(db,"users",cred.user.uid));
+      if(!snap.exists()){ showError("loginError","User not found"); return; }
+      const ud = snap.data();
+      if(ud.transactionPin !== pin){ showError("loginError","Incorrect PIN"); return; }
+    }catch(err){ showError("loginError", "Login failed"); }
+  });
+
+  async function loadDashboardUI(){
+    if(!auth.currentUser) return;
+    const uid = auth.currentUser.uid;
+    const snap = await getDoc(doc(db,"users",uid));
+    if(!snap.exists()) return;
+    currentUser = snap.data();
+    currentUser.uid = uid;
+    document.getElementById("topProfilePic").src = currentUser.profilePic || "https://via.placeholder.com/80";
+    document.getElementById("profilePic").src = currentUser.profilePic || "https://via.placeholder.com/80";
+    document.getElementById("profileName").value = currentUser.name || "";
+    document.getElementById("profileEmail").value = currentUser.email || "";
+    document.getElementById("acctMasked").innerText = maskAcc(currentUser.checkingAcc || "");
+    document.getElementById("checkingBal").innerText = "$"+(currentUser.checkingBalance || 0).toFixed(2);
+    document.getElementById("savingsBal").innerText = "$"+(currentUser.savingsBalance || 0).toFixed(2);
+    document.getElementById("overallBalance").innerText = "$"+(((currentUser.checkingBalance||0)+(currentUser.savingsBalance||0))).toFixed(2);
+    setGreeting();
+  }
+
+  document.getElementById("copyAcct").onclick = () => {
+    if(!currentUser) return;
+    navigator.clipboard.writeText(currentUser.checkingAcc || "");
+  };
+
+  function setGreeting(){ 
+    if(!currentUser) return;
+    const h = new Date().getHours();
+    let g = "Hello"; 
+    if(h<12) g="Good morning"; else if(h<18) g="Good afternoon"; else g="Good evening";
+    document.getElementById("greeting").innerText = `${g}, ${currentUser.name || ""}`;
+    document.getElementById("liveTime").innerText = new Date().toLocaleTimeString();
+  }
+  setInterval(()=>{ if(currentUser) setGreeting(); },1000);
+
+  document.getElementById("sendBack").addEventListener("click", ()=> showSection("dashboardSection"));
+  document.getElementById("topupBack").addEventListener("click", ()=> showSection("dashboardSection"));
+  document.getElementById("withdrawBack").addEventListener("click", ()=> showSection("dashboardSection"));
+  document.getElementById("wireBack").addEventListener("click", ()=> showSection("dashboardSection"));
+
+  document.getElementById("sendBtn").addEventListener("click", ()=> showSection("sendSection"));
+  document.getElementById("topupBtn").addEventListener("click", ()=> showSection("topupSection"));
+  document.getElementById("withdrawBtn").addEventListener("click", ()=> showSection("withdrawSection"));
+  document.getElementById("wireBtn").addEventListener("click", ()=> showSection("wireSection"));
+
+  document.getElementById("wireAmount").addEventListener("input", ()=>{
+    const amt = parseFloat(document.getElementById("wireAmount").value) || 0;
+    const fee = (amt * 0.05).toFixed(2);
+    document.getElementById("wireFee").innerText = fee;
+    document.getElementById("wireTotal").innerText = (amt + parseFloat(fee)).toFixed(2);
+  });
+
   async function recordTransaction(uid, data){
-    // data: {type, amount, fee, total, from, to, status, message, txid}
     await addDoc(collection(db,"users",uid,"transactions"), {
       ...data,
       createdAt: serverTimestamp()
     });
   }
 
-  async function updateUserBalances(uid, checking, savings){
-    await updateDoc(doc(db,"users",uid), { checkingBalance: checking, savingsBalance: savings });
+  function showReceipt(tx){
+    let html = `<p><strong>Type:</strong> ${tx.type}</p>`;
+    html += `<p><strong>Amount:</strong> $${(tx.amount||0).toFixed(2)}</p>`;
+    if(tx.fee) html += `<p><strong>Fee:</strong> $${(tx.fee||0).toFixed(2)}</p>`;
+    html += `<p><strong>From:</strong> ${tx.from || ""}</p>`;
+    html += `<p><strong>To:</strong> ${tx.to || ""}</p>`;
+    html += `<p><strong>ID:</strong> ${tx.txid}</p>`;
+    document.getElementById("receiptTitle").innerText = `${tx.type} Success`;
+    document.getElementById("receiptBody").innerHTML = html;
+    document.getElementById("receiptModal").style.display = "flex";
   }
 
-  // ---------- TOP-UP ----------
+  document.getElementById("closeReceiptBtn").addEventListener("click", ()=>{
+    document.getElementById("receiptModal").style.display = "none";
+    showSection("dashboardSection");
+  });
+
+  // TOP UP
   document.getElementById("topupSubmit").addEventListener("click", async ()=>{
     try{
       showError("topupError","");
-      if(!auth.currentUser){ alert("Please sign in"); return; }
+      if(!auth.currentUser){ alert("Sign in"); return; }
       const uid = auth.currentUser.uid;
       const amt = parseFloat(document.getElementById("topupAmount").value);
       const pin = document.getElementById("topupPin").value.trim();
-      if(!amt || amt <= 0) { showError("topupError","Enter a valid amount"); return; }
-      const snap = await getDoc(doc(db,"users",uid)); const udata = snap.data();
-      if(udata.transactionPin !== pin){ showError("topupError","Incorrect PIN"); return; }
-
-      const newChecking = (udata.checkingBalance || 0) + amt;
-      await updateUserBalances(uid,newChecking,udata.savingsBalance || 0);
+      if(!amt || amt <= 0 || isNaN(amt)) { showError("topupError","Valid amount"); return; }
+      const snap = await getDoc(doc(db,"users",uid));
+      const udata = snap.data();
+      if(udata.transactionPin !== pin){ showError("topupError","Wrong PIN"); return; }
+      const txid = genTxID();
+      const userRef = doc(db,"users",uid);
+      await runTransaction(db, async (transaction) => {
+        const userDoc = await transaction.get(userRef);
+        if (!userDoc.exists()) throw new Error("User not found");
+        const userData = userDoc.data();
+        transaction.update(userRef, {
+          checkingBalance: (userData.checkingBalance || 0) + amt
+        });
+      });
       await recordTransaction(uid, {
-        type: "Top-up",
-        amount: amt,
-        fee: 0,
-        total: amt,
-        from: "External",
-        to: udata.checkingAcc,
-        status: "Success",
-        message: "Top-up completed",
-        txid: genTxID()
+        type: "Top-up", amount: amt, fee: 0, total: amt,
+        from: "External", to: udata.checkingAcc, status: "Success", txid: txid
       });
       await loadDashboardUI();
-      showReceipt({
-        type:"Top-up", amount:amt, fee:0, total:amt,
-        from:"External", to:udata.checkingAcc, status:"Success", txid: genTxID()
-      });
-      document.getElementById("topupAmount").value=""; document.getElementById("topupPin").value="";
+      document.getElementById("topupAmount").value="";
+      document.getElementById("topupPin").value="";
+      showReceipt({type:"Top-up", amount:amt, from:"External", to:udata.checkingAcc, txid:txid});
     }catch(err){ showError("topupError", err.message); }
   });
 
-  // ---------- WITHDRAW ----------
+  // WITHDRAW
   document.getElementById("withdrawSubmit").addEventListener("click", async ()=>{
     try{
       showError("withdrawError","");
-      if(!auth.currentUser){ alert("Please sign in"); return; }
+      if(!auth.currentUser){ alert("Sign in"); return; }
       const uid = auth.currentUser.uid;
       const amt = parseFloat(document.getElementById("withdrawAmount").value);
       const pin = document.getElementById("withdrawPin").value.trim();
-      if(!amt || amt <= 0) { showError("withdrawError","Enter a valid amount"); return; }
-      const snap = await getDoc(doc(db,"users",uid)); const udata = snap.data();
-      if(udata.transactionPin !== pin){ showError("withdrawError","Incorrect PIN"); return; }
-      if((udata.checkingBalance || 0) < amt){ showError("withdrawError","Insufficient funds"); return; }
-
-      const newChecking = (udata.checkingBalance || 0) - amt;
-      await updateUserBalances(uid,newChecking, udata.savingsBalance || 0);
+      if(!amt || amt <= 0 || isNaN(amt)) { showError("withdrawError","Valid amount"); return; }
+      const snap = await getDoc(doc(db,"users",uid));
+      const udata = snap.data();
+      if(udata.transactionPin !== pin){ showError("withdrawError","Wrong PIN"); return; }
+      const txid = genTxID();
+      const userRef = doc(db,"users",uid);
+      await runTransaction(db, async (transaction) => {
+        const userDoc = await transaction.get(userRef);
+        const userData = userDoc.data();
+        if((userData.checkingBalance || 0) < amt) throw new Error("Insufficient");
+        transaction.update(userRef, {
+          checkingBalance: (userData.checkingBalance || 0) - amt
+        });
+      });
       await recordTransaction(uid, {
-        type: "Withdraw",
-        amount: amt,
-        fee: 0,
-        total: amt,
-        from: udata.checkingAcc,
-        to: "External",
-        status: "Success",
-        message: "Withdrawal completed",
-        txid: genTxID()
+        type: "Withdraw", amount: amt, fee: 0, total: amt,
+        from: udata.checkingAcc, to: "External", status: "Success", txid: txid
       });
       await loadDashboardUI();
-      showReceipt({
-        type:"Withdraw", amount:amt, fee:0, total:amt,
-        from:udata.checkingAcc, to:"External", status:"Success", txid: genTxID()
-      });
-      document.getElementById("withdrawAmount").value=""; document.getElementById("withdrawPin").value="";
+      document.getElementById("withdrawAmount").value="";
+      document.getElementById("withdrawPin").value="";
+      showReceipt({type:"Withdraw", amount:amt, from:udata.checkingAcc, to:"External", txid:txid});
     }catch(err){ showError("withdrawError", err.message); }
   });
 
-  // ---------- SEND ----------
+  // SEND
   document.getElementById("sendSubmit").addEventListener("click", async ()=>{
     try{
       showError("sendError","");
-      if(!auth.currentUser){ alert("Please sign in"); return; }
+      if(!auth.currentUser){ alert("Sign in"); return; }
       const uid = auth.currentUser.uid;
       const toAcc = document.getElementById("sendTo").value.trim();
       const amt = parseFloat(document.getElementById("sendAmount").value);
       const pin = document.getElementById("sendPin").value.trim();
-      if(!toAcc || !amt || amt <= 0){ showError("sendError","Enter recipient and amount"); return; }
-      const snap = await getDoc(doc(db,"users",uid)); const udata = snap.data();
-      if(udata.transactionPin !== pin){ showError("sendError","Incorrect PIN"); return; }
-      const fee = parseFloat((amt * 0.01).toFixed(2)); // demo 1%
-      const total = amt + fee;
-      if((udata.checkingBalance || 0) < total){ showError("sendError","Insufficient funds including fee"); return; }
-
-      // Find recipient by checkingAcc or savingsAcc
+      if(!toAcc || !amt || amt <= 0 || isNaN(amt)){ showError("sendError","Fill all fields"); return; }
+      const snap = await getDoc(doc(db,"users",uid));
+      const udata = snap.data();
+      if(udata.transactionPin !== pin){ showError("sendError","Wrong PIN"); return; }
+      if(toAcc === udata.checkingAcc || toAcc === udata.savingsAcc){ showError("sendError","Cannot send to yourself"); return; }
+      const fee = (amt * 0.01).toFixed(2);
+      const total = amt + parseFloat(fee);
       const q1 = query(collection(db,"users"), where("checkingAcc","==",toAcc));
-      const q2 = query(collection(db,"users"), where("savingsAcc","==",toAcc));
-      let recipientUid = null;
       let recipientSnap = await getDocs(q1);
       if(recipientSnap.empty){
+        const q2 = query(collection(db,"users"), where("savingsAcc","==",toAcc));
         recipientSnap = await getDocs(q2);
-        if(!recipientSnap.empty) recipientUid = recipientSnap.docs[0].id;
-      } else recipientUid = recipientSnap.docs[0].id;
-
-      if(!recipientUid){ showError("sendError","Recipient not found (demo users only)"); return; }
-
-      // Update balances
-      const recipientDoc = await getDoc(doc(db,"users",recipientUid));
-      const rdata = recipientDoc.data();
-
-      await updateUserBalances(uid, (udata.checkingBalance || 0) - total, udata.savingsBalance || 0);
-      await updateUserBalances(recipientUid, (rdata.checkingBalance||0) + amt, rdata.savingsBalance||0);
-
-      // Record both transactions
+      }
+      if(recipientSnap.empty){ showError("sendError","Recipient not found"); return; }
+      const recipientUid = recipientSnap.docs[0].id;
+      const txid = genTxID();
+      const senderRef = doc(db,"users",uid);
+      const recipientRef = doc(db,"users",recipientUid);
+      await runTransaction(db, async (transaction) => {
+        const senderDoc = await transaction.get(senderRef);
+        const recipientDoc = await transaction.get(recipientRef);
+        if (!senderDoc.exists() || !recipientDoc.exists()) throw new Error("User not found");
+        const senderData = senderDoc.data();
+        if((senderData.checkingBalance || 0) < total) throw new Error("Insufficient");
+        transaction.update(senderRef, {
+          checkingBalance: (senderData.checkingBalance || 0) - total
+        });
+        const recipientData = recipientDoc.data();
+        transaction.update(recipientRef, {
+          checkingBalance: (recipientData.checkingBalance || 0) + amt
+        });
+      });
       await recordTransaction(uid, {
-        type:"Send",
-        amount: amt,
-        fee, total,
-        from: udata.checkingAcc,
-        to: toAcc,
-        status:"Success",
-        message:`Sent to ${toAcc}`,
-        txid: genTxID()
+        type:"Send", amount: amt, fee: parseFloat(fee), total, from: udata.checkingAcc, to: toAcc, status:"Success", txid: txid
       });
-      await recordTransaction(recipientUid, {
-        type:"Receive",
-        amount: amt,
-        fee:0,
-        total:amt,
-        from: udata.checkingAcc,
-        to: toAcc,
-        status:"Success",
-        message:`Received from ${udata.checkingAcc}`,
-        txid: genTxID()
-      });
-
       await loadDashboardUI();
-      showReceipt({ type:"Send", amount:amt, fee, total, from:udata.checkingAcc, to:toAcc, status:"Success", txid: genTxID() });
-
-      document.getElementById("sendTo").value=""; document.getElementById("sendAmount").value=""; document.getElementById("sendPin").value="";
+      document.getElementById("sendTo").value="";
+      document.getElementById("sendAmount").value="";
+      document.getElementById("sendPin").value="";
+      showReceipt({type:"Send", amount:amt, fee:parseFloat(fee), from:udata.checkingAcc, to:toAcc, txid:txid});
     }catch(err){ showError("sendError", err.message); }
   });
 
-  // ---------- WIRE ----------
-  function updateWireFee(){
-    const amt = parseFloat(document.getElementById("wireAmount").value) || 0;
-    const fee = parseFloat((amt * 0.05).toFixed(2));
-    document.getElementById("wireFee").innerText = fee.toFixed(2);
-    document.getElementById("wireTotal").innerText = (amt + fee).toFixed(2);
-  }
-  document.getElementById("wireAmount").addEventListener("input", updateWireFee);
-
+  // WIRE
   document.getElementById("wireSubmit").addEventListener("click", async ()=>{
     try{
       showError("wireError","");
-      if(!auth.currentUser){ alert("Please sign in"); return; }
+      if(!auth.currentUser){ alert("Sign in"); return; }
       const uid = auth.currentUser.uid;
       const bank = document.getElementById("wireBank").value.trim();
       const name = document.getElementById("wireName").value.trim();
@@ -598,66 +571,37 @@
       const country = document.getElementById("wireCountry").value;
       const amt = parseFloat(document.getElementById("wireAmount").value);
       const pin = document.getElementById("wirePin").value.trim();
-      if(!bank||!name||!acc||!amt){ showError("wireError","Fill all fields"); return; }
-      const snap = await getDoc(doc(db,"users",uid)); const udata = snap.data();
-      if(udata.transactionPin !== pin){ showError("wireError","Incorrect PIN"); return; }
-      const fee = parseFloat((amt * 0.05).toFixed(2));
-      const total = amt + fee;
-      if((udata.checkingBalance||0) < total){ showError("wireError","Insufficient funds including fee"); return; }
-
-      const newChecking = (udata.checkingBalance||0) - total;
-      await updateUserBalances(uid,newChecking,udata.savingsBalance||0);
+      if(!bank||!name||!acc||!amt||amt <= 0 || isNaN(amt)){ showError("wireError","Fill all"); return; }
+      const snap = await getDoc(doc(db,"users",uid));
+      const udata = snap.data();
+      if(udata.transactionPin !== pin){ showError("wireError","Wrong PIN"); return; }
+      const fee = (amt * 0.05).toFixed(2);
+      const total = amt + parseFloat(fee);
+      const txid = genTxID();
+      const userRef = doc(db,"users",uid);
+      await runTransaction(db, async (transaction) => {
+        const userDoc = await transaction.get(userRef);
+        const userData = userDoc.data();
+        if((userData.checkingBalance || 0) < total) throw new Error("Insufficient");
+        transaction.update(userRef, {
+          checkingBalance: (userData.checkingBalance || 0) - total
+        });
+      });
       await recordTransaction(uid, {
-        type: "Wire Transfer",
-        amount: amt,
-        fee,
-        total,
-        from: udata.checkingAcc,
-        to: `${name} | ${bank} | ${acc} | ${country}`,
-        status: "Success",
-        message: `Wire sent to ${name} (${bank}, ${country})`,
-        txid: genTxID()
+        type: "Wire Transfer", amount: amt, fee: parseFloat(fee), total,
+        from: udata.checkingAcc, to: `${name} | ${bank} | ${country}`, status: "Success", txid: txid
       });
       await loadDashboardUI();
-      showReceipt({ type:"Wire Transfer", amount:amt, fee, total, from:udata.checkingAcc, to:acc, status:"Success", message:`Bank: ${bank} | Country: ${country}`, txid: genTxID() });
-      // clear fields
-      document.getElementById("wireBank").value=""; document.getElementById("wireName").value=""; document.getElementById("wireAcc").value="";
-      document.getElementById("wireAmount").value=""; document.getElementById("wirePin").value="";
-      updateWireFee();
+      document.getElementById("wireBank").value="";
+      document.getElementById("wireName").value="";
+      document.getElementById("wireAcc").value="";
+      document.getElementById("wireAmount").value="";
+      document.getElementById("wirePin").value="";
+      document.getElementById("wireFee").innerText="0.00";
+      document.getElementById("wireTotal").innerText="0.00";
+      showReceipt({type:"Wire Transfer", amount:amt, fee:parseFloat(fee), from:udata.checkingAcc, to:name, txid:txid});
     }catch(err){ showError("wireError", err.message); }
   });
-
-  // ---------- Receipt UI ----------
-  function showReceipt(tx){
-    document.getElementById("receiptTitle").innerText = `${tx.type} — ${tx.status || "Success"}`;
-    const date = new Date().toLocaleString();
-    let html = `<p><strong>Transaction ID:</strong> ${tx.txid || genTxID()}</p>`;
-    html += `<p><strong>Date:</strong> ${date}</p>`;
-    html += `<p><strong>Type:</strong> ${tx.type}</p>`;
-    html += `<p><strong>Amount:</strong> $${(tx.amount||0).toFixed(2)}</p>`;
-    html += `<p><strong>Fee:</strong> $${(tx.fee||0).toFixed(2)}</p>`;
-    html += `<p><strong>Total:</strong> $${(tx.total|| ( (tx.amount||0) + (tx.fee||0) ) ).toFixed(2)}</p>`;
-    html += `<p><strong>From:</strong> ${tx.from || ""}</p>`;
-    html += `<p><strong>To:</strong> ${tx.to || ""}</p>`;
-    if(tx.message) html += `<p>${tx.message}</p>`;
-    document.getElementById("receiptBody").innerHTML = html;
-    document.getElementById("receiptModal").style.display = "flex";
-  }
-  document.getElementById("closeReceiptBtn").addEventListener("click", ()=>{
-    document.getElementById("receiptModal").style.display = "none";
-    showSection("dashboardSection");
-  });
-
-  // ---------- Utilities ----------
-  function genTxID(){ return "TX-"+Math.floor(100000000 + Math.random()*900000000); }
-  function maskAcc(a){ if(!a) return ""; return a.slice(0,4) + " **** " + a.slice(-4); }
-
-  // ---------- Initial state ----------
-  document.getElementById("signupBox").style.display="none";
-  document.getElementById("bottomNav").style.display="none";
-  updateWireFee();
-
   </script>
-
 </body>
 </html>
