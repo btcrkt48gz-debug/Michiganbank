@@ -5,6 +5,44 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>OlaCreditUnion - Demo Banking App</title>
         <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+        
+        <!-- Firebase SDK -->
+        <script type="module">
+            import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+            import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+            import { getFirestore, doc, setDoc, getDoc, updateDoc, collection, addDoc, query, where, getDocs, orderBy } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+            
+            const firebaseConfig = {
+                apiKey: "AIzaSyAjy5sgZPMFsklKkSOMyC1HCvQ4-qNKP-M",
+                authDomain: "fir-bank-c659f.firebaseapp.com",
+                projectId: "fir-bank-c659f",
+                storageBucket: "fir-bank-c659f.firebasestorage.app",
+                messagingSenderId: "847611883266",
+                appId: "1:847611883266:web:651ecee5dfea8e0f1cdc1b",
+                measurementId: "G-QK7R83FC51"
+            };
+            
+            const app = initializeApp(firebaseConfig);
+            window.firebaseAuth = getAuth(app);
+            window.firebaseDb = getFirestore(app);
+            window.firebaseModules = { 
+                createUserWithEmailAndPassword, 
+                signInWithEmailAndPassword, 
+                onAuthStateChanged, 
+                signOut,
+                doc, 
+                setDoc, 
+                getDoc, 
+                updateDoc, 
+                collection, 
+                addDoc, 
+                query, 
+                where, 
+                getDocs,
+                orderBy
+            };
+        </script>
+        
         <style>
             * {
                 margin: 0;
@@ -778,25 +816,24 @@
                 .action-grid {
                     grid-template-columns: 1fr;
                 }
-
-                .button-group {
-                    grid-template-columns: 1fr 1fr;
-                }
+            }
+            
+            .loading {
+                text-align: center;
+                padding: 40px;
+                color: var(--text-secondary);
             }
         </style>
     </head>
     <body>
         <!-- Auth Page -->
-        <div id="authPage" class="auth-page page active">
+        <div id="authPage" class="auth-page">
             <div class="auth-card">
-                <h1>OlaCreditUnion</h1>
-                <p>Demo Banking App</p>
+                <h1>🏦 OlaCreditUnion</h1>
+                <p>Secure banking with cryptocurrency support</p>
 
                 <div class="form-tabs">
-                    <button
-                        class="tab-btn active"
-                        onclick="switchAuthTab('login')"
-                    >
+                    <button class="tab-btn active" onclick="switchAuthTab('login')">
                         Login
                     </button>
                     <button class="tab-btn" onclick="switchAuthTab('signup')">
@@ -804,7 +841,6 @@
                     </button>
                 </div>
 
-                <!-- Login Form -->
                 <form id="loginForm" onsubmit="handleLogin(event)">
                     <div class="form-group">
                         <label>Email</label>
@@ -815,9 +851,11 @@
                         <input type="password" id="loginPassword" required />
                     </div>
                     <button type="submit" class="btn btn-primary">Login</button>
+                    <div class="demo-note">
+                        Note: Your data is securely stored in Firebase
+                    </div>
                 </form>
 
-                <!-- Signup Form -->
                 <form
                     id="signupForm"
                     style="display: none"
@@ -833,13 +871,19 @@
                     </div>
                     <div class="form-group">
                         <label>Password</label>
-                        <input type="password" id="signupPassword" required />
+                        <input
+                            type="password"
+                            id="signupPassword"
+                            minlength="6"
+                            required
+                        />
                     </div>
                     <div class="form-group">
-                        <label>Transaction PIN (4 digits)</label>
+                        <label>4-Digit PIN (for transactions)</label>
                         <input
-                            type="text"
+                            type="password"
                             id="signupPin"
+                            pattern="[0-9]{4}"
                             maxlength="4"
                             required
                         />
@@ -847,132 +891,97 @@
                     <button type="submit" class="btn btn-success">
                         Create Account
                     </button>
+                    <div class="demo-note">
+                        Note: Your password and PIN are encrypted by Firebase
+                    </div>
                 </form>
-
-                <p class="demo-note">Demo app. No real money moves.</p>
             </div>
         </div>
 
         <!-- Main App -->
-        <div id="appContainer" style="display: none">
-            <!-- Sidebar -->
-            <div
-                id="sidebarOverlay"
-                class="sidebar-overlay"
-                onclick="closeSidebar()"
-            ></div>
-            <div id="sidebar" class="sidebar">
+        <div id="mainApp" style="display: none">
+            <div class="sidebar-overlay" onclick="toggleSidebar()"></div>
+
+            <div class="sidebar">
                 <div class="sidebar-header">
-                    <h2>Menu</h2>
-                    <button class="icon-btn" onclick="closeSidebar()">✕</button>
+                    <h3>Menu</h3>
+                    <button class="icon-btn" onclick="toggleSidebar()">✕</button>
                 </div>
-                <div id="userProfile" class="user-profile"></div>
+                <div class="user-profile" id="userProfile"></div>
                 <div class="sidebar-menu">
-                    <button
-                        class="sidebar-item active"
-                        onclick="switchPage('dashboard')"
-                    >
+                    <button class="sidebar-item" onclick="switchPage('dashboard'); toggleSidebar()">
                         📊 Dashboard
                     </button>
-                    <button class="sidebar-item" onclick="switchPage('crypto')">
-                        💰 Crypto Wallet
+                    <button class="sidebar-item" onclick="switchPage('crypto'); toggleSidebar()">
+                        💰 Crypto
                     </button>
-                    <button
-                        class="sidebar-item"
-                        onclick="switchPage('transactions')"
-                    >
+                    <button class="sidebar-item" onclick="switchPage('transactions'); toggleSidebar()">
                         📜 Transactions
                     </button>
-                    <button
-                        class="sidebar-item"
-                        onclick="switchPage('profile')"
-                    >
+                    <button class="sidebar-item" onclick="switchPage('profile'); toggleSidebar()">
                         👤 Profile
                     </button>
-                    <button class="sidebar-item" onclick="logout()">
+                    <button class="sidebar-item" onclick="handleLogout()">
                         🚪 Logout
                     </button>
                 </div>
             </div>
 
-            <!-- Header -->
-            <div class="app-header">
-                <button class="icon-btn" onclick="openSidebar()">☰</button>
-                <h1>OlaCreditUnion</h1>
-                <button class="icon-btn" onclick="toggleDarkMode()">🌙</button>
-            </div>
-
             <div class="container">
+                <div class="app-header">
+                    <div style="display: flex; align-items: center; gap: 12px">
+                        <button class="icon-btn" onclick="toggleSidebar()">☰</button>
+                        <h1>OlaCreditUnion</h1>
+                    </div>
+                    <div class="header-actions">
+                        <button class="icon-btn" onclick="toggleDarkMode()">
+                            🌙
+                        </button>
+                    </div>
+                </div>
+
                 <!-- Dashboard Page -->
                 <div id="dashboardPage" class="page active">
                     <div class="balance-card">
-                        <h3>Overall Balance</h3>
+                        <h3>Total Balance</h3>
                         <div class="amount" id="totalBalance">$0.00</div>
-                        <div class="details">
-                            Account: <span id="accountNumber">-</span>
+                        <div class="details" id="accountNumber">Account ****</div>
+                    </div>
+
+                    <div class="action-grid">
+                        <div class="action-btn" onclick="openModal('sendModal')">
+                            <div class="icon">📤</div>
+                            <p>Send Money</p>
+                        </div>
+                        <div class="action-btn" onclick="openModal('transferModal')">
+                            <div class="icon">🔄</div>
+                            <p>Transfer</p>
+                        </div>
+                        <div class="action-btn" onclick="openModal('topupModal')">
+                            <div class="icon">➕</div>
+                            <p>Top Up</p>
+                        </div>
+                        <div class="action-btn" onclick="openModal('wireModal')">
+                            <div class="icon">🌍</div>
+                            <p>Wire Transfer</p>
                         </div>
                     </div>
 
                     <div class="section-title">Accounts</div>
-                    <div class="account-card" onclick="switchPage('checking')">
-                        <h4>Checking</h4>
+                    <div
+                        class="account-card"
+                        onclick="switchPage('checking')"
+                    >
+                        <h4>Checking Account</h4>
                         <div class="amount" id="checkingBalance">$0.00</div>
                     </div>
                     <div class="account-card" onclick="switchPage('savings')">
-                        <h4>Savings</h4>
+                        <h4>Savings Account</h4>
                         <div class="amount" id="savingsBalance">$0.00</div>
                     </div>
-                    <div class="account-card" onclick="switchPage('crypto')">
-                        <h4>Crypto Wallet</h4>
-                        <div
-                            id="cryptoHoldings"
-                            style="font-size: 12px; margin-top: 8px"
-                        >
-                            BTC: 0 | ETH: 0 | LTC: 0
-                        </div>
-                    </div>
-
-                    <div class="section-title">Actions</div>
-                    <div class="action-grid">
-                        <div
-                            class="action-btn"
-                            onclick="openModal('sendModal')"
-                        >
-                            <div class="icon">📤</div>
-                            <p>Send Money</p>
-                        </div>
-                        <div
-                            class="action-btn"
-                            onclick="openModal('transferModal')"
-                        >
-                            <div class="icon">🔄</div>
-                            <p>Transfer</p>
-                        </div>
-                        <div
-                            class="action-btn"
-                            onclick="openModal('topupModal')"
-                        >
-                            <div class="icon">➕</div>
-                            <p>Top Up</p>
-                        </div>
-                        <div
-                            class="action-btn"
-                            onclick="openModal('withdrawModal')"
-                        >
-                            <div class="icon">💸</div>
-                            <p>Withdraw</p>
-                        </div>
-                        <div
-                            class="action-btn"
-                            onclick="openModal('wireModal')"
-                        >
-                            <div class="icon">🌍</div>
-                            <p>Wire</p>
-                        </div>
-                        <div class="action-btn" onclick="switchPage('crypto')">
-                            <div class="icon">₿</div>
-                            <p>Buy Crypto</p>
-                        </div>
+                    <div class="account-card" style="cursor: default">
+                        <h4>Crypto Holdings</h4>
+                        <div class="amount" id="cryptoHoldings" style="font-size: 14px">Loading...</div>
                     </div>
 
                     <div class="section-title">Recent Transactions</div>
@@ -1421,14 +1430,38 @@
             </div>
         </div>
 
+        <!-- Confirmation Modal -->
+        <div id="confirmationModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Confirm Transaction</h2>
+                    <button class="close-btn" onclick="closeModal('confirmationModal')">✕</button>
+                </div>
+                <div id="confirmationDetails" style="margin-bottom: 20px;"></div>
+                <div style="display: flex; gap: 12px;">
+                    <button class="btn btn-danger" style="flex: 1;" onclick="closeModal('confirmationModal')">Cancel</button>
+                    <button class="btn btn-success" style="flex: 1;" onclick="processConfirmedTransaction()">Confirm</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Receipt Modal -->
+        <div id="receiptModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>✓ Transaction Successful</h2>
+                    <button class="close-btn" onclick="closeReceiptModal()">✕</button>
+                </div>
+                <div id="receiptDetails" style="margin-bottom: 20px;"></div>
+                <button class="btn btn-primary" style="width: 100%;" onclick="closeReceiptModal()">Done</button>
+            </div>
+        </div>
+
         <script>
-            // State Management
-            let currentUser =
-                JSON.parse(localStorage.getItem("currentUser")) || null;
-            let users = JSON.parse(localStorage.getItem("users")) || [];
-            let transactions =
-                JSON.parse(localStorage.getItem("transactions")) || [];
+            let currentUser = null;
             let cryptoPrices = {};
+            let cryptoPricesLoaded = false;
+            let pendingTransaction = null;
 
             const cryptoData = {
                 btc: { name: "Bitcoin", symbol: "BTC" },
@@ -1436,7 +1469,6 @@
                 ltc: { name: "Litecoin", symbol: "LTC" },
             };
 
-            // Fetch live crypto prices
             async function fetchCryptoPrices() {
                 try {
                     const response = await fetch(
@@ -1457,7 +1489,6 @@
                             change: data.litecoin.usd_24h_change || 0,
                         },
                     };
-                    updateUI();
                 } catch (error) {
                     console.error("Error fetching crypto prices:", error);
                     cryptoPrices = {
@@ -1466,9 +1497,10 @@
                         ltc: { price: 73, change: -0.5 },
                     };
                 }
+                cryptoPricesLoaded = true;
+                updateUI();
             }
 
-            // Auth Functions
             function switchAuthTab(tab) {
                 document.getElementById("loginForm").style.display =
                     tab === "login" ? "block" : "none";
@@ -1483,110 +1515,151 @@
                 });
             }
 
-            function handleLogin(e) {
+            async function handleLogin(e) {
                 e.preventDefault();
                 const email = document.getElementById("loginEmail").value;
                 const password = document.getElementById("loginPassword").value;
 
-                const user = users.find(
-                    (u) => u.email === email && u.password === password,
-                );
-                if (user) {
-                    currentUser = user;
-                    localStorage.setItem(
-                        "currentUser",
-                        JSON.stringify(currentUser),
+                try {
+                    const { signInWithEmailAndPassword } = window.firebaseModules;
+                    const userCredential = await signInWithEmailAndPassword(
+                        window.firebaseAuth,
+                        email,
+                        password
                     );
+                    
+                    await loadUserData(userCredential.user.uid);
                     showApp();
                     showToast("Welcome back!", "success");
-                } else {
+                } catch (error) {
+                    console.error("Login error:", error);
                     showToast("Invalid credentials", "error");
                 }
             }
 
-            function handleSignup(e) {
+            async function handleSignup(e) {
                 e.preventDefault();
                 const name = document.getElementById("signupName").value;
                 const email = document.getElementById("signupEmail").value;
-                const password =
-                    document.getElementById("signupPassword").value;
+                const password = document.getElementById("signupPassword").value;
                 const pin = document.getElementById("signupPin").value;
 
-                if (users.find((u) => u.email === email)) {
-                    showToast("Email already registered", "error");
-                    return;
+                try {
+                    const { createUserWithEmailAndPassword, doc, setDoc } = window.firebaseModules;
+                    
+                    const userCredential = await createUserWithEmailAndPassword(
+                        window.firebaseAuth,
+                        email,
+                        password
+                    );
+
+                    const newUser = {
+                        name,
+                        email,
+                        pin,
+                        accountNumber: Math.floor(
+                            100000000000 + Math.random() * 900000000000,
+                        ).toString(),
+                        checkingBalance: 1000,
+                        savingsBalance: 500,
+                        btcBalance: 0,
+                        ethBalance: 0,
+                        ltcBalance: 0,
+                        btcWallet: "1" + Math.random().toString(36).substr(2, 34),
+                        ethWallet: "0x" + Math.random().toString(36).substr(2, 40),
+                        ltcWallet: "L" + Math.random().toString(36).substr(2, 34),
+                        createdAt: new Date().toISOString(),
+                    };
+
+                    await setDoc(doc(window.firebaseDb, "users", userCredential.user.uid), newUser);
+                    
+                    currentUser = { ...newUser, id: userCredential.user.uid };
+                    showApp();
+                    showToast("Account created successfully!", "success");
+                } catch (error) {
+                    console.error("Signup error:", error);
+                    if (error.code === 'auth/email-already-in-use') {
+                        showToast("Email already registered", "error");
+                    } else {
+                        showToast("Error creating account", "error");
+                    }
                 }
-
-                const newUser = {
-                    id: Math.random().toString(36).substr(2, 9),
-                    name,
-                    email,
-                    password,
-                    pin,
-                    accountNumber: Math.floor(
-                        100000000000 + Math.random() * 900000000000,
-                    ).toString(),
-                    checkingBalance: 1000,
-                    savingsBalance: 500,
-                    btcBalance: 0,
-                    ethBalance: 0,
-                    ltcBalance: 0,
-                    btcWallet: "1" + Math.random().toString(36).substr(2, 34),
-                    ethWallet: "0x" + Math.random().toString(36).substr(2, 40),
-                    ltcWallet: "L" + Math.random().toString(36).substr(2, 34),
-                    createdAt: new Date().toISOString(),
-                };
-
-                users.push(newUser);
-                localStorage.setItem("users", JSON.stringify(users));
-                currentUser = newUser;
-                localStorage.setItem(
-                    "currentUser",
-                    JSON.stringify(currentUser),
-                );
-                showApp();
-                showToast("Account created successfully!", "success");
             }
 
-            function logout() {
-                currentUser = null;
-                localStorage.removeItem("currentUser");
-                document.getElementById("authPage").classList.add("active");
-                document.getElementById("appContainer").style.display = "none";
-                closeSidebar();
-                showToast("Logged out successfully", "success");
+            async function loadUserData(uid) {
+                try {
+                    const { doc, getDoc } = window.firebaseModules;
+                    const userDoc = await getDoc(doc(window.firebaseDb, "users", uid));
+                    
+                    if (userDoc.exists()) {
+                        currentUser = { id: uid, ...userDoc.data() };
+                        await updateUI();
+                    } else {
+                        showToast("User data not found", "error");
+                    }
+                } catch (error) {
+                    console.error("Error loading user data:", error);
+                    showToast("Error loading user data", "error");
+                }
             }
 
-            // Navigation
-            function switchPage(pageName) {
-                document
-                    .querySelectorAll(".page")
-                    .forEach((p) => p.classList.remove("active"));
-                document
-                    .getElementById(pageName + "Page")
-                    .classList.add("active");
+            async function saveUserData() {
+                if (!currentUser) return;
+                
+                try {
+                    const { doc, updateDoc } = window.firebaseModules;
+                    const { id, ...userData } = currentUser;
+                    await updateDoc(doc(window.firebaseDb, "users", id), userData);
+                } catch (error) {
+                    console.error("Error saving user data:", error);
+                }
+            }
 
-                document
-                    .querySelectorAll(".nav-item")
-                    .forEach((item) => item.classList.remove("active"));
-                event.target.closest(".nav-item")?.classList.add("active");
+            async function handleLogout() {
+                try {
+                    const { signOut } = window.firebaseModules;
+                    await signOut(window.firebaseAuth);
+                    currentUser = null;
+                    document.getElementById("authPage").style.display = "flex";
+                    document.getElementById("mainApp").style.display = "none";
+                    showToast("Logged out successfully", "success");
+                } catch (error) {
+                    console.error("Logout error:", error);
+                    showToast("Error logging out", "error");
+                }
+            }
 
-                closeSidebar();
+            function showApp() {
+                document.getElementById("authPage").style.display = "none";
+                document.getElementById("mainApp").style.display = "block";
+                fetchCryptoPrices();
                 updateUI();
             }
 
-            function openSidebar() {
-                document.getElementById("sidebar").classList.add("active");
-                document
-                    .getElementById("sidebarOverlay")
-                    .classList.add("active");
+            function switchPage(page) {
+                document.querySelectorAll(".page").forEach((p) => {
+                    p.classList.remove("active");
+                });
+                document.querySelectorAll(".nav-item").forEach((n) => {
+                    n.classList.remove("active");
+                });
+
+                document.getElementById(page + "Page").classList.add("active");
+                
+                const navMap = {
+                    dashboard: 0,
+                    crypto: 1,
+                    transactions: 2,
+                    profile: 3,
+                };
+                if (navMap[page] !== undefined) {
+                    document.querySelectorAll(".nav-item")[navMap[page]].classList.add("active");
+                }
             }
 
-            function closeSidebar() {
-                document.getElementById("sidebar").classList.remove("active");
-                document
-                    .getElementById("sidebarOverlay")
-                    .classList.remove("active");
+            function toggleSidebar() {
+                document.querySelector(".sidebar").classList.toggle("active");
+                document.querySelector(".sidebar-overlay").classList.toggle("active");
             }
 
             function openModal(modalId) {
@@ -1597,24 +1670,37 @@
                 document.getElementById(modalId).classList.remove("active");
             }
 
-            function showApp() {
-                document.getElementById("authPage").classList.remove("active");
-                document.getElementById("appContainer").style.display = "block";
-                fetchCryptoPrices();
+            function closeReceiptModal() {
+                closeModal("receiptModal");
+                const modalId = pendingTransaction?.originalModal;
+                if (modalId) closeModal(modalId);
+                pendingTransaction = null;
                 updateUI();
-                setInterval(fetchCryptoPrices, 60000); // Update every minute
             }
 
-            // Transaction Handlers
-            function handleSendMoney(e) {
+            function showConfirmation(details, modalId) {
+                if (!pendingTransaction) pendingTransaction = {};
+                pendingTransaction.originalModal = modalId;
+                document.getElementById("confirmationDetails").innerHTML = `<div style="background: var(--bg-secondary); padding: 16px; border-radius: 8px; font-size: 14px;">${details}</div>`;
+                openModal("confirmationModal");
+            }
+
+            async function processConfirmedTransaction() {
+                if (!pendingTransaction || !pendingTransaction.execute) return;
+                closeModal("confirmationModal");
+                await pendingTransaction.execute();
+            }
+
+            function showReceipt(receiptHTML) {
+                document.getElementById("receiptDetails").innerHTML = receiptHTML;
+                openModal("receiptModal");
+            }
+
+            async function handleSendMoney(e) {
                 e.preventDefault();
                 const form = e.target;
-                const recipient = form.querySelector(
-                    'input[type="email"]',
-                ).value;
-                const amount = parseFloat(
-                    form.querySelector('input[type="number"]').value,
-                );
+                const recipient = form.querySelector('input[type="email"]').value;
+                const amount = parseFloat(form.querySelector('input[type="number"]').value);
                 const pin = form.querySelector('input[type="password"]').value;
 
                 if (currentUser.pin !== pin) {
@@ -1623,46 +1709,35 @@
                 }
 
                 if (currentUser.checkingBalance < amount) {
-                    showToast("Insufficient funds", "error");
+                    showToast("Insufficient balance", "error");
                     return;
                 }
 
-                currentUser.checkingBalance -= amount;
-                addTransaction({
-                    type: "send",
-                    amount,
-                    currency: "USD",
-                    recipient,
-                    fromAccount: "checking",
-                    description: `Sent to ${recipient}`,
-                });
-
-                localStorage.setItem(
-                    "currentUser",
-                    JSON.stringify(currentUser),
-                );
-                localStorage.setItem(
-                    "users",
-                    JSON.stringify(
-                        users.map((u) =>
-                            u.id === currentUser.id ? currentUser : u,
-                        ),
-                    ),
-                );
-                showToast("Money sent successfully!", "success");
-                closeModal("sendModal");
-                form.reset();
-                updateUI();
+                const details = `<strong>Send Money</strong><br>To: ${recipient}<br>Amount: $${amount.toFixed(2)}<br><br>Confirm transfer?`;
+                pendingTransaction = {
+                    originalModal: "sendModal",
+                    execute: async () => {
+                        currentUser.checkingBalance -= amount;
+                        await addTransaction({
+                            type: "send",
+                            amount: amount.toFixed(2),
+                            recipient,
+                            fromAccount: "checking",
+                            description: `Sent $${amount.toFixed(2)} to ${recipient}`,
+                        });
+                        await saveUserData();
+                        showReceipt(`<div style="text-align: center; padding: 16px;"><div style="font-size: 32px; margin-bottom: 12px;">✓</div><p><strong>Money Sent Successfully!</strong></p><div style="background: var(--bg-secondary); padding: 12px; border-radius: 8px; margin: 12px 0; font-size: 13px;"><p>To: <strong>${recipient}</strong></p><p>Amount: <strong>$${amount.toFixed(2)}</strong></p><p>Time: <strong>${new Date().toLocaleString()}</strong></p></div></div>`);
+                    }
+                };
+                showConfirmation(details, "sendModal");
             }
 
-            function handleTransfer(e) {
+            async function handleTransfer(e) {
                 e.preventDefault();
                 const form = e.target;
-                const from = form.querySelectorAll("select")[0].value;
-                const to = form.querySelectorAll("select")[1].value;
-                const amount = parseFloat(
-                    form.querySelector('input[type="number"]').value,
-                );
+                const fromAccount = form.querySelectorAll("select")[0].value;
+                const toAccount = form.querySelectorAll("select")[1].value;
+                const amount = parseFloat(form.querySelector('input[type="number"]').value);
                 const pin = form.querySelector('input[type="password"]').value;
 
                 if (currentUser.pin !== pin) {
@@ -1670,97 +1745,65 @@
                     return;
                 }
 
-                const fromBalance =
-                    from === "checking"
-                        ? currentUser.checkingBalance
-                        : currentUser.savingsBalance;
-                if (fromBalance < amount) {
-                    showToast("Insufficient funds", "error");
+                if (fromAccount === toAccount) {
+                    showToast("Cannot transfer to the same account", "error");
                     return;
                 }
 
-                if (from === "checking") {
-                    currentUser.checkingBalance -= amount;
-                    currentUser.savingsBalance += amount;
-                } else {
-                    currentUser.savingsBalance -= amount;
-                    currentUser.checkingBalance += amount;
+                if (currentUser[fromAccount + "Balance"] < amount) {
+                    showToast("Insufficient balance", "error");
+                    return;
                 }
 
-                addTransaction({
-                    type: "transfer",
-                    amount,
-                    currency: "USD",
-                    fromAccount: from,
-                    toAccount: to,
-                    description: `Transfer from ${from} to ${to}`,
-                });
-
-                localStorage.setItem(
-                    "currentUser",
-                    JSON.stringify(currentUser),
-                );
-                localStorage.setItem(
-                    "users",
-                    JSON.stringify(
-                        users.map((u) =>
-                            u.id === currentUser.id ? currentUser : u,
-                        ),
-                    ),
-                );
-                showToast("Transfer completed!", "success");
-                closeModal("transferModal");
-                form.reset();
-                updateUI();
+                const details = `<strong>Transfer Between Accounts</strong><br>From: ${fromAccount}<br>To: ${toAccount}<br>Amount: $${amount.toFixed(2)}<br><br>Confirm transfer?`;
+                pendingTransaction = {
+                    originalModal: "transferModal",
+                    execute: async () => {
+                        currentUser[fromAccount + "Balance"] -= amount;
+                        currentUser[toAccount + "Balance"] += amount;
+                        await addTransaction({
+                            type: "transfer",
+                            amount: amount.toFixed(2),
+                            fromAccount,
+                            toAccount,
+                            description: `Transferred $${amount.toFixed(2)} from ${fromAccount} to ${toAccount}`,
+                        });
+                        await saveUserData();
+                        showReceipt(`<div style="text-align: center; padding: 16px;"><div style="font-size: 32px; margin-bottom: 12px;">✓</div><p><strong>Transfer Completed!</strong></p><div style="background: var(--bg-secondary); padding: 12px; border-radius: 8px; margin: 12px 0; font-size: 13px;"><p>From: <strong>${fromAccount}</strong></p><p>To: <strong>${toAccount}</strong></p><p>Amount: <strong>$${amount.toFixed(2)}</strong></p><p>Time: <strong>${new Date().toLocaleString()}</strong></p></div></div>`);
+                    }
+                };
+                showConfirmation(details, "transferModal");
             }
 
-            function handleTopup(e) {
+            async function handleTopup(e) {
                 e.preventDefault();
                 const form = e.target;
                 const account = form.querySelector("select").value;
-                const amount = parseFloat(
-                    form.querySelector('input[type="number"]').value,
-                );
+                const amount = parseFloat(form.querySelector('input[type="number"]').value);
 
-                if (account === "checking") {
-                    currentUser.checkingBalance += amount;
-                } else {
-                    currentUser.savingsBalance += amount;
-                }
-
-                addTransaction({
-                    type: "topup",
-                    amount,
-                    currency: "USD",
-                    toAccount: account,
-                    description: `Top up ${account}`,
-                });
-
-                localStorage.setItem(
-                    "currentUser",
-                    JSON.stringify(currentUser),
-                );
-                localStorage.setItem(
-                    "users",
-                    JSON.stringify(
-                        users.map((u) =>
-                            u.id === currentUser.id ? currentUser : u,
-                        ),
-                    ),
-                );
-                showToast("Top-up successful!", "success");
-                closeModal("topupModal");
-                form.reset();
-                updateUI();
+                const details = `<strong>Top Up Account</strong><br>Account: ${account}<br>Amount: $${amount.toFixed(2)}<br><br>Confirm?`;
+                pendingTransaction = {
+                    originalModal: "topupModal",
+                    execute: async () => {
+                        currentUser[account + "Balance"] += amount;
+                        await addTransaction({
+                            type: "topup",
+                            amount: amount.toFixed(2),
+                            toAccount: account,
+                            description: `Added $${amount.toFixed(2)} to ${account} account`,
+                        });
+                        await saveUserData();
+                        showReceipt(`<div style="text-align: center; padding: 16px;"><div style="font-size: 32px; margin-bottom: 12px;">✓</div><p><strong>Funds Added!</strong></p><div style="background: var(--bg-secondary); padding: 12px; border-radius: 8px; margin: 12px 0; font-size: 13px;"><p>Account: <strong>${account}</strong></p><p>Amount: <strong>$${amount.toFixed(2)}</strong></p><p>Time: <strong>${new Date().toLocaleString()}</strong></p></div></div>`);
+                    }
+                };
+                showConfirmation(details, "topupModal");
             }
 
-            function handleWithdraw(e) {
+            async function handleWithdraw(e) {
                 e.preventDefault();
                 const form = e.target;
-                const account = form.querySelectorAll("select")[0].value;
-                const amount = parseFloat(
-                    form.querySelector('input[type="number"]').value,
-                );
+                const account = form.querySelector("select").value;
+                const amount = parseFloat(form.querySelectorAll('input[type="number"]')[0].value);
                 const pin = form.querySelector('input[type="password"]').value;
 
                 if (currentUser.pin !== pin) {
@@ -1768,56 +1811,37 @@
                     return;
                 }
 
-                const balance =
-                    account === "checking"
-                        ? currentUser.checkingBalance
-                        : currentUser.savingsBalance;
-                if (balance < amount) {
-                    showToast("Insufficient funds", "error");
+                if (currentUser[account + "Balance"] < amount) {
+                    showToast("Insufficient balance", "error");
                     return;
                 }
 
-                if (account === "checking") {
-                    currentUser.checkingBalance -= amount;
-                } else {
-                    currentUser.savingsBalance -= amount;
-                }
-
-                addTransaction({
-                    type: "withdraw",
-                    amount,
-                    currency: "USD",
-                    fromAccount: account,
-                    description: `Withdraw from ${account}`,
-                });
-
-                localStorage.setItem(
-                    "currentUser",
-                    JSON.stringify(currentUser),
-                );
-                localStorage.setItem(
-                    "users",
-                    JSON.stringify(
-                        users.map((u) =>
-                            u.id === currentUser.id ? currentUser : u,
-                        ),
-                    ),
-                );
-                showToast("Withdrawal successful!", "success");
-                closeModal("withdrawModal");
-                form.reset();
-                updateUI();
+                const details = `<strong>Withdraw Funds</strong><br>From: ${account}<br>Amount: $${amount.toFixed(2)}<br><br>Confirm withdrawal?`;
+                pendingTransaction = {
+                    originalModal: "withdrawModal",
+                    execute: async () => {
+                        currentUser[account + "Balance"] -= amount;
+                        await addTransaction({
+                            type: "withdraw",
+                            amount: amount.toFixed(2),
+                            fromAccount: account,
+                            description: `Withdrew $${amount.toFixed(2)} from ${account} account`,
+                        });
+                        await saveUserData();
+                        showReceipt(`<div style="text-align: center; padding: 16px;"><div style="font-size: 32px; margin-bottom: 12px;">✓</div><p><strong>Withdrawal Successful!</strong></p><div style="background: var(--bg-secondary); padding: 12px; border-radius: 8px; margin: 12px 0; font-size: 13px;"><p>From: <strong>${account}</strong></p><p>Amount: <strong>$${amount.toFixed(2)}</strong></p><p>Time: <strong>${new Date().toLocaleString()}</strong></p></div></div>`);
+                    }
+                };
+                showConfirmation(details, "withdrawModal");
             }
 
-            function handleWireTransfer(e) {
+            async function handleWireTransfer(e) {
                 e.preventDefault();
                 const form = e.target;
-                const recipient = form.querySelectorAll("input")[0].value;
-                const country = form.querySelectorAll("input")[1].value;
-                const amount = parseFloat(
-                    form.querySelectorAll("input")[2].value,
-                );
-                const pin = form.querySelector('input[type="password"]').value;
+                const inputs = form.querySelectorAll("input");
+                const recipient = inputs[0].value;
+                const country = inputs[1].value;
+                const amount = parseFloat(inputs[2].value);
+                const pin = inputs[3].value;
 
                 if (currentUser.pin !== pin) {
                     showToast("Invalid PIN", "error");
@@ -1825,100 +1849,135 @@
                 }
 
                 if (currentUser.checkingBalance < amount) {
-                    showToast("Insufficient funds", "error");
+                    showToast("Insufficient balance", "error");
                     return;
                 }
 
-                currentUser.checkingBalance -= amount;
-                addTransaction({
-                    type: "wire",
-                    amount,
-                    currency: "USD",
-                    recipient: `${recipient} (${country})`,
-                    fromAccount: "checking",
-                    description: `Wire to ${recipient} in ${country}`,
-                });
-
-                localStorage.setItem(
-                    "currentUser",
-                    JSON.stringify(currentUser),
-                );
-                localStorage.setItem(
-                    "users",
-                    JSON.stringify(
-                        users.map((u) =>
-                            u.id === currentUser.id ? currentUser : u,
-                        ),
-                    ),
-                );
-                showToast("Wire transfer sent!", "success");
-                closeModal("wireModal");
-                form.reset();
-                updateUI();
+                const details = `<strong>Wire Transfer</strong><br>To: ${recipient}<br>Country: ${country}<br>Amount: $${amount.toFixed(2)}<br><br>Confirm?`;
+                pendingTransaction = {
+                    originalModal: "wireModal",
+                    execute: async () => {
+                        currentUser.checkingBalance -= amount;
+                        await addTransaction({
+                            type: "wire",
+                            amount: amount.toFixed(2),
+                            recipient,
+                            country,
+                            fromAccount: "checking",
+                            description: `Wire transfer of $${amount.toFixed(2)} to ${recipient} in ${country}`,
+                        });
+                        await saveUserData();
+                        showReceipt(`<div style="text-align: center; padding: 16px;"><div style="font-size: 32px; margin-bottom: 12px;">✓</div><p><strong>Wire Transfer Sent!</strong></p><div style="background: var(--bg-secondary); padding: 12px; border-radius: 8px; margin: 12px 0; font-size: 13px;"><p>To: <strong>${recipient}</strong></p><p>Country: <strong>${country}</strong></p><p>Amount: <strong>$${amount.toFixed(2)}</strong></p><p>Time: <strong>${new Date().toLocaleString()}</strong></p></div></div>`);
+                    }
+                };
+                showConfirmation(details, "wireModal");
             }
 
-            function handleBuyCrypto(e) {
+            async function handleBuyCrypto(e) {
                 e.preventDefault();
+                if (!cryptoPricesLoaded) {
+                    showToast("Crypto prices still loading, please wait", "error");
+                    return;
+                }
+
                 const form = e.target;
-                const crypto = form.querySelector("select").value;
-                const amount = parseFloat(
-                    form.querySelectorAll("input")[0].value,
-                );
-                const pin = form.querySelectorAll("input")[1].value;
+                const crypto = document.getElementById("buyCryptoSelect").value;
+                const usdAmount = parseFloat(document.getElementById("buyCryptoAmount").value);
+                const pin = document.getElementById("buyCryptoPin").value;
 
                 if (currentUser.pin !== pin) {
                     showToast("Invalid PIN", "error");
                     return;
                 }
 
-                const fee = amount * 0.02;
-                const totalCost = amount + fee;
+                const fee = usdAmount * 0.02;
+                const total = usdAmount + fee;
+                const cryptoAmount = usdAmount / cryptoPrices[crypto].price;
 
-                if (currentUser.checkingBalance < totalCost) {
-                    showToast("Insufficient funds", "error");
+                if (currentUser.checkingBalance < total) {
+                    showToast("Insufficient balance", "error");
                     return;
                 }
 
-                const cryptoAmount = amount / cryptoPrices[crypto].price;
-                currentUser.checkingBalance -= totalCost;
-                currentUser[crypto + "Balance"] += cryptoAmount;
-
-                addTransaction({
-                    type: "buy_crypto",
-                    amount,
-                    currency: crypto.toUpperCase(),
-                    cryptoAmount: cryptoAmount.toFixed(8),
-                    fromAccount: "checking",
-                    toAccount: crypto,
-                    fee: fee.toFixed(2),
-                    description: `Bought ${cryptoAmount.toFixed(8)} ${crypto.toUpperCase()}`,
-                });
-
-                localStorage.setItem(
-                    "currentUser",
-                    JSON.stringify(currentUser),
-                );
-                localStorage.setItem(
-                    "users",
-                    JSON.stringify(
-                        users.map((u) =>
-                            u.id === currentUser.id ? currentUser : u,
-                        ),
-                    ),
-                );
-                showToast("Purchase successful!", "success");
-                closeModal("buyCryptoModal");
-                form.reset();
-                updateUI();
+                const details = `<strong>Buy Cryptocurrency</strong><br>Crypto: ${crypto.toUpperCase()}<br>Amount: $${usdAmount.toFixed(2)}<br>Fee: $${fee.toFixed(2)}<br>Total: $${total.toFixed(2)}<br>Get: ${cryptoAmount.toFixed(8)} ${crypto.toUpperCase()}<br><br>Confirm?`;
+                pendingTransaction = {
+                    originalModal: "buyCryptoModal",
+                    execute: async () => {
+                        currentUser.checkingBalance -= total;
+                        currentUser[crypto + "Balance"] += cryptoAmount;
+                        await addTransaction({
+                            type: "buy_crypto",
+                            amount: total.toFixed(2),
+                            currency: crypto.toUpperCase(),
+                            cryptoAmount: cryptoAmount.toFixed(8),
+                            fromAccount: "checking",
+                            description: `Bought ${cryptoAmount.toFixed(8)} ${crypto.toUpperCase()} for $${usdAmount.toFixed(2)}`,
+                        });
+                        await saveUserData();
+                        showReceipt(`<div style="text-align: center; padding: 16px;"><div style="font-size: 32px; margin-bottom: 12px;">✓</div><p><strong>Purchase Successful!</strong></p><div style="background: var(--bg-secondary); padding: 12px; border-radius: 8px; margin: 12px 0; font-size: 13px;"><p>Crypto: <strong>${crypto.toUpperCase()}</strong></p><p>Amount: <strong>${cryptoAmount.toFixed(8)}</strong></p><p>Cost: <strong>$${total.toFixed(2)}</strong> (Fee: $${fee.toFixed(2)})</p><p>Time: <strong>${new Date().toLocaleString()}</strong></p></div></div>`);
+                    }
+                };
+                showConfirmation(details, "buyCryptoModal");
             }
 
-            function handleSellCrypto(e) {
+            async function handleSellCrypto(e) {
                 e.preventDefault();
+                if (!cryptoPricesLoaded) {
+                    showToast("Crypto prices still loading, please wait", "error");
+                    return;
+                }
+
+                const form = e.target;
+                const crypto = document.getElementById("sellCryptoSelect").value;
+                const cryptoAmount = parseFloat(document.getElementById("sellCryptoAmount").value);
+                const pin = document.getElementById("sellCryptoPin").value;
+
+                if (currentUser.pin !== pin) {
+                    showToast("Invalid PIN", "error");
+                    return;
+                }
+
+                if (currentUser[crypto + "Balance"] < cryptoAmount) {
+                    showToast("Insufficient crypto", "error");
+                    return;
+                }
+
+                const usdValue = cryptoAmount * cryptoPrices[crypto].price;
+                const fee = usdValue * 0.02;
+                const netAmount = usdValue - fee;
+
+                const details = `<strong>Sell Cryptocurrency</strong><br>Crypto: ${crypto.toUpperCase()}<br>Amount: ${cryptoAmount.toFixed(8)}<br>Value: $${usdValue.toFixed(2)}<br>Fee: $${fee.toFixed(2)}<br>Net: $${netAmount.toFixed(2)}<br><br>Confirm?`;
+                pendingTransaction = {
+                    originalModal: "sellCryptoModal",
+                    execute: async () => {
+                        currentUser[crypto + "Balance"] -= cryptoAmount;
+                        currentUser.checkingBalance += netAmount;
+                        await addTransaction({
+                            type: "sell_crypto",
+                            amount: netAmount.toFixed(2),
+                            currency: crypto.toUpperCase(),
+                            cryptoAmount: cryptoAmount.toFixed(8),
+                            toAccount: "checking",
+                            description: `Sold ${cryptoAmount.toFixed(8)} ${crypto.toUpperCase()} for $${netAmount.toFixed(2)}`,
+                        });
+                        await saveUserData();
+                        showReceipt(`<div style="text-align: center; padding: 16px;"><div style="font-size: 32px; margin-bottom: 12px;">✓</div><p><strong>Sale Successful!</strong></p><div style="background: var(--bg-secondary); padding: 12px; border-radius: 8px; margin: 12px 0; font-size: 13px;"><p>Crypto: <strong>${crypto.toUpperCase()}</strong></p><p>Amount: <strong>${cryptoAmount.toFixed(8)}</strong></p><p>Received: <strong>$${netAmount.toFixed(2)}</strong> (Fee: $${fee.toFixed(2)})</p><p>Time: <strong>${new Date().toLocaleString()}</strong></p></div></div>`);
+                    }
+                };
+                showConfirmation(details, "sellCryptoModal");
+            }
+
+            async function handleSendCrypto(e) {
+                e.preventDefault();
+                if (!cryptoPricesLoaded) {
+                    showToast("Crypto prices still loading, please wait", "error");
+                    return;
+                }
+
                 const form = e.target;
                 const crypto = form.querySelector("select").value;
-                const cryptoAmount = parseFloat(
-                    form.querySelectorAll("input")[0].value,
-                );
+                const recipient = form.querySelector('input[type="text"]').value;
+                const cryptoAmount = parseFloat(form.querySelector('input[type="number"]').value);
                 const pin = form.querySelector('input[type="password"]').value;
 
                 if (currentUser.pin !== pin) {
@@ -1931,119 +1990,72 @@
                     return;
                 }
 
-                const usdAmount = cryptoAmount * cryptoPrices[crypto].price;
-                currentUser.checkingBalance += usdAmount;
-                currentUser[crypto + "Balance"] -= cryptoAmount;
+                const usdValue = (cryptoAmount * cryptoPrices[crypto].price).toFixed(2);
 
-                addTransaction({
-                    type: "sell_crypto",
-                    amount: usdAmount.toFixed(2),
-                    currency: crypto.toUpperCase(),
-                    cryptoAmount: cryptoAmount.toFixed(8),
-                    fromAccount: crypto,
-                    toAccount: "checking",
-                    description: `Sold ${cryptoAmount.toFixed(8)} ${crypto.toUpperCase()}`,
-                });
-
-                localStorage.setItem(
-                    "currentUser",
-                    JSON.stringify(currentUser),
-                );
-                localStorage.setItem(
-                    "users",
-                    JSON.stringify(
-                        users.map((u) =>
-                            u.id === currentUser.id ? currentUser : u,
-                        ),
-                    ),
-                );
-                showToast("Sale successful!", "success");
-                closeModal("sellCryptoModal");
-                form.reset();
-                updateUI();
+                const details = `<strong>Send Cryptocurrency</strong><br>Crypto: ${crypto.toUpperCase()}<br>To: ${recipient}<br>Amount: ${cryptoAmount.toFixed(8)}<br>Value: $${usdValue}<br><br>Confirm?`;
+                pendingTransaction = {
+                    originalModal: "sendCryptoModal",
+                    execute: async () => {
+                        currentUser[crypto + "Balance"] -= cryptoAmount;
+                        await addTransaction({
+                            type: "send_crypto",
+                            amount: usdValue,
+                            currency: crypto.toUpperCase(),
+                            cryptoAmount: cryptoAmount.toFixed(8),
+                            fromAccount: crypto,
+                            recipient,
+                            description: `Sent ${cryptoAmount.toFixed(8)} ${crypto.toUpperCase()} to ${recipient}`,
+                        });
+                        await saveUserData();
+                        showReceipt(`<div style="text-align: center; padding: 16px;"><div style="font-size: 32px; margin-bottom: 12px;">✓</div><p><strong>Crypto Sent Successfully!</strong></p><div style="background: var(--bg-secondary); padding: 12px; border-radius: 8px; margin: 12px 0; font-size: 13px;"><p>Crypto: <strong>${crypto.toUpperCase()}</strong></p><p>Amount: <strong>${cryptoAmount.toFixed(8)}</strong></p><p>To: <strong>${recipient}</strong></p><p>Time: <strong>${new Date().toLocaleString()}</strong></p></div></div>`);
+                    }
+                };
+                showConfirmation(details, "sendCryptoModal");
             }
 
-            function handleSendCrypto(e) {
-                e.preventDefault();
-                const form = e.target;
-                const crypto = form.querySelector("select").value;
-                const recipient =
-                    form.querySelector('input[type="text"]').value;
-                const cryptoAmount = parseFloat(
-                    form.querySelector('input[type="number"]').value,
-                );
-                const pin = form.querySelector('input[type="password"]').value;
-
-                if (currentUser.pin !== pin) {
-                    showToast("Invalid PIN", "error");
-                    return;
+            async function addTransaction(tx) {
+                try {
+                    const { collection, addDoc } = window.firebaseModules;
+                    await addDoc(collection(window.firebaseDb, "transactions"), {
+                        ...tx,
+                        userId: currentUser.id,
+                        status: "completed",
+                        createdAt: new Date().toISOString(),
+                    });
+                } catch (error) {
+                    console.error("Error adding transaction:", error);
                 }
+            }
 
-                if (currentUser[crypto + "Balance"] < cryptoAmount) {
-                    showToast("Insufficient crypto", "error");
-                    return;
+            async function loadTransactions() {
+                try {
+                    const { collection, query, where, getDocs, orderBy } = window.firebaseModules;
+                    const q = query(
+                        collection(window.firebaseDb, "transactions"),
+                        where("userId", "==", currentUser.id),
+                        orderBy("createdAt", "desc")
+                    );
+                    
+                    const querySnapshot = await getDocs(q);
+                    const transactions = [];
+                    querySnapshot.forEach((doc) => {
+                        transactions.push({ id: doc.id, ...doc.data() });
+                    });
+                    
+                    return transactions;
+                } catch (error) {
+                    console.error("Error loading transactions:", error);
+                    return [];
                 }
-
-                const usdValue = (
-                    cryptoAmount * cryptoPrices[crypto].price
-                ).toFixed(2);
-                currentUser[crypto + "Balance"] -= cryptoAmount;
-
-                addTransaction({
-                    type: "send_crypto",
-                    amount: usdValue,
-                    currency: crypto.toUpperCase(),
-                    cryptoAmount: cryptoAmount.toFixed(8),
-                    fromAccount: crypto,
-                    recipient,
-                    description: `Sent ${cryptoAmount.toFixed(8)} ${crypto.toUpperCase()} to ${recipient}`,
-                });
-
-                localStorage.setItem(
-                    "currentUser",
-                    JSON.stringify(currentUser),
-                );
-                localStorage.setItem(
-                    "users",
-                    JSON.stringify(
-                        users.map((u) =>
-                            u.id === currentUser.id ? currentUser : u,
-                        ),
-                    ),
-                );
-                showToast("Crypto sent!", "success");
-                closeModal("sendCryptoModal");
-                form.reset();
-                updateUI();
             }
 
-            function addTransaction(tx) {
-                transactions.push({
-                    ...tx,
-                    id: Math.random().toString(36).substr(2, 9),
-                    userId: currentUser.id,
-                    status: "completed",
-                    createdAt: new Date().toISOString(),
-                });
-                localStorage.setItem(
-                    "transactions",
-                    JSON.stringify(transactions),
-                );
-            }
-
-            // UI Updates
-            function updateUI() {
+            async function updateUI() {
                 if (!currentUser) return;
 
-                const userTransactions = transactions.filter(
-                    (t) => t.userId === currentUser.id,
-                );
-                const total =
-                    currentUser.checkingBalance + currentUser.savingsBalance;
+                const userTransactions = await loadTransactions();
+                const total = currentUser.checkingBalance + currentUser.savingsBalance;
 
-                // Dashboard
-                document.getElementById("totalBalance").textContent =
-                    "$" + total.toFixed(2);
+                document.getElementById("totalBalance").textContent = "$" + total.toFixed(2);
                 document.getElementById("accountNumber").textContent =
                     currentUser.accountNumber.slice(-4);
                 document.getElementById("checkingBalance").textContent =
@@ -2055,153 +2067,144 @@
                 document.getElementById("savingsDetailBalance").textContent =
                     "$" + currentUser.savingsBalance.toFixed(2);
 
-                const cryptoHoldings = `BTC: ${currentUser.btcBalance.toFixed(4)} | ETH: ${currentUser.ethBalance.toFixed(4)} | LTC: ${currentUser.ltcBalance.toFixed(4)}`;
-                document.getElementById("cryptoHoldings").textContent =
-                    cryptoHoldings;
+                if (cryptoPricesLoaded) {
+                    const cryptoHoldings = `BTC: ${currentUser.btcBalance.toFixed(4)} | ETH: ${currentUser.ethBalance.toFixed(4)} | LTC: ${currentUser.ltcBalance.toFixed(4)}`;
+                    document.getElementById("cryptoHoldings").textContent = cryptoHoldings;
+                } else {
+                    document.getElementById("cryptoHoldings").textContent = "Loading prices...";
+                }
 
-                // Recent Transactions
                 const recentTxHTML = userTransactions
                     .slice(0, 5)
                     .map(
                         (tx) => `
-                <div class="transaction-item">
-                    <div class="transaction-left">
-                        <div class="transaction-icon">${getTransactionIcon(tx.type)}</div>
-                        <div class="transaction-info">
-                            <h4>${tx.description || tx.type}</h4>
-                            <p>${new Date(tx.createdAt).toLocaleDateString()}</p>
+                    <div class="transaction-item">
+                        <div class="transaction-left">
+                            <div class="transaction-icon">${getTransactionIcon(tx.type)}</div>
+                            <div class="transaction-info">
+                                <h4>${tx.description || tx.type}</h4>
+                                <p>${new Date(tx.createdAt).toLocaleDateString()}</p>
+                            </div>
+                        </div>
+                        <div class="transaction-amount">
+                            <div class="amount ${["send", "withdraw", "buy_crypto", "wire"].includes(tx.type) ? "amount-negative" : "amount-positive"}">
+                                ${["send", "withdraw", "buy_crypto", "wire"].includes(tx.type) ? "-" : "+"}$${parseFloat(tx.amount).toFixed(2)}
+                            </div>
                         </div>
                     </div>
-                    <div class="transaction-amount">
-                        <div class="amount ${["send", "withdraw", "buy_crypto", "wire"].includes(tx.type) ? "amount-negative" : "amount-positive"}">
-                            ${["send", "withdraw", "buy_crypto", "wire"].includes(tx.type) ? "-" : "+"}$${parseFloat(tx.amount).toFixed(2)}
-                        </div>
-                    </div>
-                </div>
-            `,
+                `,
                     )
                     .join("");
                 document.getElementById("recentTransactions").innerHTML =
                     recentTxHTML ||
                     '<p style="color: var(--text-secondary);">No transactions yet</p>';
 
-                // Crypto List
-                const cryptoListHTML = Object.entries(cryptoData)
-                    .map(([key, value]) => {
-                        const price = cryptoPrices[key];
-                        const balance = currentUser[key + "Balance"];
-                        return `
-                    <div class="crypto-item" onclick="showCryptoDetail('${key}')">
-                        <div class="crypto-left">
-                            <div class="crypto-icon">${key === "btc" ? "₿" : key === "eth" ? "Ξ" : "Ł"}</div>
-                            <div class="crypto-name">
-                                <h4>${value.name}</h4>
-                                <p>${key.toUpperCase()}</p>
+                if (cryptoPricesLoaded) {
+                    const cryptoListHTML = Object.entries(cryptoData)
+                        .map(([key, value]) => {
+                            const price = cryptoPrices[key];
+                            return `
+                        <div class="crypto-item" onclick="showCryptoDetail('${key}')">
+                            <div class="crypto-left">
+                                <div class="crypto-icon">${key === "btc" ? "₿" : key === "eth" ? "Ξ" : "Ł"}</div>
+                                <div class="crypto-name">
+                                    <h4>${value.name}</h4>
+                                    <p>${key.toUpperCase()}</p>
+                                </div>
+                            </div>
+                            <div class="crypto-right">
+                                <div class="price">$${price.price.toLocaleString("en-US", { maximumFractionDigits: 2 })}</div>
+                                <div class="change ${price.change >= 0 ? "change-positive" : "change-negative"}">
+                                    ${price.change >= 0 ? "+" : ""}${price.change.toFixed(2)}%
+                                </div>
                             </div>
                         </div>
-                        <div class="crypto-right">
-                            <div class="price">$${price.price.toLocaleString("en-US", { maximumFractionDigits: 2 })}</div>
-                            <div class="change ${price.change >= 0 ? "change-positive" : "change-negative"}">
-                                ${price.change >= 0 ? "+" : ""}${price.change.toFixed(2)}%
-                            </div>
-                        </div>
-                    </div>
-                `;
-                    })
-                    .join("");
-                document.getElementById("cryptoList").innerHTML =
-                    cryptoListHTML;
+                    `;
+                        })
+                        .join("");
+                    document.getElementById("cryptoList").innerHTML = cryptoListHTML;
+                } else {
+                    document.getElementById("cryptoList").innerHTML = '<div class="loading">Loading crypto prices...</div>';
+                }
 
-                // Transactions List
                 const transactionsHTML = userTransactions
                     .map(
                         (tx) => `
-                <div class="transaction-item">
-                    <div class="transaction-left">
-                        <div class="transaction-icon">${getTransactionIcon(tx.type)}</div>
-                        <div class="transaction-info">
-                            <h4>${tx.description || tx.type}</h4>
-                            <p>${new Date(tx.createdAt).toLocaleDateString()} ${new Date(tx.createdAt).toLocaleTimeString()}</p>
+                    <div class="transaction-item">
+                        <div class="transaction-left">
+                            <div class="transaction-icon">${getTransactionIcon(tx.type)}</div>
+                            <div class="transaction-info">
+                                <h4>${tx.description || tx.type}</h4>
+                                <p>${new Date(tx.createdAt).toLocaleDateString()} ${new Date(tx.createdAt).toLocaleTimeString()}</p>
+                            </div>
+                        </div>
+                        <div class="transaction-amount">
+                            <div class="amount ${["send", "withdraw", "buy_crypto", "wire"].includes(tx.type) ? "amount-negative" : "amount-positive"}">
+                                ${["send", "withdraw", "buy_crypto", "wire"].includes(tx.type) ? "-" : "+"}${tx.cryptoAmount ? tx.cryptoAmount + " " + tx.currency : "$" + parseFloat(tx.amount).toFixed(2)}
+                            </div>
                         </div>
                     </div>
-                    <div class="transaction-amount">
-                        <div class="amount ${["send", "withdraw", "buy_crypto", "wire"].includes(tx.type) ? "amount-negative" : "amount-positive"}">
-                            ${["send", "withdraw", "buy_crypto", "wire"].includes(tx.type) ? "-" : "+"}${tx.cryptoAmount ? tx.cryptoAmount + " " + tx.currency : "$" + parseFloat(tx.amount).toFixed(2)}
-                        </div>
-                    </div>
-                </div>
-            `,
+                `,
                     )
                     .join("");
                 document.getElementById("transactionsList").innerHTML =
                     transactionsHTML ||
                     '<p style="color: var(--text-secondary);">No transactions yet</p>';
 
-                // Profile
                 const profileHTML = `
-                <div class="card">
-                    <div style="display: flex; gap: 12px; align-items: center; margin-bottom: 16px;">
-                        <div class="user-avatar">${currentUser.name[0]}</div>
-                        <div>
-                            <h4>${currentUser.name}</h4>
-                            <p>${currentUser.email}</p>
+                    <div class="card">
+                        <div style="display: flex; gap: 12px; align-items: center; margin-bottom: 16px;">
+                            <div class="user-avatar">${currentUser.name[0]}</div>
+                            <div>
+                                <h4>${currentUser.name}</h4>
+                                <p>${currentUser.email}</p>
+                            </div>
+                        </div>
+                        <div style="font-size: 12px; color: var(--text-secondary);">
+                            <p>Account Number: <strong>${currentUser.accountNumber}</strong></p>
+                            <p>Member Since: <strong>${new Date(currentUser.createdAt).toLocaleDateString()}</strong></p>
                         </div>
                     </div>
-                    <div style="font-size: 12px; color: var(--text-secondary);">
-                        <p>Account Number: <strong>${currentUser.accountNumber}</strong></p>
-                        <p>Member Since: <strong>${new Date(currentUser.createdAt).toLocaleDateString()}</strong></p>
-                    </div>
-                </div>
-            `;
+                `;
                 document.getElementById("profileInfo").innerHTML = profileHTML;
 
-                // Wallet Addresses
                 const walletsHTML = `
-                <div class="card">
-                    <div style="margin-bottom: 12px;">
-                        <p style="font-size: 12px; color: var(--text-secondary);">Bitcoin (BTC)</p>
-                        <p style="font-size: 12px; font-family: monospace; word-break: break-all;">${currentUser.btcWallet}</p>
+                    <div class="card">
+                        <div style="margin-bottom: 12px;">
+                            <p style="font-size: 12px; color: var(--text-secondary);">Bitcoin (BTC)</p>
+                            <p style="font-size: 12px; font-family: monospace; word-break: break-all;">${currentUser.btcWallet}</p>
+                        </div>
                     </div>
-                </div>
-                <div class="card">
-                    <div style="margin-bottom: 12px;">
-                        <p style="font-size: 12px; color: var(--text-secondary);">Ethereum (ETH)</p>
-                        <p style="font-size: 12px; font-family: monospace; word-break: break-all;">${currentUser.ethWallet}</p>
+                    <div class="card">
+                        <div style="margin-bottom: 12px;">
+                            <p style="font-size: 12px; color: var(--text-secondary);">Ethereum (ETH)</p>
+                            <p style="font-size: 12px; font-family: monospace; word-break: break-all;">${currentUser.ethWallet}</p>
+                        </div>
                     </div>
-                </div>
-                <div class="card">
-                    <div style="margin-bottom: 12px;">
-                        <p style="font-size: 12px; color: var(--text-secondary);">Litecoin (LTC)</p>
-                        <p style="font-size: 12px; font-family: monospace; word-break: break-all;">${currentUser.ltcWallet}</p>
+                    <div class="card">
+                        <div style="margin-bottom: 12px;">
+                            <p style="font-size: 12px; color: var(--text-secondary);">Litecoin (LTC)</p>
+                            <p style="font-size: 12px; font-family: monospace; word-break: break-all;">${currentUser.ltcWallet}</p>
+                        </div>
                     </div>
-                </div>
-            `;
-                document.getElementById("walletAddresses").innerHTML =
-                    walletsHTML;
+                `;
+                document.getElementById("walletAddresses").innerHTML = walletsHTML;
 
-                // User Profile in Sidebar
                 const userProfileHTML = `
-                <div style="display: flex; align-items: center; gap: 12px; width: 100%;">
-                    <div class="user-avatar" style="width: 40px; height: 40px; font-size: 16px;">${currentUser.name[0]}</div>
-                    <div style="flex: 1;">
-                        <div style="font-weight: 600; font-size: 14px;">${currentUser.name}</div>
-                        <div style="font-size: 12px; color: var(--text-secondary);">${currentUser.email}</div>
+                    <div style="display: flex; align-items: center; gap: 12px; width: 100%;">
+                        <div class="user-avatar" style="width: 40px; height: 40px; font-size: 16px;">${currentUser.name[0]}</div>
+                        <div style="flex: 1;">
+                            <div style="font-weight: 600; font-size: 14px;">${currentUser.name}</div>
+                            <div style="font-size: 12px; color: var(--text-secondary);">${currentUser.email}</div>
+                        </div>
                     </div>
-                </div>
-            `;
-                document.getElementById("userProfile").innerHTML =
-                    userProfileHTML;
+                `;
+                document.getElementById("userProfile").innerHTML = userProfileHTML;
 
-                // Update Crypto Info in Modals
-                if (document.getElementById("buyCryptoAmount")) {
-                    const selectedCrypto =
-                        document.getElementById("buyCryptoSelect").value;
-                    const amount =
-                        parseFloat(
-                            document.getElementById("buyCryptoAmount").value,
-                        ) || 0;
-                    const cryptoAmount =
-                        amount / cryptoPrices[selectedCrypto].price;
+                if (cryptoPricesLoaded && document.getElementById("buyCryptoAmount")) {
+                    const selectedCrypto = document.getElementById("buyCryptoSelect").value;
+                    const amount = parseFloat(document.getElementById("buyCryptoAmount").value) || 0;
+                    const cryptoAmount = amount / cryptoPrices[selectedCrypto].price;
                     const fee = amount * 0.02;
                     document.getElementById("buyCryptoInfo").innerHTML =
                         `You will get: ${cryptoAmount.toFixed(8)} ${selectedCrypto.toUpperCase()} | Fee: $${fee.toFixed(2)}`;
@@ -2209,34 +2212,39 @@
             }
 
             function showCryptoDetail(crypto) {
+                if (!cryptoPricesLoaded) {
+                    showToast("Crypto prices still loading, please wait", "error");
+                    return;
+                }
+
                 const data = cryptoData[crypto];
                 const price = cryptoPrices[crypto];
                 const balance = currentUser[crypto + "Balance"];
                 const balanceUSD = balance * price.price;
 
                 const html = `
-                <div class="balance-card">
-                    <h3>${data.name} (${data.symbol})</h3>
-                    <div class="amount">$${price.price.toLocaleString("en-US", { maximumFractionDigits: 2 })}</div>
-                    <div class="details">24h: ${price.change >= 0 ? "+" : ""}${price.change.toFixed(2)}%</div>
-                </div>
-                <div class="card">
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-                        <div>
-                            <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 4px;">You Own</p>
-                            <p style="font-weight: bold;">${balance.toFixed(8)} ${data.symbol}</p>
+                    <div class="balance-card">
+                        <h3>${data.name} (${data.symbol})</h3>
+                        <div class="amount">$${price.price.toLocaleString("en-US", { maximumFractionDigits: 2 })}</div>
+                        <div class="details">24h: ${price.change >= 0 ? "+" : ""}${price.change.toFixed(2)}%</div>
+                    </div>
+                    <div class="card">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                            <div>
+                                <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 4px;">You Own</p>
+                                <p style="font-weight: bold;">${balance.toFixed(8)} ${data.symbol}</p>
+                            </div>
+                            <div>
+                                <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 4px;">Value in USD</p>
+                                <p style="font-weight: bold;">$${balanceUSD.toFixed(2)}</p>
+                            </div>
                         </div>
-                        <div>
-                            <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 4px;">Value in USD</p>
-                            <p style="font-weight: bold;">$${balanceUSD.toFixed(2)}</p>
+                        <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border);">
+                            <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 4px;">Wallet Address</p>
+                            <p style="font-size: 11px; font-family: monospace; word-break: break-all;">${currentUser[crypto + "Wallet"]}</p>
                         </div>
                     </div>
-                    <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border);">
-                        <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 4px;">Wallet Address</p>
-                        <p style="font-size: 11px; font-family: monospace; word-break: break-all;">${currentUser[crypto + "Wallet"]}</p>
-                    </div>
-                </div>
-            `;
+                `;
                 document.getElementById("cryptoDetail").innerHTML = html;
                 switchPage("cryptoDetail");
             }
@@ -2265,24 +2273,24 @@
             }
 
             function toggleDarkMode() {
-                document.documentElement.classList.toggle("dark-mode");
-                localStorage.setItem(
-                    "darkMode",
-                    document.documentElement.classList.contains("dark-mode"),
-                );
+                document.body.classList.toggle("dark-mode");
+                const isDark = document.body.classList.contains("dark-mode");
+                localStorage.setItem("darkMode", isDark);
             }
 
-            // Initialize
             if (localStorage.getItem("darkMode") === "true") {
-                document.documentElement.classList.add("dark-mode");
+                document.body.classList.add("dark-mode");
             }
 
-            if (currentUser) {
-                showApp();
-            }
-
-            // Update crypto prices every minute
-            fetchCryptoPrices();
+            window.addEventListener('load', () => {
+                const { onAuthStateChanged } = window.firebaseModules;
+                onAuthStateChanged(window.firebaseAuth, async (user) => {
+                    if (user) {
+                        await loadUserData(user.uid);
+                        showApp();
+                    }
+                });
+            });
         </script>
     </body>
 </html>
