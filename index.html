@@ -2,62 +2,87 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>CredCrypt Bank</title>
+<!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<!-- Chart.js for crypto charts -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<!-- Font Awesome for icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 <style>
+/* ----------------- General Styles ----------------- */
 body{margin:0;font-family:Arial,sans-serif;background:#f4f6f9;color:#333;}
 .hidden{display:none;}
-section{padding:20px;max-width:600px;margin:20px auto;background:#fff;border-radius:15px;box-shadow:0 5px 15px rgba(0,0,0,0.1);}
-button{padding:10px 15px;border:none;border-radius:10px;cursor:pointer;background: linear-gradient(135deg,#6a5af9,#8c76ff);color:#fff;font-weight:600;margin:5px;transition:0.3s;}
+section{padding:20px;border-radius:15px;box-shadow:0 5px 15px rgba(0,0,0,0.1);background:#fff;max-width:400px;margin:50px auto;}
+button{padding:12px 20px;border:none;border-radius:10px;background:linear-gradient(135deg,#6a5af9,#8c76ff);color:#fff;font-weight:600;margin:5px;cursor:pointer;transition:0.3s;}
 button:hover{transform:translateY(-3px);box-shadow:0 5px 15px rgba(106,90,249,0.5);}
-input,select{width:100%;padding:10px;margin:5px 0 15px 0;border-radius:10px;border:1px solid #ccc;}
+input,select{width:100%;padding:12px;margin:5px 0 15px 0;border-radius:10px;border:1px solid #ccc;}
+h2{text-align:center;margin-bottom:20px;}
+
+/* ----------------- Loading Screen ----------------- */
 #loading-screen{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);display:flex;flex-direction:column;justify-content:center;align-items:center;color:#fff;font-size:18px;z-index:999;}
 #loading-screen.hidden{display:none;z-index:0;}
 .loader{border:8px solid #f3f3f3;border-top:8px solid #6a5af9;border-radius:50%;width:60px;height:60px;animation:spin 1s linear infinite;margin-bottom:15px;}
 @keyframes spin{0%{transform:rotate(0deg);}100%{transform:rotate(360deg);}}
 
-/* Dashboard quick buttons */
+/* ----------------- Dashboard Styles ----------------- */
+#dashboard-section{max-width:500px;margin:20px auto;padding:20px;}
+#balances{display:flex;justify-content:space-between;margin-bottom:15px;}
+.balance-card{background:#fff;padding:15px;border-radius:15px;box-shadow:0 5px 15px rgba(0,0,0,0.1);text-align:center;flex:1;margin:5px;}
 #quick-buttons{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:15px;}
+
+/* ----------------- Crypto Grid ----------------- */
 .crypto-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:20px;}
 .crypto-card{background:linear-gradient(135deg,#6a5af9,#8c76ff);color:#fff;padding:15px;border-radius:15px;text-align:center;cursor:pointer;box-shadow:0 8px 20px rgba(106,90,249,0.3);transition:0.3s;}
 .crypto-card:hover{transform:translateY(-5px);box-shadow:0 12px 25px rgba(106,90,249,0.5);}
+
+/* ----------------- Modals ----------------- */
 .modal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);display:flex;justify-content:center;align-items:center;z-index:999;}
 .modal-content{background:#fff;padding:20px;border-radius:15px;width:90%;max-width:400px;position:relative;}
 #receipt-details{background:#fff;padding:15px;border-radius:15px;box-shadow:0 5px 15px rgba(0,0,0,0.1);margin-bottom:15px;}
 .transaction-card{background:#fff;padding:15px;margin:10px 0;border-radius:15px;box-shadow:0 5px 15px rgba(0,0,0,0.1);cursor:pointer;transition:0.3s;}
 .transaction-card:hover{transform:translateY(-3px);box-shadow:0 10px 20px rgba(0,0,0,0.15);}
+
+/* ----------------- PIN Keypad ----------------- */
 #pin-keypad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:15px;}
 .pin-button{background:linear-gradient(135deg,#6a5af9,#8c76ff);padding:15px;border-radius:10px;font-size:18px;font-weight:bold;color:#fff;}
-#pin-dots{text-align:center;font-size:24px;letter-spacing:10px;}
+#pin-dots{text-align:center;font-size:24px;letter-spacing:10px;margin-bottom:10px;}
+
+/* ----------------- Bottom Navigation ----------------- */
+#bottom-nav{display:flex;justify-content:space-around;align-items:center;position:fixed;bottom:0;width:100%;padding:10px;background:#fff;box-shadow:0 -2px 10px rgba(0,0,0,0.1);}
+#bottom-nav button{background:none;box-shadow:none;color:#6a5af9;font-size:18px;}
+#nav-crypto img{height:40px;width:40px;}
+@media (max-width:480px){section{margin:20px;padding:15px;width:90%;}input,select,button{font-size:16px;padding:12px;}}
+
 </style>
 </head>
 <body>
 
-<!-- Loading -->
+<!-- ----------------- Loading ----------------- -->
 <div id="loading-screen" class="hidden"><div class="loader"></div><p>Processing...</p></div>
 
-<!-- Signup -->
+<!-- ----------------- Signup ----------------- -->
 <section id="signup-section" class="hidden">
 <h2>Sign Up</h2>
 <input type="email" id="signup-email" placeholder="Email">
 <input type="password" id="signup-password" placeholder="Password">
 <button id="signup-btn">Sign Up</button>
-<p>Already have an account? <button id="go-login">Login</button></p>
+<p style="text-align:center;">Already have an account? <button id="go-login">Login</button></p>
 </section>
 
-<!-- Login -->
+<!-- ----------------- Login ----------------- -->
 <section id="login-section" class="hidden">
 <h2>Login</h2>
 <input type="email" id="login-email" placeholder="Email">
 <input type="password" id="login-password" placeholder="Password">
 <button id="login-btn">Login</button>
-<p>No account? <button id="go-signup">Sign Up</button></p>
+<p style="text-align:center;">No account? <button id="go-signup">Sign Up</button></p>
 </section>
 
-<!-- User Info -->
+<!-- ----------------- User Info ----------------- -->
 <section id="user-info-section" class="hidden">
 <h2>User Info</h2>
 <input type="text" id="first-name" placeholder="First Name">
@@ -70,30 +95,36 @@ input,select{width:100%;padding:10px;margin:5px 0 15px 0;border-radius:10px;bord
 <button id="submit-user-info">Submit</button>
 </section>
 
-<!-- Dashboard -->
+<!-- ----------------- Dashboard ----------------- -->
 <section id="dashboard-section" class="hidden">
 <h2 id="greeting"></h2>
-<div id="main-balance"><h2 id="main-balance-value">$0.00</h2><p>Main Balance</p></div>
-<p>Checking: $<span id="checking-balance">0.00</span></p>
-<p>Savings: $<span id="savings-balance">0.00</span></p>
+<div id="balances">
+<div class="balance-card"><h3>Main Balance</h3><p>$<span id="main-balance-value">0.00</span></p></div>
+<div class="balance-card"><h3>Checking</h3><p>$<span id="checking-balance">0.00</span></p></div>
+<div class="balance-card"><h3>Savings</h3><p>$<span id="savings-balance">0.00</span></p></div>
+</div>
 <div id="quick-buttons">
 <button data-action="bank-transfer">Bank Transfer</button>
 <button data-action="wire-transfer">Wire Transfer</button>
 <button data-action="pay-bills">Pay Bills</button>
 <button data-action="top-up">Top Up</button>
 <button data-action="crypto">Crypto</button>
+<button data-action="credit-score">Credit Score</button>
+<button data-action="loan">Loan</button>
+<button data-action="cards">Cards</button>
+<button data-action="more">More</button>
 </div>
 <button id="view-transactions">Transaction History</button>
 </section>
 
-<!-- Transactions -->
+<!-- ----------------- Transactions ----------------- -->
 <section id="transactions-section" class="hidden">
 <h2>Transaction History</h2>
 <div id="transaction-list"></div>
 <button onclick="showSection(dashboardSection)">Back to Dashboard</button>
 </section>
 
-<!-- Crypto -->
+<!-- ----------------- Crypto ----------------- -->
 <section id="crypto-section" class="hidden">
 <h2>Crypto</h2>
 <div id="crypto-list" class="crypto-grid"></div>
@@ -114,13 +145,13 @@ input,select{width:100%;padding:10px;margin:5px 0 15px 0;border-radius:10px;bord
 </div>
 </div>
 
-<!-- Receipt -->
+<!-- ----------------- Receipt ----------------- -->
 <section id="receipt-section" class="hidden">
 <div id="receipt-details"></div>
 <button id="back-dashboard">Back to Dashboard</button>
 </section>
 
-<!-- PIN Modal -->
+<!-- ----------------- PIN Modal ----------------- -->
 <div id="pin-modal" class="modal hidden">
 <div class="modal-content">
 <h3>Enter PIN</h3>
@@ -130,8 +161,16 @@ input,select{width:100%;padding:10px;margin:5px 0 15px 0;border-radius:10px;bord
 </div>
 </div>
 
+<!-- ----------------- Bottom Navigation ----------------- -->
+<div id="bottom-nav">
+<button id="nav-dashboard"><i class="fa fa-home"></i><br>Dashboard</button>
+<button id="nav-crypto"><img src="crypto-icon.svg" alt="Crypto"></button>
+<button id="nav-profile"><i class="fa fa-user"></i><br>Profile</button>
+</div>
+
+<!-- =================== JavaScript =================== -->
 <script>
-// ================= Firebase =================
+// ---------------- Firebase ----------------
 const firebaseConfig = {
 apiKey: "AIzaSyAjy5sgZPMFsklKkSOMyC1HCvQ4-qNKP-M",
 authDomain: "fir-bank-c659f.firebaseapp.com",
@@ -142,18 +181,16 @@ appId: "1:847611883266:web:651ecee5dfea8e0f1cdc1b",
 measurementId: "G-QK7R83FC51"
 };
 firebase.initializeApp(firebaseConfig);
-const auth=firebase.auth();
-const db=firebase.firestore();
+const auth = firebase.auth();
+const db = firebase.firestore();
 
-// ================= Helpers =================
-function showSection(section){ document.querySelectorAll('section').forEach(s=>s.classList.add('hidden')); section.classList.remove('hidden'); }
-const loadingScreen=document.getElementById('loading-screen');
-function showLoading(show){ loadingScreen.classList.toggle('hidden',!show); }
-
-// Hide loading immediately on page load
+// ---------------- Helpers ----------------
+function showSection(section){document.querySelectorAll('section').forEach(s=>s.classList.add('hidden'));section.classList.remove('hidden');}
+const loadingScreen = document.getElementById('loading-screen');
+function showLoading(show){loadingScreen.style.display = show?'flex':'none';}
 document.addEventListener("DOMContentLoaded",()=>{ showLoading(false); });
 
-// ================= Sections =================
+// ---------------- Sections ----------------
 const signupSection=document.getElementById('signup-section');
 const loginSection=document.getElementById('login-section');
 const userInfoSection=document.getElementById('user-info-section');
@@ -161,65 +198,54 @@ const dashboardSection=document.getElementById('dashboard-section');
 const transactionsSection=document.getElementById('transactions-section');
 showSection(loginSection);
 
-// Navigation buttons
+// ---------------- Navigation ----------------
 document.getElementById('go-login').onclick=()=>showSection(loginSection);
 document.getElementById('go-signup').onclick=()=>showSection(signupSection);
 
-// ================= Signup/Login =================
+// ---------------- Signup/Login ----------------
 document.getElementById('signup-btn').onclick=async()=>{
   const email=document.getElementById('signup-email').value;
   const pass=document.getElementById('signup-password').value;
-  try{
-    showLoading(true);
-    await auth.createUserWithEmailAndPassword(email,pass);
-    showSection(userInfoSection);
-  }catch(e){ alert(e.message);}
+  if(!email || !pass){alert('Fill all fields');return;}
+  showLoading(true);
+  try{await auth.createUserWithEmailAndPassword(email,pass); showSection(userInfoSection);}catch(e){alert(e.message);}
   showLoading(false);
 };
 document.getElementById('login-btn').onclick=async()=>{
   const email=document.getElementById('login-email').value;
   const pass=document.getElementById('login-password').value;
-  try{
-    showLoading(true);
-    await auth.signInWithEmailAndPassword(email,pass);
-    showSection(dashboardSection);
-    updateBalances();
-  }catch(e){ alert(e.message);}
+  if(!email || !pass){alert('Fill all fields');return;}
+  showLoading(true);
+  try{await auth.signInWithEmailAndPassword(email,pass); showSection(dashboardSection); updateBalances();}catch(e){alert(e.message);}
   showLoading(false);
 };
 
-// ================= Auth State =================
-auth.onAuthStateChanged(user=>{
-  if(user){ showSection(dashboardSection); updateBalances(); }
-  else{ showSection(loginSection); }
-  showLoading(false);
-});
+// ---------------- Auth State ----------------
+auth.onAuthStateChanged(user=>{if(user){showSection(dashboardSection);updateBalances();}else{showSection(loginSection);}showLoading(false);});
 
-// ================= User Info =================
+// ---------------- User Info ----------------
+document.getElementById('country').addEventListener('change',()=>{
+  const states={'USA':['California','New York','Texas'],'Nigeria':['Lagos','Abuja','Kano'],'UK':['England','Scotland','Wales']};
+  const sel=document.getElementById('state'); sel.innerHTML='<option value="">Select State</option>';
+  (states[document.getElementById('country').value]||[]).forEach(s=>{const o=document.createElement('option');o.value=s;o.textContent=s;sel.appendChild(o);});
+});
 document.getElementById('submit-user-info').onclick=async()=>{
   const uid=auth.currentUser.uid;
-  await db.collection('users').doc(uid).set({
-    firstName:document.getElementById('first-name').value,
-    lastName:document.getElementById('last-name').value,
-    phone:document.getElementById('phone').value,
-    age:document.getElementById('age').value,
-    country:document.getElementById('country').value,
-    state:document.getElementById('state').value,
-    address:document.getElementById('address-line').value,
-    checking:0,
-    savings:0,
-    crypto:{},
-    pin:"1234"
-  });
-  showSection(dashboardSection); updateBalances();
+  const f=document.getElementById('first-name').value; const l=document.getElementById('last-name').value;
+  const p=document.getElementById('phone').value; const a=document.getElementById('age').value;
+  const c=document.getElementById('country').value; const s=document.getElementById('state').value;
+  const ad=document.getElementById('address-line').value;
+  if(!f||!l||!p||!a||!c||!s||!ad){alert('Fill all fields'); return;}
+  showLoading(true);
+  await db.collection('users').doc(uid).set({firstName:f,lastName:l,phone:p,age:a,country:c,state:s,address:ad,checking:0,savings:0,crypto:{},pin:"1234"});
+  showLoading(false); showSection(dashboardSection); updateBalances();
 };
 
-// ================= Dashboard Balances =================
+// ---------------- Dashboard Balances ----------------
 const greeting=document.getElementById('greeting');
 const mainBalanceValue=document.getElementById('main-balance-value');
 const checkingBalanceElem=document.getElementById('checking-balance');
 const savingsBalanceElem=document.getElementById('savings-balance');
-
 async function updateBalances(){
   const uid=auth.currentUser.uid;
   const doc=await db.collection('users').doc(uid).get();
@@ -230,8 +256,16 @@ async function updateBalances(){
   greeting.textContent=`Good Morning, ${data.firstName||''}`;
 }
 
-// ================= Crypto + PIN + Transactions =================
-// Merge your previous crypto scripts here with live price, USD/BTC toggle, chart, PIN modal, receipt, pending approvals, notifications.
+// ---------------- Quick Buttons ----------------
+// Placeholder, real functions should handle actual transactions, crypto, etc.
+document.querySelectorAll('#quick-buttons button').forEach(btn=>{
+  btn.addEventListener('click',()=>{alert(`${btn.textContent} clicked!`);});
+});
+
+// ---------------- Bottom Nav ----------------
+document.getElementById('nav-dashboard').onclick=()=>showSection(dashboardSection);
+document.getElementById('nav-crypto').onclick=()=>showSection(cryptoSection);
+document.getElementById('nav-profile').onclick=()=>alert('Profile page placeholder');
 
 </script>
 </body>
