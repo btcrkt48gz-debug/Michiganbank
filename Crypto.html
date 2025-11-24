@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CredCrypt Bank - Crypto Dashboard</title>
+<style>
+:root {--bg:#f0f2f5;--card:#ffffffcc;--text:#111;--accent:#0b74ff;}
+body {margin:0;font-family:Inter,Arial,sans-serif;background:var(--bg);color:var(--text);}
+.container {max-width:900px;margin:20px auto;padding:16px;}
+.card {background:var(--card);padding:16px;border-radius:16px;box-shadow:0 8px 24px rgba(0,0,0,0.08);margin-bottom:16px;cursor:pointer;transition:0.2s;}
+.card:hover{box-shadow:0 12px 30px rgba(0,0,0,0.2);}
+.grid4 {display:grid;grid-template-columns:repeat(4,1fr);gap:16px;}
+.balance {font-size:20px;font-weight:700;margin-bottom:8px;}
+.muted{color:#555;}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyAjy5sgZPMFsklKkSOMyC1HCvQ4-qNKP-M",
+  authDomain: "fir-bank-c659f.firebaseapp.com",
+  projectId: "fir-bank-c659f",
+  storageBucket: "fir-bank-c659f.firebasestorage.app",
+  messagingSenderId: "847611883266",
+  appId: "1:847611883266:web:651ecee5dfea8e0f1cdc1b",
+  measurementId: "G-QK7R83FC51"
+};
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
+let cryptoBalances={};
+let cryptoPrices={BTC:7000000,ETH:450000,USDT:900,BNB:160000}; // initial values
+function fmtAmt(n){return Number(n||0).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});}
+function refreshBalances(){
+  document.getElementById('btcBal').textContent='₦'+fmtAmt(cryptoBalances.BTC||0);
+  document.getElementById('ethBal').textContent='₦'+fmtAmt(cryptoBalances.ETH||0);
+  document.getElementById('usdtBal').textContent='₦'+fmtAmt(cryptoBalances.USDT||0);
+  document.getElementById('bnbBal').textContent='₦'+fmtAmt(cryptoBalances.BNB||0);
+}
+function updatePrices(){ // Simulate live price changes
+  for(let c in cryptoPrices){cryptoPrices[c]+=(Math.random()-0.5)*1000;}
+}
+setInterval(updatePrices,3000);
+setInterval(refreshBalances,1000);
+</script>
+</head>
+<body>
+<div class="container">
+  <h2>Crypto Dashboard</h2>
+  <div class="grid4">
+    <div class="card" onclick="location.href='crypto-detail.html?coin=BTC'">
+      <div>Bitcoin (BTC)</div>
+      <div class="balance" id="btcBal">₦0.00</div>
+      <div class="muted">Live: ₦<span id="btcPrice">0</span></div>
+    </div>
+    <div class="card" onclick="location.href='crypto-detail.html?coin=ETH'">
+      <div>Ethereum (ETH)</div>
+      <div class="balance" id="ethBal">₦0.00</div>
+      <div class="muted">Live: ₦<span id="ethPrice">0</span></div>
+    </div>
+    <div class="card" onclick="location.href='crypto-detail.html?coin=USDT'">
+      <div>Tether (USDT)</div>
+      <div class="balance" id="usdtBal">₦0.00</div>
+      <div class="muted">Live: ₦<span id="usdtPrice">0</span></div>
+    </div>
+    <div class="card" onclick="location.href='crypto-detail.html?coin=BNB'">
+      <div>Binance Coin (BNB)</div>
+      <div class="balance" id="bnbBal">₦0.00</div>
+      <div class="muted">Live: ₦<span id="bnbPrice">0</span></div>
+    </div>
+  </div>
+</div>
+
+<script>
+auth.onAuthStateChanged(user=>{
+  if(!user) return window.location.href='index.html';
+  db.collection('users').doc(user.uid).onSnapshot(doc=>{
+    if(!doc.exists) return;
+    cryptoBalances=doc.data().cryptoBalances||{BTC:0,ETH:0,USDT:0,BNB:0};
+    refreshBalances();
+  });
+});
+
+function updatePriceElements(){
+  document.getElementById('btcPrice').textContent=fmtAmt(cryptoPrices.BTC);
+  document.getElementById('ethPrice').textContent=fmtAmt(cryptoPrices.ETH);
+  document.getElementById('usdtPrice').textContent=fmtAmt(cryptoPrices.USDT);
+  document.getElementById('bnbPrice').textContent=fmtAmt(cryptoPrices.BNB);
+}
+setInterval(updatePriceElements,1000);
+updatePriceElements();
+</script>
+</body>
+</html>
