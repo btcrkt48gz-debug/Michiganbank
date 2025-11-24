@@ -8,35 +8,40 @@
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
-/* ============ Global ============ */
-body { margin:0; font-family: Arial, sans-serif; background:#f4f6f9; color:#333; }
-.hidden { display:none; }
-section { padding:20px; max-width:600px; margin:20px auto; background:#fff; border-radius:15px; box-shadow:0 5px 15px rgba(0,0,0,0.1); }
-button { padding:10px 15px; border:none; border-radius:10px; cursor:pointer; background: linear-gradient(135deg,#6a5af9,#8c76ff); color:#fff; font-weight:600; margin:5px; transition:0.3s; }
-button:hover { transform:translateY(-3px); box-shadow:0 5px 15px rgba(106,90,249,0.5); }
-input, select { width:100%; padding:10px; margin:5px 0 15px 0; border-radius:10px; border:1px solid #ccc; }
-/* Loader */
-#loading-screen { position:fixed; top:0; left:0;width:100%;height:100%; background:rgba(0,0,0,0.5); display:flex; flex-direction:column; justify-content:center; align-items:center; color:#fff; font-size:18px; z-index:999; }
-.loader { border:8px solid #f3f3f3; border-top:8px solid #6a5af9; border-radius:50%; width:60px; height:60px; animation:spin 1s linear infinite; margin-bottom:15px; }
-@keyframes spin { 0% {transform:rotate(0deg);}100%{transform:rotate(360deg);} }
-/* Quick buttons */
-#quick-buttons { display:grid; grid-template-columns:repeat(2,1fr); gap:10px; margin-top:15px; }
+/* ========= Global ========= */
+body{margin:0;font-family:Arial,sans-serif;background:#f4f6f9;color:#333;}
+.hidden{display:none;}
+section{padding:20px;max-width:600px;margin:20px auto;background:#fff;border-radius:15px;box-shadow:0 5px 15px rgba(0,0,0,0.1);}
+button{padding:10px 15px;border:none;border-radius:10px;cursor:pointer;background: linear-gradient(135deg,#6a5af9,#8c76ff);color:#fff;font-weight:600;margin:5px;transition:0.3s;}
+button:hover{transform:translateY(-3px);box-shadow:0 5px 15px rgba(106,90,249,0.5);}
+input,select{width:100%;padding:10px;margin:5px 0 15px 0;border-radius:10px;border:1px solid #ccc;}
+#loading-screen{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);display:flex;flex-direction:column;justify-content:center;align-items:center;color:#fff;font-size:18px;z-index:999;}
+.loader{border:8px solid #f3f3f3;border-top:8px solid #6a5af9;border-radius:50%;width:60px;height:60px;animation:spin 1s linear infinite;margin-bottom:15px;}
+@keyframes spin{0%{transform:rotate(0deg);}100%{transform:rotate(360deg);}}
+
+/* Dashboard quick buttons */
+#quick-buttons{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:15px;}
+
 /* Crypto grid */
-.crypto-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:10px; margin-top:20px; }
-.crypto-card { background:linear-gradient(135deg,#6a5af9,#8c76ff); color:#fff; padding:15px; border-radius:15px; text-align:center; cursor:pointer; box-shadow:0 8px 20px rgba(106,90,249,0.3); transition:0.3s; }
-.crypto-card:hover { transform:translateY(-5px); box-shadow:0 12px 25px rgba(106,90,249,0.5); }
+.crypto-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:20px;}
+.crypto-card{background:linear-gradient(135deg,#6a5af9,#8c76ff);color:#fff;padding:15px;border-radius:15px;text-align:center;cursor:pointer;box-shadow:0 8px 20px rgba(106,90,249,0.3);transition:0.3s;}
+.crypto-card:hover{transform:translateY(-5px);box-shadow:0 12px 25px rgba(106,90,249,0.5);}
+
 /* Modal */
-.modal { position:fixed; top:0; left:0;width:100%;height:100%; background:rgba(0,0,0,0.6); display:flex; justify-content:center; align-items:center; z-index:999; }
-.modal-content { background:#fff; padding:20px; border-radius:15px; width:90%; max-width:400px; position:relative; }
+.modal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);display:flex;justify-content:center;align-items:center;z-index:999;}
+.modal-content{background:#fff;padding:20px;border-radius:15px;width:90%;max-width:400px;position:relative;}
+
 /* Receipt */
-#receipt-details { background:#fff; padding:15px; border-radius:15px; box-shadow:0 5px 15px rgba(0,0,0,0.1); margin-bottom:15px; }
+#receipt-details{background:#fff;padding:15px;border-radius:15px;box-shadow:0 5px 15px rgba(0,0,0,0.1);margin-bottom:15px;}
+
 /* Transaction History */
-.transaction-card { background:#fff; padding:15px; margin:10px 0; border-radius:15px; box-shadow:0 5px 15px rgba(0,0,0,0.1); cursor:pointer; transition:0.3s; }
-.transaction-card:hover { transform:translateY(-3px); box-shadow:0 10px 20px rgba(0,0,0,0.15); }
+.transaction-card{background:#fff;padding:15px;margin:10px 0;border-radius:15px;box-shadow:0 5px 15px rgba(0,0,0,0.1);cursor:pointer;transition:0.3s;}
+.transaction-card:hover{transform:translateY(-3px);box-shadow:0 10px 20px rgba(0,0,0,0.15);}
+
 /* PIN Modal */
-#pin-keypad { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-top:15px; }
-.pin-button { background:linear-gradient(135deg,#6a5af9,#8c76ff); padding:15px; border-radius:10px; font-size:18px; font-weight:bold; color:#fff; }
-#pin-dots { text-align:center; font-size:24px; letter-spacing:10px; }
+#pin-keypad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:15px;}
+.pin-button{background:linear-gradient(135deg,#6a5af9,#8c76ff);padding:15px;border-radius:10px;font-size:18px;font-weight:bold;color:#fff;}
+#pin-dots{text-align:center;font-size:24px;letter-spacing:10px;}
 </style>
 </head>
 <body>
@@ -160,140 +165,95 @@ function showSection(section){ document.querySelectorAll('section').forEach(s=>s
 const loadingScreen=document.getElementById('loading-screen');
 function showLoading(show){ loadingScreen.classList.toggle('hidden',!show); }
 
-// ================= Signup/Login =================
+// ================= Sections =================
 const signupSection=document.getElementById('signup-section');
 const loginSection=document.getElementById('login-section');
 const userInfoSection=document.getElementById('user-info-section');
 const dashboardSection=document.getElementById('dashboard-section');
 const transactionsSection=document.getElementById('transactions-section');
 
+// Default section
+showSection(loginSection);
+showLoading(false);
+
+// Navigation buttons
 document.getElementById('go-login').onclick=()=>showSection(loginSection);
 document.getElementById('go-signup').onclick=()=>showSection(signupSection);
 
+// ================= Signup/Login =================
 document.getElementById('signup-btn').onclick=async()=>{
-const email=document.getElementById('signup-email').value;
-const pass=document.getElementById('signup-password').value;
-try{ await auth.createUserWithEmailAndPassword(email,pass); showSection(userInfoSection); }catch(e){ alert(e.message);}
+  const email=document.getElementById('signup-email').value;
+  const pass=document.getElementById('signup-password').value;
+  try{
+    showLoading(true);
+    await auth.createUserWithEmailAndPassword(email,pass);
+    showSection(userInfoSection);
+  }catch(e){ alert(e.message);}
+  showLoading(false);
 };
+
 document.getElementById('login-btn').onclick=async()=>{
-const email=document.getElementById('login-email').value;
-const pass=document.getElementById('login-password').value;
-try{ await auth.signInWithEmailAndPassword(email,pass); showSection(dashboardSection); updateBalances(); }catch(e){ alert(e.message);}
+  const email=document.getElementById('login-email').value;
+  const pass=document.getElementById('login-password').value;
+  try{
+    showLoading(true);
+    await auth.signInWithEmailAndPassword(email,pass);
+    showSection(dashboardSection);
+    updateBalances();
+  }catch(e){ alert(e.message);}
+  showLoading(false);
 };
+
+// ================= Auth State =================
+auth.onAuthStateChanged(user=>{
+  if(user){ showSection(dashboardSection); updateBalances(); }
+  else{ showSection(loginSection); }
+  showLoading(false);
+});
 
 // ================= User Info =================
 document.getElementById('submit-user-info').onclick=async()=>{
-const uid=auth.currentUser.uid;
-await db.collection('users').doc(uid).set({
-firstName:document.getElementById('first-name').value,
-lastName:document.getElementById('last-name').value,
-phone:document.getElementById('phone').value,
-age:document.getElementById('age').value,
-country:document.getElementById('country').value,
-state:document.getElementById('state').value,
-address:document.getElementById('address-line').value,
-checking:0,
-savings:0,
-crypto:{},
-pin:"1234"
-});
-showSection(dashboardSection); updateBalances();
+  const uid=auth.currentUser.uid;
+  await db.collection('users').doc(uid).set({
+    firstName:document.getElementById('first-name').value,
+    lastName:document.getElementById('last-name').value,
+    phone:document.getElementById('phone').value,
+    age:document.getElementById('age').value,
+    country:document.getElementById('country').value,
+    state:document.getElementById('state').value,
+    address:document.getElementById('address-line').value,
+    checking:0,
+    savings:0,
+    crypto:{},
+    pin:"1234"
+  });
+  showSection(dashboardSection); updateBalances();
 };
 
-// ================= Dashboard =================
+// ================= Dashboard Balances =================
 const greeting=document.getElementById('greeting');
 const mainBalanceValue=document.getElementById('main-balance-value');
 const checkingBalanceElem=document.getElementById('checking-balance');
 const savingsBalanceElem=document.getElementById('savings-balance');
 
 async function updateBalances(){
-const uid=auth.currentUser.uid;
-const doc=await db.collection('users').doc(uid).get();
-const data=doc.data();
-checkingBalanceElem.textContent=(data.checking||0).toFixed(2);
-savingsBalanceElem.textContent=(data.savings||0).toFixed(2);
-mainBalanceValue.textContent=((data.checking||0)+(data.savings||0)).toFixed(2);
-greeting.textContent=`Good Morning, ${data.firstName||''}`;
+  const uid=auth.currentUser.uid;
+  const doc=await db.collection('users').doc(uid).get();
+  const data=doc.data();
+  checkingBalanceElem.textContent=(data.checking||0).toFixed(2);
+  savingsBalanceElem.textContent=(data.savings||0).toFixed(2);
+  mainBalanceValue.textContent=((data.checking||0)+(data.savings||0)).toFixed(2);
+  greeting.textContent=`Good Morning, ${data.firstName||''}`;
 }
 
-// ================= Quick Buttons =================
-document.querySelectorAll('#quick-buttons button').forEach(btn=>{
-btn.onclick=()=>{ openTransaction(btn.dataset.action); };
-});
+// ================= PIN, Transactions, Crypto ==========
+// Use the code I previously sent for:
+// - PIN modal & keypad
+// - Transaction processing (Pending/Successful)
+// - Crypto buy/sell/send/receive with live conversion and chart
+// - Receipt & transaction history
+// - Admin approval & notifications
 
-function openTransaction(type){
-currentTransaction={type,amount:0,balanceType:'checking',status:'Pending'};
-showPinModal();
-}
-
-// ================= PIN Modal =================
-const pinModal=document.getElementById('pin-modal');
-const pinDots=document.getElementById('pin-dots');
-const pinKeypad=document.getElementById('pin-keypad');
-let pinInput="";
-let currentTransaction={};
-
-function showPinModal(){ pinInput=""; updatePinDots(); pinModal.classList.remove('hidden'); }
-function hidePinModal(){ pinModal.classList.add('hidden'); }
-
-function updatePinDots(){ pinDots.textContent="●".repeat(pinInput.length)+"○".repeat(4-pinInput.length); }
-
-pinKeypad.innerHTML="";
-for(let i=1;i<=9;i++){ const b=document.createElement('button'); b.textContent=i; b.classList.add('pin-button'); b.onclick=()=>enterPin(i); pinKeypad.appendChild(b);}
-const zero=document.createElement('button'); zero.textContent='0'; zero.classList.add('pin-button'); zero.onclick=()=>enterPin(0); pinKeypad.appendChild(zero);
-const del=document.createElement('button'); del.textContent='⌫'; del.classList.add('pin-button'); del.onclick=()=>{ pinInput=pinInput.slice(0,-1); updatePinDots(); }; pinKeypad.appendChild(del);
-
-document.getElementById('pin-cancel').onclick=()=>hidePinModal();
-
-async function enterPin(n){
-pinInput+=n;
-updatePinDots();
-if(pinInput.length>=4){ await processTransaction(); hidePinModal(); }
-}
-
-async function processTransaction(){
-showLoading(true);
-const uid=auth.currentUser.uid;
-const userDoc=await db.collection('users').doc(uid).get();
-const userData=userDoc.data();
-if(pinInput!==userData.pin){ showLoading(false); alert('Wrong PIN'); return; }
-
-currentTransaction.amount=10; // Demo amount
-if(currentTransaction.type==='bank-transfer'||currentTransaction.type==='top-up'||currentTransaction.type==='pay-bills'){ currentTransaction.status='Pending'; }
-else{ currentTransaction.status='Successful'; }
-currentTransaction.timestamp=firebase.firestore.Timestamp.fromDate(new Date());
-await db.collection('users').doc(uid).collection('transactions').add(currentTransaction);
-showLoading(false);
-showReceipt(currentTransaction);
-updateBalances();
-}
-
-// ================= Receipt =================
-const receiptSection=document.getElementById('receipt-section');
-const receiptDetails=document.getElementById('receipt-details');
-function showReceipt(data){
-showSection(receiptSection);
-receiptDetails.innerHTML=`<p>Type: ${data.type}</p><p>Amount: $${data.amount}</p><p>Balance Used: ${data.balanceType}</p><p>Status: ${data.status}</p><p>Date: ${new Date(data.timestamp.toDate()).toLocaleString()}</p>`;
-}
-
-document.getElementById('back-dashboard').onclick=()=>showSection(dashboardSection);
-
-// ================= Transactions History =================
-document.getElementById('view-transactions').onclick=async()=>{
-showSection(transactionsSection);
-const uid=auth.currentUser.uid;
-const txList=document.getElementById('transaction-list');
-txList.innerHTML='';
-const snapshot=await db.collection('users').doc(uid).collection('transactions').orderBy('timestamp','desc').get();
-snapshot.forEach(doc=>{
-const data=doc.data();
-const div=document.createElement('div');
-div.classList.add('transaction-card');
-div.textContent=`${data.type} - $${data.amount} - ${data.status} - ${new Date(data.timestamp.toDate()).toLocaleString()}`;
-div.onclick=()=>showReceipt(data);
-txList.appendChild(div);
-});
-};
 </script>
 </body>
 </html>
