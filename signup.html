@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CredCrypt Bank - Sign Up</title>
+<style>
+:root {--bg:#f0f2f5;--card:#ffffffcc;--text:#111;--accent:#0b74ff;}
+body {margin:0;font-family:Inter,Arial,sans-serif;background:var(--bg);color:var(--text);}
+.container {max-width:500px;margin:40px auto;padding:16px;}
+.card {background:#fff;padding:20px;border-radius:16px;box-shadow:0 8px 24px rgba(0,0,0,0.1);margin-bottom:16px;}
+.input, select {width:100%;padding:12px;margin-bottom:12px;border-radius:12px;border:1px solid #ccc;}
+.btn {background:var(--accent);color:#fff;border:none;padding:12px 16px;border-radius:12px;cursor:pointer;font-weight:600;width:100%;}
+</style>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyAjy5sgZPMFsklKkSOMyC1HCvQ4-qNKP-M",
+  authDomain: "fir-bank-c659f.firebaseapp.com",
+  projectId: "fir-bank-c659f",
+  storageBucket: "fir-bank-c659f.firebasestorage.app",
+  messagingSenderId: "847611883266",
+  appId: "1:847611883266:web:651ecee5dfea8e0f1cdc1b",
+  measurementId: "G-QK7R83FC51"
+};
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
+</script>
+</head>
+<body>
+<div class="container">
+  <div class="card">
+    <h2>Sign Up</h2>
+    <input id="email" type="email" class="input" placeholder="Email">
+    <input id="password" type="password" class="input" placeholder="Password">
+    <button id="signupBtn" class="btn">Sign Up</button>
+  </div>
+</div>
+
+<script>
+document.getElementById('signupBtn').addEventListener('click', async ()=>{
+  const email=document.getElementById('email').value;
+  const password=document.getElementById('password').value;
+  if(!email||!password) return alert("Enter email and password");
+  try{
+    const userCred=await auth.createUserWithEmailAndPassword(email,password);
+    await userCred.user.sendEmailVerification();
+    alert("Verification email sent! Please confirm and continue.");
+    window.location.href='user-info.html';
+  }catch(err){alert(err.message);}
+});
+</script>
+</body>
+</html>
