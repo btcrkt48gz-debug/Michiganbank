@@ -874,6 +874,17 @@
 </div>
 
 <script>
+    // Global State
+    let currentUser = null;
+    let userData = null;
+    let cryptoData = { BTC: 45230, ETH: 2850, ADA: 1.45, SOL: 98 };
+    let currentPin = '';
+    let pinBuffer = '';
+    let currentCryptoAction = null;
+    let darkMode = localStorage.getItem('darkMode') === 'true';
+    let auth = null;
+    let db = null;
+
     // Firebase Config
     const firebaseConfig = {
         apiKey: "AIzaSyDl1hgfXs5k_XiGXJh8mN2pQrR_2vZ8K4w",
@@ -884,26 +895,43 @@
         appId: "1:847611883266:web:7f3d2d4e8f9g0h1i2j3k"
     };
 
-    // Initialize Firebase
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
+    // Wait for Firebase to load and initialize
+    function initializeFirebase() {
+        if (typeof firebase === 'undefined') {
+            setTimeout(initializeFirebase, 100);
+            return;
+        }
+        
+        try {
+            if (!firebase.apps.length) {
+                firebase.initializeApp(firebaseConfig);
+            }
+            auth = firebase.auth();
+            db = firebase.firestore();
+            console.log('Firebase initialized successfully');
+            setupAuthListener();
+        } catch (error) {
+            console.error('Firebase init error:', error);
+            setTimeout(initializeFirebase, 100);
+        }
+    }
 
-    // Global State
-    let currentUser = null;
-    let userData = null;
-    let cryptoData = { BTC: 45230, ETH: 2850, ADA: 1.45, SOL: 98 };
-    let currentPin = '';
-    let pinBuffer = '';
-    let currentCryptoAction = null;
-    let darkMode = localStorage.getItem('darkMode') === 'true';
+    // Start Firebase init immediately
+    initializeFirebase();
 
-    // Initialize
+    // Initialize when DOM is ready
     document.addEventListener('DOMContentLoaded', () => {
         if (darkMode) document.body.classList.add('dark-mode');
         initPinGrid();
-        setupAuthListener();
         fetchCryptoPrices();
+        
+        // Ensure Firebase is initialized
+        if (!auth || !db) {
+            console.log('Waiting for Firebase...');
+            setTimeout(() => {
+                if (auth && db) setupAuthListener();
+            }, 500);
+        }
     });
 
     // Auth
@@ -923,6 +951,12 @@
 
     async function handleLogin(e) {
         e.preventDefault();
+        
+        if (!auth || !db) {
+            alert('Firebase is initializing... Please wait and try again.');
+            return;
+        }
+        
         const email = document.getElementById('loginEmail').value;
         const password = document.getElementById('loginPassword').value;
         const errorDiv = document.getElementById('loginError');
@@ -938,6 +972,12 @@
 
     async function handleSignup(e) {
         e.preventDefault();
+        
+        if (!auth || !db) {
+            alert('Firebase is initializing... Please wait and try again.');
+            return;
+        }
+        
         const firstName = document.getElementById('firstName').value;
         const lastName = document.getElementById('lastName').value;
         const email = document.getElementById('signupEmail').value;
