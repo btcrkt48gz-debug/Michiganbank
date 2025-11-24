@@ -901,7 +901,7 @@
             setTimeout(initializeFirebase, 100);
             return;
         }
-        
+
         try {
             if (!firebase.apps.length) {
                 firebase.initializeApp(firebaseConfig);
@@ -924,7 +924,7 @@
         if (darkMode) document.body.classList.add('dark-mode');
         initPinGrid();
         fetchCryptoPrices();
-        
+
         // Ensure Firebase is initialized
         if (!auth || !db) {
             console.log('Waiting for Firebase...');
@@ -951,12 +951,12 @@
 
     async function handleLogin(e) {
         e.preventDefault();
-        
+
         if (!auth || !db) {
             alert('Firebase is initializing... Please wait and try again.');
             return;
         }
-        
+
         const email = document.getElementById('loginEmail').value;
         const password = document.getElementById('loginPassword').value;
         const errorDiv = document.getElementById('loginError');
@@ -972,12 +972,12 @@
 
     async function handleSignup(e) {
         e.preventDefault();
-        
+
         if (!auth || !db) {
             alert('Firebase is initializing... Please wait and try again.');
             return;
         }
-        
+
         const firstName = document.getElementById('firstName').value;
         const lastName = document.getElementById('lastName').value;
         const email = document.getElementById('signupEmail').value;
@@ -995,7 +995,7 @@
         try {
             errorDiv.classList.add('hidden');
             const result = await auth.createUserWithEmailAndPassword(email, password);
-            
+
             // Create user profile
             await db.collection('users').doc(result.user.uid).set({
                 firstName,
@@ -1023,7 +1023,7 @@
     // Load User Data
     async function loadUserData() {
         if (!currentUser) return;
-        
+
         const doc = await db.collection('users').doc(currentUser.uid).get();
         if (doc.exists) {
             userData = doc.data();
@@ -1033,11 +1033,11 @@
 
     function updateUI() {
         if (!userData) return;
-        
+
         document.getElementById('totalBalance').textContent = `$${userData.mainBalance.toFixed(2)}`;
         document.getElementById('checkingBalance').textContent = `$${userData.checking.toFixed(2)}`;
         document.getElementById('savingsBalance').textContent = `$${userData.savings.toFixed(2)}`;
-        
+
         updateTransactionsList();
         updateCryptoList();
     }
@@ -1055,7 +1055,7 @@
                 </div>
             </div>
         `).join('') : '<div style="padding: 20px; text-align: center; color: #888;">No transactions</div>';
-        
+
         document.getElementById('recentTransactions').innerHTML = html;
         document.getElementById('allTransactions').innerHTML = html;
     }
@@ -1082,11 +1082,11 @@
     async function handleTopUp(e) {
         e.preventDefault();
         const amount = parseFloat(document.getElementById('topupAmount').value);
-        
+
         try {
             const newBalance = userData.mainBalance + amount;
             const newChecking = userData.checking + amount;
-            
+
             await db.collection('users').doc(currentUser.uid).update({
                 mainBalance: newBalance,
                 checking: newChecking,
@@ -1098,7 +1098,7 @@
                     status: 'completed'
                 })
             });
-            
+
             await loadUserData();
             closeModal('topup');
             document.getElementById('topupAmount').value = '';
@@ -1114,13 +1114,13 @@
         const to = document.getElementById('transferTo').value;
         const amount = parseFloat(document.getElementById('transferAmount').value);
         const errorDiv = document.getElementById('transferError');
-        
+
         try {
             const fromBalance = userData[from];
             if (fromBalance < amount) {
                 throw new Error(`Insufficient ${from} balance`);
             }
-            
+
             const updates = {
                 [from]: userData[from] - amount,
                 [to]: userData[to] + amount,
@@ -1135,7 +1135,7 @@
                     status: 'completed'
                 })
             };
-            
+
             await db.collection('users').doc(currentUser.uid).update(updates);
             await loadUserData();
             closeModal('transfer');
@@ -1151,13 +1151,13 @@
         currentCryptoAction = { symbol, name, price, type: 'buy' };
         document.getElementById('buyCryptoTitle').textContent = `Buy ${name}`;
         document.getElementById('cryptoPriceLabel').textContent = `Price: $${price.toFixed(2)} per ${symbol}`;
-        
+
         document.getElementById('cryptoAmount').oninput = () => {
             const usd = parseFloat(document.getElementById('cryptoAmount').value) || 0;
             const crypto = usd / price;
             document.getElementById('cryptoCalculation').textContent = `${crypto.toFixed(8)} ${symbol} for $${usd.toFixed(2)}`;
         };
-        
+
         showModal('buyCrypto');
     }
 
@@ -1223,7 +1223,7 @@
             btn.onclick = () => addPin(i);
             grid.appendChild(btn);
         }
-        
+
         const clearBtn = document.createElement('button');
         clearBtn.className = 'pin-btn';
         clearBtn.textContent = 'Clear';
@@ -1279,7 +1279,7 @@
     function switchTab(tab) {
         document.querySelectorAll('[id$="Tab"]').forEach(el => el.classList.add('hidden'));
         document.getElementById(tab + 'Tab').classList.remove('hidden');
-        
+
         document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
         event.target.classList.add('active');
     }
