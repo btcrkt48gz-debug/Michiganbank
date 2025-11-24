@@ -117,7 +117,60 @@ h2{text-align:center;margin-bottom:20px;}
 <button data-action="more">More</button>
 </div>
 <button id="view-transactions">Transaction History</button>
+
+<!-- Crypto Section -->
+<div id="crypto-section" class="hidden">
+<h2>Crypto</h2>
+<div class="crypto-grid" id="crypto-grid"></div>
+<div id="crypto-detail-modal" class="modal hidden">
+  <div class="modal-content">
+    <h3 id="crypto-name"></h3>
+    <canvas id="crypto-chart" height="150"></canvas>
+    <input type="number" id="crypto-amount" placeholder="Amount to buy/sell">
+    <select id="crypto-action">
+      <option value="buy">Buy</option>
+      <option value="sell">Sell</option>
+      <option value="send">Send</option>
+      <option value="receive">Receive</option>
+    </select>
+    <p>Converted: $<span id="crypto-converted">0.00</span></p>
+    <button id="crypto-confirm-btn">Confirm</button>
+    <button id="crypto-close-btn">Close</button>
+  </div>
+</div>
+</div>
 </section>
+
+<!-- PIN Modal -->
+<div id="pin-modal" class="modal hidden">
+  <div class="modal-content">
+    <h3>Enter Transaction PIN</h3>
+    <div id="pin-dots">••••</div>
+    <div id="pin-keypad">
+      <button class="pin-button">1</button>
+      <button class="pin-button">2</button>
+      <button class="pin-button">3</button>
+      <button class="pin-button">4</button>
+      <button class="pin-button">5</button>
+      <button class="pin-button">6</button>
+      <button class="pin-button">7</button>
+      <button class="pin-button">8</button>
+      <button class="pin-button">9</button>
+      <button class="pin-button">0</button>
+      <button class="pin-button" id="pin-clear">Clear</button>
+    </div>
+    <button id="pin-submit">Submit</button>
+  </div>
+</div>
+
+<!-- Receipt Modal -->
+<div id="receipt-modal" class="modal hidden">
+  <div class="modal-content">
+    <h3>Transaction Receipt</h3>
+    <div id="receipt-details"></div>
+    <button id="receipt-close-btn">Back to Dashboard</button>
+  </div>
+</div>
 
 <!-- Bottom Navigation -->
 <div id="bottom-nav">
@@ -146,7 +199,7 @@ function showSection(section){document.querySelectorAll('section').forEach(s=>s.
 const loadingScreen = document.getElementById('loading-screen');
 function showLoading(show){loadingScreen.style.display = show?'flex':'none';}
 
-// ---------------- Sections ----------------
+// Sections
 const signupSection=document.getElementById('signup-section');
 const loginSection=document.getElementById('login-section');
 const userInfoSection=document.getElementById('user-info-section');
@@ -211,19 +264,147 @@ async function updateBalances(){
   const data=doc.data();
   checkingBalanceElem.textContent=(data.checking||0).toFixed(2);
   savingsBalanceElem.textContent=(data.savings||0).toFixed(2);
-  mainBalanceValue.textContent=((data.checking||0)+(data.savings||0)).toFixed(2);
+  const cryptoTotal = Object.values(data.crypto||{}).reduce((a,b)=>a+b,0);
+  mainBalanceValue.textContent=((data.checking||0)+(data.savings||0)+cryptoTotal).toFixed(2);
   greeting.textContent=`Good Morning, ${data.firstName||''}`;
 }
 
-// Quick Buttons Placeholder
+// ---------------- Quick Buttons ----------------
 document.querySelectorAll('#quick-buttons button').forEach(btn=>{
-  btn.addEventListener('click',()=>{alert(`${btn.textContent} clicked! (Will implement transaction modal)`);});
+  btn.addEventListener('click',()=>{
+    const action = btn.getAttribute('data-action');
+    const transaction = {
+      action: action,
+      amount: Math.floor(Math.random()*1000)+1,
+      fee: 2,
+      type: action==='crypto' || action==='top-up' ? 'internal' : 'external'
+    };
+    openPinModal(transaction);
+  });
 });
 
-// Bottom Nav
+// ---------------- Bottom Nav ----------------
 document.getElementById('nav-dashboard').onclick=()=>showSection(dashboardSection);
-document.getElementById('nav-crypto').onclick=()=>alert('Crypto section placeholder');
+document.getElementById('nav-crypto').onclick=()=>{showSection(dashboardSection); document.getElementById('crypto-section').classList.remove('hidden');};
 document.getElementById('nav-profile').onclick=()=>alert('Profile page placeholder');
+
+// ---------------- Crypto Live ----------------
+const cryptoGrid = document.getElementById('crypto-grid');
+const cryptoModal = document.getElementById('crypto-detail-modal');
+const cryptoNameElem = document.getElementById('crypto-name');
+const cryptoChartElem = document.getElementById('crypto-chart').getContext('2d');
+const cryptoAmountInput = document.getElementById('crypto-amount');
+const cryptoActionSelect = document.getElementById('crypto-action');
+const cryptoConverted = document.getElementById('crypto-converted');
+const cryptoConfirmBtn = document.getElementById('crypto-confirm-btn');
+const cryptoCloseBtn = document.getElementById('crypto-close-btn');
+let cryptoData = {};
+let selectedCrypto = '';
+let chartInstance;
+const coins = ['bitcoin','ethereum','litecoin','ripple'];
+async function fetchCryptoPrices(){
+  const res = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${coins.join(',')}&vs_currencies=usd`);
+  cryptoData = await res.json();
+  cryptoGrid.innerHTML='';
+  coins.forEach(c=>{
+    const card = document.createElement('div');
+    card.className='crypto-card';
+    card.innerHTML=`<h4>${c.toUpperCase()}</h4><p>$${cryptoData[c].usd}</p>`;
+    card.onclick=()=>openCryptoDetail(c);
+    cryptoGrid.appendChild(card);
+  });
+}
+async function openCryptoDetail(c){
+  selectedCrypto=c;
+  cryptoNameElem.textContent=c.toUpperCase();
+  cryptoAmountInput.value='';
+  cryptoConverted.textContent='0.00';
+  cryptoModal.classList.remove('hidden');
+  const chartRes = await fetch(`https://api.coingecko.com/api/v3/coins/${c}/market_chart?vs_currency=usd&days=30`);
+  const chartData = await chartRes.json();
+  const labels = chartData.prices.map(p=>new Date(p[0]).toLocaleDateString());
+  const data = chartData.prices.map(p=>p[1]);
+  if(chartInstance) chartInstance.destroy();
+  chartInstance = new Chart(cryptoChartElem,{type:'line',data:{labels, datasets:[{label:c.toUpperCase(),data, borderColor:'#6a5af9',fill:false}]}});
+}
+cryptoAmountInput.addEventListener('input',()=>{
+  const val=parseFloat(cryptoAmountInput.value)||0;
+  cryptoConverted.textContent=(val*cryptoData[selectedCrypto].usd).toFixed(2);
+});
+cryptoCloseBtn.onclick=()=>cryptoModal.classList.add('hidden');
+cryptoConfirmBtn.onclick=()=>{const transaction={action:'crypto',crypto:selectedCrypto,amount:parseFloat(cryptoAmountInput.value),type:'internal'}; openPinModal(transaction); cryptoModal.classList.add('hidden');};
+fetchCryptoPrices();
+
+// ---------------- PIN Modal ----------------
+let currentTransaction = null;
+let enteredPin = '';
+const pinModal = document.getElementById('pin-modal');
+const pinDots = document.getElementById('pin-dots');
+document.querySelectorAll('.pin-button').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    if(btn.id==='pin-clear'){enteredPin='';updatePinDots();return;}
+    if(enteredPin.length<4){enteredPin+=btn.textContent;updatePinDots();}
+  });
+});
+function updatePinDots(){pinDots.textContent=enteredPin.split('').map(()=> '•').concat('••••'.slice(enteredPin.length)).join('');}
+function openPinModal(txn){currentTransaction=txn;enteredPin='';updatePinDots();pinModal.classList.remove('hidden');}
+document.getElementById('pin-submit').onclick=async()=>{
+  const uid = auth.currentUser.uid;
+  const userDoc = await db.collection('users').doc(uid).get();
+  const correctPin = userDoc.data().pin || "1234";
+  if(enteredPin!==correctPin){alert('Incorrect PIN');enteredPin='';updatePinDots();return;}
+  pinModal.classList.add('hidden');
+  showLoading(true);
+  setTimeout(async()=>{
+    showLoading(false);
+    const status = currentTransaction.type==='internal'?'Success':'Pending';
+    const txnRef = await db.collection('users').doc(uid).collection('transactions').add({...currentTransaction,status,timestamp:new Date()});
+    if(status==='Success'){
+      const userData = userDoc.data();
+      if(currentTransaction.action==='crypto'){
+        userData.crypto = userData.crypto || {};
+        userData.crypto[currentTransaction.crypto] = (userData.crypto[currentTransaction.crypto]||0) + parseFloat(currentTransaction.amount);
+      } else if(currentTransaction.action==='top-up'){
+        userData.checking = (userData.checking||0) + parseFloat(currentTransaction.amount);
+      }
+      await db.collection('users').doc(uid).update(userData);
+      updateBalances();
+    }
+    showReceipt({...currentTransaction,status,timestamp:new Date()});
+  },2000);
+};
+
+// ---------------- Receipt ----------------
+const receiptModal=document.getElementById('receipt-modal');
+const receiptDetailsElem=document.getElementById('receipt-details');
+const receiptCloseBtn=document.getElementById('receipt-close-btn');
+function showReceipt(txn){
+  let html=`<p><strong>Transaction Type:</strong> ${txn.action}</p>
+  <p><strong>Amount:</strong> $${txn.amount}</p>
+  ${txn.fee?`<p><strong>Fee:</strong> $${txn.fee}</p>`:''}
+  ${txn.crypto?`<p><strong>Crypto:</strong> ${txn.crypto.toUpperCase()}</p>`:''}
+  <p><strong>Status:</strong> ${txn.status}</p>
+  <p><strong>Date:</strong> ${new Date(txn.timestamp.seconds*1000 || txn.timestamp).toLocaleString()}</p>`;
+  receiptDetailsElem.innerHTML=html;
+  receiptModal.classList.remove('hidden');
+}
+receiptCloseBtn.onclick=()=>{receiptModal.classList.add('hidden');updateBalances();};
+
+// ---------------- Notifications ----------------
+auth.onAuthStateChanged(user=>{
+  if(!user) return;
+  const uid=user.uid;
+  db.collection('users').doc(uid).collection('transactions').onSnapshot(snapshot=>{
+    snapshot.docChanges().forEach(change=>{
+      if(change.type==='added'){
+        const data=change.doc.data();
+        if(data.status==='Pending') alert(`New transaction pending: ${data.action} $${data.amount}`);
+        else if(data.status==='Success') alert(`Transaction successful: ${data.action} $${data.amount}`);
+      }
+    });
+  });
+});
 </script>
+
 </body>
 </html>
