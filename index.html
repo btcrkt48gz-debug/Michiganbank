@@ -1,145 +1,1142 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Financial App - Complete Code Documentation</title>
-<style>
-body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    max-width: 1400px;
-    margin: auto;
-    padding: 20px;
-    background: #f5f5f5;
-    line-height: 1.6;
-}
-h1 { color: #1E3A8A; border-bottom: 3px solid #3B82F6; padding-bottom: 10px; }
-h2 { color: #3B82F6; margin-top: 30px; background: #EFF6FF; padding: 10px 15px; border-left: 4px solid #1E3A8A; }
-h3 { color: #1E3A8A; margin-top: 20px; }
-.file-section { background: white; border: 1px solid #ddd; border-radius: 8px; margin: 20px 0; overflow: hidden; }
-.file-header { background: #1E3A8A; color: white; padding: 12px 20px; font-weight: bold; font-size: 16px; font-family: monospace; }
-.file-path { background: #3B82F6; padding: 8px; font-family: 'Courier New', Courier, monospace; font-size: 14px; color: white; margin: 0; }
-pre { padding: 20px; background: #d4d4d4; overflow-x: auto; font-family: 'Courier New', monospace; font-size: 13px; line-height: 1.5; }
-.summary { background: #DCFCE7; border: 2px solid #10B981; border-radius: 8px; padding: 20px; margin: 20px 0; }
-.summary h3 { color: #047857; margin-top: 0; }
-.fix-list { background: #FEF3C7; border-left: 4px solid #F59E0B; padding: 15px 20px; margin: 15px 0; }
-.toc { background: white; border: 2px solid #3B82F6; border-radius: 8px; padding: 20px; }
-.toc h2 { margin-top: 0; }
-.toc ul { list-style: none; padding-left: 0; }
-.toc a { color: #1E3A8A; text-decoration: none; }
-.toc a:hover { text-decoration: underline; }
-footer { text-align: center; padding: 40px 0; color: #666; border-top: 2px solid #ddd; margin-top: 50px; }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OlaCreditUnion - Professional Banking</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #3b82f6;
+            --primary-dark: #1e40af;
+            --secondary: #10b981;
+            --destructive: #ef4444;
+            --muted: #f3f4f6;
+            --muted-dark: #1f2937;
+            --text: #111827;
+            --text-light: #6b7280;
+            --bg: #ffffff;
+            --border: #e5e7eb;
+        }
+
+        [data-theme="dark"] {
+            --primary: #60a5fa;
+            --text: #f9fafb;
+            --text-light: #d1d5db;
+            --bg: #111827;
+            --muted: #1f2937;
+            --muted-dark: #f3f4f6;
+            --border: #374151;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+
+        /* Auth Page */
+        .auth-container {
+            display: none;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            padding: 1rem;
+        }
+
+        .auth-container.active {
+            display: flex;
+        }
+
+        .auth-card {
+            background: var(--bg);
+            border-radius: 0.75rem;
+            padding: 2rem;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 20px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .auth-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .logo {
+            width: 50px;
+            height: 50px;
+            background: rgba(59, 130, 246, 0.1);
+            border-radius: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            font-size: 1.5rem;
+        }
+
+        .auth-header h1 {
+            font-size: 1.875rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .auth-header p {
+            color: var(--text-light);
+            font-size: 0.875rem;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .tab {
+            flex: 1;
+            padding: 0.75rem;
+            background: none;
+            border: none;
+            border-bottom: 2px solid transparent;
+            cursor: pointer;
+            font-weight: 500;
+            color: var(--text-light);
+            transition: all 0.3s;
+        }
+
+        .tab.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            font-size: 0.875rem;
+        }
+
+        input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: 0.375rem;
+            font-size: 1rem;
+            background: var(--bg);
+            color: var(--text);
+            transition: border-color 0.3s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        button {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 0.375rem;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            width: 100%;
+            background: var(--primary);
+            color: white;
+            margin-top: 0.5rem;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 6px rgba(59, 130, 246, 0.3);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .helper-text {
+            font-size: 0.75rem;
+            color: var(--text-light);
+            margin-top: 0.5rem;
+            text-align: center;
+        }
+
+        .error {
+            color: var(--destructive);
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 1rem;
+            right: 1rem;
+            background: var(--muted);
+            padding: 1rem;
+            border-radius: 0.375rem;
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .toast.success {
+            border-left: 4px solid var(--secondary);
+        }
+
+        .toast.error {
+            border-left: 4px solid var(--destructive);
+        }
+
+        /* Dashboard */
+        .dashboard {
+            display: none;
+        }
+
+        .dashboard.active {
+            display: block;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .header-title {
+            font-size: 1.875rem;
+            font-weight: 700;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .btn-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 0.375rem;
+            background: var(--muted);
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.3s;
+        }
+
+        .btn-icon:hover {
+            background: var(--border);
+        }
+
+        .card {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .card-gradient {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            color: white;
+            border: none;
+        }
+
+        .card-title {
+            font-size: 0.875rem;
+            opacity: 0.9;
+            margin-bottom: 0.5rem;
+        }
+
+        .card-value {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .card-meta {
+            font-size: 0.875rem;
+            opacity: 0.85;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .action-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 1rem;
+            background: var(--muted);
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.875rem;
+        }
+
+        .action-btn:hover {
+            background: var(--border);
+            transform: translateY(-2px);
+        }
+
+        .transactions-list {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 0.75rem;
+            overflow: hidden;
+        }
+
+        .transaction {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            border-bottom: 1px solid var(--border);
+            transition: background 0.3s;
+        }
+
+        .transaction:last-child {
+            border-bottom: none;
+        }
+
+        .transaction:hover {
+            background: var(--muted);
+        }
+
+        .transaction-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--muted);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+
+        .transaction-info {
+            flex: 1;
+        }
+
+        .transaction-title {
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+        }
+
+        .transaction-date {
+            font-size: 0.75rem;
+            color: var(--text-light);
+        }
+
+        .transaction-amount {
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .amount-negative {
+            color: var(--destructive);
+        }
+
+        .amount-positive {
+            color: var(--secondary);
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--bg);
+            border-radius: 0.75rem;
+            padding: 2rem;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+        }
+
+        .modal-header {
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+
+        .modal-description {
+            color: var(--text-light);
+            font-size: 0.875rem;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: var(--muted);
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 0.25rem;
+            cursor: pointer;
+            font-size: 1.25rem;
+        }
+
+        .select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: 0.375rem;
+            font-size: 1rem;
+            background: var(--bg);
+            color: var(--text);
+            cursor: pointer;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            background: var(--muted);
+            border-radius: 0.25rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .badge-success {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--secondary);
+        }
+
+        .badge-destructive {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--destructive);
+        }
+
+        @media (max-width: 640px) {
+            .header {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            .quick-actions {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
 </head>
 <body>
+    <!-- Auth Page -->
+    <div id="authPage" class="auth-container active">
+        <div class="auth-card">
+            <div class="auth-header">
+                <div class="logo">🏦</div>
+                <h1>OlaCreditUnion</h1>
+                <p>Your trusted digital banking partner</p>
+            </div>
 
-<h1>Financial App - Complete Fixed Code</h1>
+            <div class="tabs">
+                <button class="tab active" onclick="switchTab('login')">Login</button>
+                <button class="tab" onclick="switchTab('signup')">Sign Up</button>
+            </div>
 
-<div class="summary">
-<h3>All Issues Fixed!</h3>
-<p><strong>Date:</strong> November 23, 2025</p>
-<p>This document contains all the fixed code for the financial application with improvements applied to navigation, state management, screens, and functionality.</p>
-</div>
+            <!-- Login Tab -->
+            <div id="login" class="tab-content active">
+                <form onsubmit="handleLogin(event)">
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" id="loginEmail" placeholder="your@email.com" required>
+                        <div id="loginEmailError" class="error"></div>
+                    </div>
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="password" id="loginPassword" placeholder="••••••••" required>
+                        <div id="loginPasswordError" class="error"></div>
+                    </div>
+                    <button type="submit" class="btn-primary">Log In</button>
+                </form>
+            </div>
 
-<div class="fix-list">
-<h3>Fixes Applied:</h3>
-<ul>
-<li><strong>Transfer Receipt Bug:</strong> Fixed loading screen stuck on "Processing". Shows 2s loading then success.</li>
-<li><strong>Manual Recipient Entry:</strong> Input custom recipient details now works in Transfer Send screen.</li>
-<li><strong>Receive Money Screen:</strong> Dedicated screen showing account details for receiving transfers.</li>
-<li><strong>Removed Receive from Home:</strong> Only Send and Crypto quick actions are available.</li>
-<li><strong>Profile Menu:</strong> All items navigate to functional screens (Personal Info, Security, Notifications, Help Center).</li>
-</ul>
-</div>
+            <!-- Signup Tab -->
+            <div id="signup" class="tab-content">
+                <form onsubmit="handleSignup(event)">
+                    <div class="form-group">
+                        <label>Full Name</label>
+                        <input type="text" id="signupName" placeholder="John Doe" required>
+                        <div id="signupNameError" class="error"></div>
+                    </div>
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" id="signupEmail" placeholder="your@email.com" required>
+                        <div id="signupEmailError" class="error"></div>
+                    </div>
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="password" id="signupPassword" placeholder="••••••••" required>
+                        <div id="signupPasswordError" class="error"></div>
+                    </div>
+                    <div class="form-group">
+                        <label>4-Digit PIN</label>
+                        <input type="password" id="signupPin" placeholder="••••" maxlength="4" required>
+                        <div id="signupPinError" class="error"></div>
+                    </div>
+                    <button type="submit" class="btn-primary">Create Account</button>
+                    <p class="helper-text">Demo accounts start with $1,000 in checking and $500 in savings</p>
+                </form>
+            </div>
+        </div>
+    </div>
 
-<div class="toc">
-<h2>Table of Contents</h2>
-<ul>
-<li><a href="#types">1. Types & Interfaces</a></li>
-<li><a href="#store">2. State Management (Zustand)</a></li>
-<li><a href="#navigation">3. Navigation Setup</a></li>
-<li><a href="#home">4. Home Screen</a></li>
-<li><a href="#transfer">5. Transfer Screens</a></li>
-<li><a href="#crypto">6. Crypto Screens</a></li>
-<li><a href="#activity">7. Activity Screen</a></li>
-<li><a href="#profile">8. Profile Screens</a></li>
-<li><a href="#app">9. App Entry Point</a></li>
-</ul>
-</div>
+    <!-- Dashboard -->
+    <div id="dashboard" class="dashboard">
+        <div class="container">
+            <div class="header">
+                <h1 class="header-title">Welcome back!</h1>
+                <div class="header-actions">
+                    <button class="btn-icon" onclick="toggleTheme()" title="Toggle theme">🌙</button>
+                    <button class="btn-icon" onclick="logout()" title="Logout">🚪</button>
+                </div>
+            </div>
 
-<!-- TYPES -->
-<div id="types" class="file-section">
-<div class="file-header">Types & Interfaces</div>
-<div class="file-path">src/types/index.ts</div>
-<pre><code>/* Full types code from first part */</code></pre>
-</div>
+            <!-- Total Balance Card -->
+            <div class="card card-gradient">
+                <div class="card-title">Total Balance</div>
+                <div class="card-value">$<span id="totalBalance">0.00</span></div>
+                <div class="card-meta">Account: •••• <span id="accountLastFour">0000</span></div>
+            </div>
 
-<!-- STATE MANAGEMENT -->
-<div id="store" class="file-section">
-<div class="file-header">State Management (Zustand)</div>
-<div class="file-path">src/state/appStore.ts</div>
-<pre><code>/* Full Zustand store code from first part */</code></pre>
-</div>
+            <!-- Quick Actions -->
+            <div>
+                <h2 class="section-title">Quick Actions</h2>
+                <div class="quick-actions">
+                    <button class="action-btn" onclick="openModal('transferModal')">
+                        <span>💸</span>
+                        <span>Transfer</span>
+                    </button>
+                    <button class="action-btn" onclick="openModal('topupModal')">
+                        <span>➕</span>
+                        <span>Top Up</span>
+                    </button>
+                    <button class="action-btn" onclick="openModal('withdrawModal')">
+                        <span>➖</span>
+                        <span>Withdraw</span>
+                    </button>
+                    <button class="action-btn" onclick="openModal('sendModal')">
+                        <span>✉️</span>
+                        <span>Send Money</span>
+                    </button>
+                    <button class="action-btn" onclick="openModal('wireModal')">
+                        <span>🌍</span>
+                        <span>Wire Transfer</span>
+                    </button>
+                </div>
+            </div>
 
-<!-- NAVIGATION -->
-<div id="navigation" class="file-section">
-<div class="file-header">Navigation Configuration</div>
-<div class="file-path">src/navigation/RootNavigator.tsx</div>
-<pre><code>/* Full navigation stack + tabs code from both parts */</code></pre>
-</div>
+            <!-- Accounts Grid -->
+            <h2 class="section-title">Accounts</h2>
+            <div class="grid">
+                <div class="card">
+                    <div class="card-title">Checking Account</div>
+                    <div class="card-value">$<span id="checkingBalance">0.00</span></div>
+                </div>
+                <div class="card">
+                    <div class="card-title">Savings Account</div>
+                    <div class="card-value">$<span id="savingsBalance">0.00</span></div>
+                </div>
+                <div class="card">
+                    <div class="card-title">Crypto Holdings</div>
+                    <div class="card-value">$<span id="cryptoHoldings">0.00</span></div>
+                </div>
+            </div>
 
-<!-- HOME SCREEN -->
-<div id="home" class="file-section">
-<div class="file-header">Home Screen (Fixed - Removed Receive Button)</div>
-<div class="file-path">src/screens/HomeScreen.tsx</div>
-<pre><code>/* Full HomeScreen.tsx code from second part */</code></pre>
-</div>
+            <!-- Recent Transactions -->
+            <h2 class="section-title">Recent Transactions</h2>
+            <div class="transactions-list" id="transactionsList">
+                <div class="transaction">
+                    <div class="transaction-icon">⏳</div>
+                    <div class="transaction-info">
+                        <div class="transaction-title">No transactions yet</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-<!-- TRANSFER SEND -->
-<div id="transfer" class="file-section">
-<div class="file-header">Transfer Send Screen (Fixed - Manual Entry Added)</div>
-<div class="file-path">src/screens/TransferSendScreen.tsx</div>
-<pre><code>/* Full TransferSendScreen.tsx code from second part */</code></pre>
-</div>
+    <!-- Modals -->
+    <div id="transferModal" class="modal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('transferModal')">&times;</button>
+            <div class="modal-header">
+                <h2 class="modal-title">Transfer Between Accounts</h2>
+                <p class="modal-description">Move funds between your checking and savings accounts</p>
+            </div>
+            <form onsubmit="handleTransfer(event)">
+                <div class="form-group">
+                    <label>From Account</label>
+                    <select id="transferFrom" class="select" required>
+                        <option value="checking">Checking</option>
+                        <option value="savings">Savings</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>To Account</label>
+                    <select id="transferTo" class="select" required>
+                        <option value="checking">Checking</option>
+                        <option value="savings">Savings</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Amount (USD)</label>
+                    <input type="number" id="transferAmount" step="0.01" placeholder="0.00" required>
+                </div>
+                <div class="form-group">
+                    <label>PIN</label>
+                    <input type="password" id="transferPin" maxlength="4" placeholder="••••" required>
+                </div>
+                <button type="submit" class="btn-primary">Transfer Funds</button>
+            </form>
+        </div>
+    </div>
 
-<!-- CRYPTO SCREENS -->
-<div id="crypto" class="file-section">
-<div class="file-header">Crypto Screens</div>
-<div class="file-path">src/screens/CryptoScreens.tsx</div>
-<pre><code>/* CryptoDetail, CryptoBuy, CryptoSell, CryptoSend, CryptoReceive code from second part */</code></pre>
-</div>
+    <div id="topupModal" class="modal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('topupModal')">&times;</button>
+            <div class="modal-header">
+                <h2 class="modal-title">Top Up Account</h2>
+                <p class="modal-description">Add funds to your account</p>
+            </div>
+            <form onsubmit="handleTopup(event)">
+                <div class="form-group">
+                    <label>Account</label>
+                    <select id="topupAccount" class="select" required>
+                        <option value="checking">Checking</option>
+                        <option value="savings">Savings</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Amount (USD)</label>
+                    <input type="number" id="topupAmount" step="0.01" placeholder="0.00" required>
+                </div>
+                <button type="submit" class="btn-primary">Add Funds</button>
+            </form>
+        </div>
+    </div>
 
-<!-- PROFILE SCREENS -->
-<div id="profile" class="file-section">
-<div class="file-header">Profile Screens</div>
-<div class="file-path">src/screens/ProfileScreens.tsx</div>
-<pre><code>/* PersonalInfo, Security, Notifications, HelpCenter code from second part */</code></pre>
-</div>
+    <div id="withdrawModal" class="modal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('withdrawModal')">&times;</button>
+            <div class="modal-header">
+                <h2 class="modal-title">Withdraw Funds</h2>
+                <p class="modal-description">Withdraw money from your account</p>
+            </div>
+            <form onsubmit="handleWithdraw(event)">
+                <div class="form-group">
+                    <label>Account</label>
+                    <select id="withdrawAccount" class="select" required>
+                        <option value="checking">Checking</option>
+                        <option value="savings">Savings</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Amount (USD)</label>
+                    <input type="number" id="withdrawAmount" step="0.01" placeholder="0.00" required>
+                </div>
+                <div class="form-group">
+                    <label>PIN</label>
+                    <input type="password" id="withdrawPin" maxlength="4" placeholder="••••" required>
+                </div>
+                <button type="submit" class="btn-primary" style="background: var(--destructive);">Withdraw Funds</button>
+            </form>
+        </div>
+    </div>
 
-<!-- SUMMARY -->
-<div class="summary">
-<h3>Ready to Use!</h3>
-<p>All code has been fixed and is fully functional. Features include:</p>
-<ul>
-<li>25+ fully functional screens</li>
-<li>Complete navigation with bottom tabs and stack navigators</li>
-<li>Wire transfer flow with manual entry and saved beneficiaries</li>
-<li>Cryptocurrency trading (buy, sell, send, receive)</li>
-<li>Transaction history with filtering and search</li>
-<li>Profile management with working menu items</li>
-<li>Receive money feature with account details</li>
-<li>Fixed transfer receipt loading screen</li>
-<li>All TypeScript types properly defined</li>
-<li>Persistent state with Zustand + AsyncStorage</li>
-</ul>
-<p>Copy this entire HTML file for reference. All React Native code is now working!</p>
-</div>
+    <div id="sendModal" class="modal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('sendModal')">&times;</button>
+            <div class="modal-header">
+                <h2 class="modal-title">Send Money</h2>
+                <p class="modal-description">Send money to another user via email</p>
+            </div>
+            <form onsubmit="handleSend(event)">
+                <div class="form-group">
+                    <label>Recipient Email</label>
+                    <input type="email" id="sendRecipient" placeholder="recipient@email.com" required>
+                </div>
+                <div class="form-group">
+                    <label>Amount (USD)</label>
+                    <input type="number" id="sendAmount" step="0.01" placeholder="0.00" required>
+                </div>
+                <div class="form-group">
+                    <label>PIN</label>
+                    <input type="password" id="sendPin" maxlength="4" placeholder="••••" required>
+                </div>
+                <button type="submit" class="btn-primary">Send Money</button>
+            </form>
+        </div>
+    </div>
 
-<footer>
-<p><strong>Financial App - Complete Code Documentation</strong></p>
-<p>Built with React Native 0.76.7 + Expo SDK 53 + TypeScript</p>
-<p>© 2025 - All fixes applied and tested</p>
-</footer>
+    <div id="wireModal" class="modal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('wireModal')">&times;</button>
+            <div class="modal-header">
+                <h2 class="modal-title">Wire Transfer</h2>
+                <p class="modal-description">Send an international wire transfer</p>
+            </div>
+            <form onsubmit="handleWire(event)">
+                <div class="form-group">
+                    <label>Recipient Name</label>
+                    <input type="text" id="wireRecipient" placeholder="John Doe" required>
+                </div>
+                <div class="form-group">
+                    <label>Country</label>
+                    <input type="text" id="wireCountry" placeholder="United States" required>
+                </div>
+                <div class="form-group">
+                    <label>Amount (USD)</label>
+                    <input type="number" id="wireAmount" step="0.01" placeholder="0.00" required>
+                </div>
+                <div class="form-group">
+                    <label>PIN</label>
+                    <input type="password" id="wirePin" maxlength="4" placeholder="••••" required>
+                </div>
+                <button type="submit" class="btn-primary">Send Wire Transfer</button>
+            </form>
+        </div>
+    </div>
 
+    <script>
+        // Simple in-memory storage (for demo purposes)
+        const STORAGE_KEY = 'banking_app_data';
+        const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
+
+        // Initialize app
+        if (currentUser) {
+            showDashboard();
+        } else {
+            showAuthPage();
+        }
+
+        // Auth Functions
+        function switchTab(tab) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            document.getElementById(tab).classList.add('active');
+        }
+
+        function handleLogin(event) {
+            event.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+
+            // Simple validation - in real app, use Firebase
+            if (email && password) {
+                const user = {
+                    id: Math.random().toString(36).substr(2, 9),
+                    email: email,
+                    name: email.split('@')[0],
+                    checkingBalance: 1000,
+                    savingsBalance: 500,
+                    transactions: []
+                };
+
+                localStorage.setItem('currentUser', JSON.stringify(user));
+                showToast('Welcome back!', 'success');
+                setTimeout(() => showDashboard(), 500);
+            }
+        }
+
+        function handleSignup(event) {
+            event.preventDefault();
+            const name = document.getElementById('signupName').value;
+            const email = document.getElementById('signupEmail').value;
+            const password = document.getElementById('signupPassword').value;
+            const pin = document.getElementById('signupPin').value;
+
+            if (name && email && password && pin && pin.length === 4) {
+                const user = {
+                    id: Math.random().toString(36).substr(2, 9),
+                    email: email,
+                    name: name,
+                    pin: pin,
+                    accountNumber: Math.floor(100000000000 + Math.random() * 900000000000),
+                    checkingBalance: 1000,
+                    savingsBalance: 500,
+                    transactions: []
+                };
+
+                localStorage.setItem('currentUser', JSON.stringify(user));
+                showToast('Account created successfully!', 'success');
+                setTimeout(() => showDashboard(), 500);
+            } else {
+                showToast('Please fill all fields correctly', 'error');
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('currentUser');
+            showToast('Logged out successfully', 'success');
+            setTimeout(() => showAuthPage(), 500);
+        }
+
+        // Dashboard Functions
+        function showDashboard() {
+            document.getElementById('authPage').classList.remove('active');
+            document.getElementById('dashboard').classList.add('active');
+            updateDashboard();
+        }
+
+        function showAuthPage() {
+            document.getElementById('dashboard').classList.remove('active');
+            document.getElementById('authPage').classList.add('active');
+        }
+
+        function updateDashboard() {
+            const user = JSON.parse(localStorage.getItem('currentUser'));
+            if (!user) return;
+
+            const total = user.checkingBalance + user.savingsBalance;
+            document.getElementById('totalBalance').textContent = total.toFixed(2);
+            document.getElementById('checkingBalance').textContent = user.checkingBalance.toFixed(2);
+            document.getElementById('savingsBalance').textContent = user.savingsBalance.toFixed(2);
+            document.getElementById('accountLastFour').textContent = user.accountNumber.toString().slice(-4);
+
+            updateTransactions();
+        }
+
+        function updateTransactions() {
+            const user = JSON.parse(localStorage.getItem('currentUser'));
+            const list = document.getElementById('transactionsList');
+            
+            if (user.transactions && user.transactions.length > 0) {
+                list.innerHTML = user.transactions.slice(0, 5).map(t => `
+                    <div class="transaction">
+                        <div class="transaction-icon">${t.icon}</div>
+                        <div class="transaction-info">
+                            <div class="transaction-title">${t.description}</div>
+                            <div class="transaction-date">${t.date}</div>
+                        </div>
+                        <div class="transaction-amount ${t.amount < 0 ? 'amount-negative' : 'amount-positive'}">
+                            ${t.amount > 0 ? '+' : ''}$${Math.abs(t.amount).toFixed(2)}
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        // Transaction Functions
+        function handleTransfer(event) {
+            event.preventDefault();
+            const user = JSON.parse(localStorage.getItem('currentUser'));
+            const from = document.getElementById('transferFrom').value;
+            const to = document.getElementById('transferTo').value;
+            const amount = parseFloat(document.getElementById('transferAmount').value);
+            const pin = document.getElementById('transferPin').value;
+
+            if (from === to) {
+                showToast('Cannot transfer to the same account', 'error');
+                return;
+            }
+
+            if (user.pin && user.pin !== pin) {
+                showToast('Invalid PIN', 'error');
+                return;
+            }
+
+            const fromBalance = from === 'checking' ? user.checkingBalance : user.savingsBalance;
+            if (fromBalance < amount) {
+                showToast('Insufficient balance', 'error');
+                return;
+            }
+
+            // Process transfer
+            if (from === 'checking') {
+                user.checkingBalance -= amount;
+                user.savingsBalance += amount;
+            } else {
+                user.savingsBalance -= amount;
+                user.checkingBalance += amount;
+            }
+
+            user.transactions.push({
+                icon: '💸',
+                description: `Transfer from ${from} to ${to}`,
+                date: new Date().toLocaleString(),
+                amount: -amount
+            });
+
+            localStorage.setItem('currentUser', JSON.stringify(user));
+            updateDashboard();
+            closeModal('transferModal');
+            showToast('Transfer successful!', 'success');
+            event.target.reset();
+        }
+
+        function handleTopup(event) {
+            event.preventDefault();
+            const user = JSON.parse(localStorage.getItem('currentUser'));
+            const account = document.getElementById('topupAccount').value;
+            const amount = parseFloat(document.getElementById('topupAmount').value);
+
+            if (account === 'checking') {
+                user.checkingBalance += amount;
+            } else {
+                user.savingsBalance += amount;
+            }
+
+            user.transactions.push({
+                icon: '➕',
+                description: `Top up to ${account}`,
+                date: new Date().toLocaleString(),
+                amount: amount
+            });
+
+            localStorage.setItem('currentUser', JSON.stringify(user));
+            updateDashboard();
+            closeModal('topupModal');
+            showToast('Funds added successfully!', 'success');
+            event.target.reset();
+        }
+
+        function handleWithdraw(event) {
+            event.preventDefault();
+            const user = JSON.parse(localStorage.getItem('currentUser'));
+            const account = document.getElementById('withdrawAccount').value;
+            const amount = parseFloat(document.getElementById('withdrawAmount').value);
+            const pin = document.getElementById('withdrawPin').value;
+
+            if (user.pin && user.pin !== pin) {
+                showToast('Invalid PIN', 'error');
+                return;
+            }
+
+            const balance = account === 'checking' ? user.checkingBalance : user.savingsBalance;
+            if (balance < amount) {
+                showToast('Insufficient balance', 'error');
+                return;
+            }
+
+            if (account === 'checking') {
+                user.checkingBalance -= amount;
+            } else {
+                user.savingsBalance -= amount;
+            }
+
+            user.transactions.push({
+                icon: '➖',
+                description: `Withdraw from ${account}`,
+                date: new Date().toLocaleString(),
+                amount: -amount
+            });
+
+            localStorage.setItem('currentUser', JSON.stringify(user));
+            updateDashboard();
+            closeModal('withdrawModal');
+            showToast('Withdrawal successful!', 'success');
+            event.target.reset();
+        }
+
+        function handleSend(event) {
+            event.preventDefault();
+            const user = JSON.parse(localStorage.getItem('currentUser'));
+            const recipient = document.getElementById('sendRecipient').value;
+            const amount = parseFloat(document.getElementById('sendAmount').value);
+            const pin = document.getElementById('sendPin').value;
+
+            if (user.pin && user.pin !== pin) {
+                showToast('Invalid PIN', 'error');
+                return;
+            }
+
+            if (user.checkingBalance < amount) {
+                showToast('Insufficient balance', 'error');
+                return;
+            }
+
+            user.checkingBalance -= amount;
+            user.transactions.push({
+                icon: '✉️',
+                description: `Sent to ${recipient}`,
+                date: new Date().toLocaleString(),
+                amount: -amount
+            });
+
+            localStorage.setItem('currentUser', JSON.stringify(user));
+            updateDashboard();
+            closeModal('sendModal');
+            showToast('Money sent successfully!', 'success');
+            event.target.reset();
+        }
+
+        function handleWire(event) {
+            event.preventDefault();
+            const user = JSON.parse(localStorage.getItem('currentUser'));
+            const recipient = document.getElementById('wireRecipient').value;
+            const country = document.getElementById('wireCountry').value;
+            const amount = parseFloat(document.getElementById('wireAmount').value);
+            const pin = document.getElementById('wirePin').value;
+
+            if (user.pin && user.pin !== pin) {
+                showToast('Invalid PIN', 'error');
+                return;
+            }
+
+            if (user.checkingBalance < amount) {
+                showToast('Insufficient balance', 'error');
+                return;
+            }
+
+            user.checkingBalance -= amount;
+            user.transactions.push({
+                icon: '🌍',
+                description: `Wire to ${recipient} in ${country}`,
+                date: new Date().toLocaleString(),
+                amount: -amount
+            });
+
+            localStorage.setItem('currentUser', JSON.stringify(user));
+            updateDashboard();
+            closeModal('wireModal');
+            showToast('Wire transfer sent successfully!', 'success');
+            event.target.reset();
+        }
+
+        // Modal Functions
+        function openModal(modalId) {
+            document.getElementById(modalId).classList.add('active');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+
+        // Theme Toggle
+        function toggleTheme() {
+            const currentTheme = localStorage.getItem('theme') || 'light';
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            localStorage.setItem('theme', newTheme);
+            document.documentElement.setAttribute('data-theme', newTheme);
+        }
+
+        // Initialize theme
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+
+        // Toast Function
+        function showToast(message, type = 'success') {
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.innerHTML = `<strong>${type === 'success' ? '✓' : '⚠'}</strong> ${message}`;
+            document.body.appendChild(toast);
+
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
+        }
+
+        // Close modal on background click
+        document.querySelectorAll('.modal').forEach(modal => {
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.classList.remove('active');
+                }
+            });
+        });
+    </script>
 </body>
 </html>
