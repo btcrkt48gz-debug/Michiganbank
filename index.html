@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CredCrypt - Digital Banking</title>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js"></script>
     <style>
         * {
             margin: 0;
@@ -11,109 +14,73 @@
             box-sizing: border-box;
         }
 
+        html, body {
+            height: 100%;
+            width: 100%;
+        }
+
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: #333;
-            min-height: 100vh;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+            background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+            color: #1f2937;
+            overflow-x: hidden;
         }
 
         body.dark-mode {
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-            color: #fff;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: #f1f5f9;
         }
 
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
+        .page {
+            display: none;
+            min-height: 100vh;
+            width: 100%;
         }
 
-        /* Header */
-        .header {
+        .page.active {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            padding: 20px;
-            border-radius: 15px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        .header h1 {
-            font-size: 28px;
-            background: linear-gradient(135deg, #fff, #e0e0ff);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .header-actions {
-            display: flex;
-            gap: 15px;
-            align-items: center;
-        }
-
-        button {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
-
-        button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-        }
-
-        button:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        .btn-secondary {
-            background: rgba(255, 255, 255, 0.2);
-            border: 1px solid rgba(255, 255, 255, 0.3);
         }
 
         /* Auth Pages */
-        .auth-container {
+        .auth-page {
             display: flex;
-            justify-content: center;
             align-items: center;
-            min-height: 100vh;
+            justify-content: center;
             padding: 20px;
         }
 
         .auth-box {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
+            background: white;
+            border-radius: 24px;
             padding: 40px;
-            border-radius: 20px;
             width: 100%;
-            max-width: 400px;
+            max-width: 420px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+        }
+
+        body.dark-mode .auth-box {
+            background: #1e293b;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
         }
 
         .auth-box h2 {
-            font-size: 28px;
-            margin-bottom: 10px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
 
         .auth-box p {
-            color: #888;
-            margin-bottom: 30px;
+            color: #6b7280;
+            margin-bottom: 32px;
+            font-size: 14px;
+        }
+
+        body.dark-mode .auth-box p {
+            color: #9ca3af;
         }
 
         .form-group {
@@ -122,259 +89,310 @@
 
         .form-group label {
             display: block;
-            margin-bottom: 8px;
             font-weight: 600;
-            color: #333;
+            font-size: 14px;
+            margin-bottom: 8px;
+            color: #1f2937;
+        }
+
+        body.dark-mode .form-group label {
+            color: #f1f5f9;
         }
 
         .form-group input {
             width: 100%;
-            padding: 12px;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
+            padding: 12px 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
             font-size: 14px;
-            transition: border-color 0.3s ease;
+            transition: all 0.2s;
+            background: #f9fafb;
+        }
+
+        body.dark-mode .form-group input {
+            background: #0f172a;
+            border-color: #334155;
+            color: #f1f5f9;
         }
 
         .form-group input:focus {
             outline: none;
-            border-color: #667eea;
+            border-color: #8b5cf6;
+            background: white;
+        }
+
+        body.dark-mode .form-group input:focus {
+            background: #1e293b;
+        }
+
+        .auth-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            margin-top: 24px;
+            transition: all 0.3s;
+        }
+
+        .auth-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(139, 92, 246, 0.3);
         }
 
         .auth-link {
             text-align: center;
-            margin-top: 20px;
+            margin-top: 16px;
+            font-size: 14px;
+            color: #6b7280;
+        }
+
+        body.dark-mode .auth-link {
+            color: #9ca3af;
         }
 
         .auth-link a {
-            color: #667eea;
+            color: #8b5cf6;
             cursor: pointer;
             text-decoration: none;
             font-weight: 600;
         }
 
         /* Dashboard */
-        .dashboard {
-            display: grid;
-            grid-template-columns: 1fr;
+        .dashboard-page {
+            flex-direction: column;
+        }
+
+        .header {
+            background: white;
+            border-bottom: 1px solid #e5e7eb;
+            padding: 16px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+
+        body.dark-mode .header {
+            background: #1e293b;
+            border-bottom: 1px solid #334155;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .header-btn {
+            background: #f3f4f6;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 13px;
+            transition: all 0.2s;
+            color: #1f2937;
+        }
+
+        body.dark-mode .header-btn {
+            background: #334155;
+            color: #f1f5f9;
+        }
+
+        .header-btn:hover {
+            background: #e5e7eb;
+        }
+
+        body.dark-mode .header-btn:hover {
+            background: #475569;
+        }
+
+        .main-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .content-grid {
+            max-width: 600px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
             gap: 20px;
         }
 
-        .card {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            padding: 25px;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+        .greeting {
+            margin-bottom: 8px;
         }
 
-        body.dark-mode .card {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: #fff;
+        .greeting h2 {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 4px;
         }
 
-        .balance-card {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 30px;
-            border-radius: 15px;
-            margin-bottom: 10px;
-        }
-
-        .balance-card h3 {
+        .greeting p {
             font-size: 14px;
-            opacity: 0.9;
-            margin-bottom: 12px;
-            font-weight: 600;
+            color: #6b7280;
         }
 
-        .balance-card .balance-amount {
-            font-size: 36px;
-            font-weight: bold;
+        body.dark-mode .greeting p {
+            color: #9ca3af;
         }
 
-        .balance-row {
+        /* Account Cards */
+        .account-cards {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            margin-bottom: 30px;
+            gap: 16px;
         }
 
         .account-card {
             background: white;
-            color: #333;
-            padding: 25px;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e5e7eb;
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
         }
 
         body.dark-mode .account-card {
-            background: rgba(255, 255, 255, 0.1);
-            color: #fff;
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: #1e293b;
+            border-color: #334155;
         }
 
-        .account-card h3 {
-            font-size: 14px;
-            opacity: 0.7;
+        .account-card .label {
+            font-size: 13px;
+            color: #6b7280;
+            font-weight: 500;
             margin-bottom: 12px;
-            font-weight: 600;
         }
 
-        .account-card .balance-amount {
-            font-size: 32px;
-            font-weight: bold;
-            margin-bottom: 15px;
+        body.dark-mode .account-card .label {
+            color: #9ca3af;
         }
 
-        /* Quick Actions */
-        .quick-actions {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-            gap: 15px;
-            margin-bottom: 30px;
+        .account-card .amount {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 16px;
         }
 
-        .action-btn {
-            background: rgba(255, 255, 255, 0.9);
-            border: 2px solid #e0e0e0;
-            padding: 20px;
-            border-radius: 12px;
-            cursor: pointer;
-            text-align: center;
-            transition: all 0.3s ease;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .action-btn:hover {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        .account-card button {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%);
             color: white;
-            border-color: #667eea;
-            transform: translateY(-4px);
-        }
-
-        .action-icon {
-            font-size: 24px;
-        }
-
-        .action-label {
-            font-size: 12px;
+            border: none;
+            border-radius: 10px;
             font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
         }
 
-        /* Crypto List */
-        .crypto-list {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        .account-card button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(139, 92, 246, 0.3);
+        }
+
+        /* Total Balance */
+        .total-card {
+            background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%);
+            color: white;
+            border-radius: 20px;
+            padding: 32px;
+        }
+
+        .total-card .label {
+            font-size: 13px;
+            opacity: 0.9;
+            margin-bottom: 8px;
+        }
+
+        .total-card .amount {
+            font-size: 48px;
+            font-weight: 700;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
             gap: 20px;
-            margin-bottom: 30px;
+            border-bottom: 2px solid #e5e7eb;
+            padding: 0;
         }
 
-        .crypto-card {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        body.dark-mode .tabs {
+            border-bottom: 2px solid #334155;
+        }
+
+        .tab {
+            background: none;
+            border: none;
+            padding: 12px 0;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            color: #9ca3af;
+            border-bottom: 3px solid transparent;
+            margin-bottom: -2px;
+            transition: all 0.2s;
+        }
+
+        .tab.active {
+            color: #8b5cf6;
+            border-bottom-color: #8b5cf6;
+        }
+
+        /* Card List */
+        .card-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+        }
+
+        .card {
+            background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%);
             color: white;
             padding: 20px;
             border-radius: 12px;
             cursor: pointer;
-            transition: transform 0.3s ease;
+            transition: all 0.3s;
         }
 
-        .crypto-card:hover {
+        .card:hover {
             transform: scale(1.05);
+            box-shadow: 0 15px 30px rgba(139, 92, 246, 0.3);
         }
 
-        .crypto-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-
-        .crypto-name {
-            font-weight: bold;
+        .card-name {
+            font-weight: 700;
             font-size: 16px;
+            margin-bottom: 12px;
         }
 
-        .crypto-change {
-            font-size: 12px;
-            background: rgba(255, 255, 255, 0.2);
-            padding: 4px 8px;
-            border-radius: 4px;
-        }
-
-        .crypto-price {
+        .card-price {
             font-size: 24px;
-            font-weight: bold;
-            margin-bottom: 10px;
+            font-weight: 700;
+            margin-bottom: 8px;
         }
 
-        .crypto-holding {
+        .card-info {
             font-size: 12px;
             opacity: 0.9;
-        }
-
-        /* Transactions */
-        .transaction-list {
-            max-height: 400px;
-            overflow-y: auto;
-        }
-
-        .transaction-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px;
-            border-bottom: 1px solid #e0e0e0;
-            cursor: pointer;
-            transition: background 0.3s ease;
-        }
-
-        body.dark-mode .transaction-item {
-            border-bottom: 1px solid #333;
-        }
-
-        .transaction-item:hover {
-            background: #f5f5f5;
-        }
-
-        body.dark-mode .transaction-item:hover {
-            background: #333;
-        }
-
-        .transaction-info {
-            flex: 1;
-        }
-
-        .transaction-type {
-            font-weight: 600;
-            margin-bottom: 4px;
-        }
-
-        .transaction-date {
-            font-size: 12px;
-            color: #888;
-        }
-
-        body.dark-mode .transaction-date {
-            color: #aaa;
-        }
-
-        .transaction-amount {
-            font-size: 16px;
-            font-weight: bold;
-        }
-
-        .transaction-amount.negative {
-            color: #e74c3c;
-        }
-
-        .transaction-amount.positive {
-            color: #27ae60;
         }
 
         /* Modal */
@@ -387,8 +405,8 @@
             height: 100%;
             background: rgba(0, 0, 0, 0.5);
             z-index: 1000;
-            justify-content: center;
             align-items: center;
+            justify-content: center;
             padding: 20px;
         }
 
@@ -398,243 +416,238 @@
 
         .modal-content {
             background: white;
-            padding: 40px;
             border-radius: 20px;
+            padding: 32px;
             width: 100%;
             max-width: 500px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-height: 90vh;
+            overflow-y: auto;
             position: relative;
         }
 
         body.dark-mode .modal-content {
-            background: #2a2a3e;
-            color: #fff;
+            background: #1e293b;
         }
 
         .modal-header {
             font-size: 24px;
-            font-weight: bold;
-            margin-bottom: 20px;
+            font-weight: 700;
+            margin-bottom: 24px;
             text-align: center;
         }
 
-        .close-btn {
+        .modal-close {
             position: absolute;
-            top: 10px;
-            right: 10px;
-            background: #e0e0e0;
-            color: #333;
+            top: 16px;
+            right: 16px;
+            background: #f3f4f6;
             border: none;
-            width: 30px;
-            height: 30px;
+            width: 36px;
+            height: 36px;
             border-radius: 50%;
             cursor: pointer;
-            font-size: 18px;
+            font-size: 24px;
+            color: #1f2937;
         }
 
-        body.dark-mode .close-btn {
-            background: #444;
-            color: #fff;
+        body.dark-mode .modal-close {
+            background: #334155;
+            color: #f1f5f9;
         }
 
-        /* PIN Grid */
+        /* Pin Grid */
+        .pin-display {
+            text-align: center;
+            font-size: 32px;
+            letter-spacing: 12px;
+            margin: 24px 0;
+            height: 40px;
+            font-weight: 700;
+        }
+
         .pin-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-            margin: 20px 0;
+            gap: 12px;
+            margin-bottom: 24px;
         }
 
         .pin-btn {
-            padding: 20px;
+            padding: 16px;
             font-size: 18px;
-            font-weight: bold;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-weight: 600;
+            background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%);
             color: white;
             border: none;
             border-radius: 10px;
             cursor: pointer;
+            transition: all 0.2s;
         }
 
         .pin-btn:hover {
-            opacity: 0.9;
+            transform: translateY(-2px);
         }
 
-        .pin-display {
-            text-align: center;
-            font-size: 32px;
-            letter-spacing: 10px;
+        .pin-btn:active {
+            transform: translateY(0);
+        }
+
+        /* Input Fields */
+        .input-group {
             margin-bottom: 20px;
-            height: 40px;
         }
 
-        /* Tabs */
-        .tabs {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-            border-bottom: 2px solid #e0e0e0;
-        }
-
-        body.dark-mode .tabs {
-            border-bottom: 2px solid #444;
-        }
-
-        .tab {
-            padding: 10px 20px;
-            background: none;
-            border: none;
-            cursor: pointer;
+        .input-group label {
+            display: block;
             font-weight: 600;
-            color: #888;
-            border-bottom: 3px solid transparent;
-            margin-bottom: -2px;
+            font-size: 13px;
+            margin-bottom: 8px;
+            color: #1f2937;
         }
 
-        .tab.active {
-            color: #667eea;
-            border-bottom-color: #667eea;
+        body.dark-mode .input-group label {
+            color: #f1f5f9;
         }
 
-        body.dark-mode .tab {
-            color: #aaa;
+        .input-group input,
+        .input-group select {
+            width: 100%;
+            padding: 12px 14px;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            font-size: 14px;
+            background: #f9fafb;
+            color: #1f2937;
         }
 
-        body.dark-mode .tab.active {
-            color: #9db8ff;
+        body.dark-mode .input-group input,
+        body.dark-mode .input-group select {
+            background: #0f172a;
+            border-color: #334155;
+            color: #f1f5f9;
         }
 
-        /* Responsive */
-        @media (max-width: 768px) {
-            .crypto-list {
+        .input-group input:focus,
+        .input-group select:focus {
+            outline: none;
+            border-color: #8b5cf6;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%);
+            color: white;
+            width: 100%;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(139, 92, 246, 0.3);
+        }
+
+        .btn-secondary {
+            background: #f3f4f6;
+            color: #1f2937;
+            width: 100%;
+        }
+
+        body.dark-mode .btn-secondary {
+            background: #334155;
+            color: #f1f5f9;
+        }
+
+        /* Transactions */
+        .transaction-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px;
+            border-bottom: 1px solid #e5e7eb;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        body.dark-mode .transaction-item {
+            border-bottom: 1px solid #334155;
+        }
+
+        .transaction-item:hover {
+            background: #f9fafb;
+        }
+
+        body.dark-mode .transaction-item:hover {
+            background: #0f172a;
+        }
+
+        .transaction-info {
+            flex: 1;
+        }
+
+        .transaction-type {
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+
+        .transaction-date {
+            font-size: 12px;
+            color: #9ca3af;
+        }
+
+        .transaction-amount {
+            font-weight: 700;
+            font-size: 16px;
+        }
+
+        .transaction-positive {
+            color: #10b981;
+        }
+
+        .transaction-negative {
+            color: #ef4444;
+        }
+
+        @media (max-width: 640px) {
+            .account-cards {
                 grid-template-columns: 1fr;
             }
 
-            .quick-actions {
-                grid-template-columns: repeat(3, 1fr);
+            .auth-box {
+                padding: 24px;
             }
 
-            .header h1 {
-                font-size: 20px;
-            }
-
-            .account-card .balance-amount {
+            .greeting h2 {
                 font-size: 24px;
             }
 
-            .modal-content {
-                padding: 20px;
+            .total-card .amount {
+                font-size: 36px;
             }
 
-            .balance-row {
-                grid-template-columns: 1fr;
+            .account-card .amount {
+                font-size: 24px;
             }
-        }
-
-        /* Utility Classes */
-        .hidden {
-            display: none !important;
-        }
-
-        .mt-20 {
-            margin-top: 20px;
-        }
-
-        .text-center {
-            text-align: center;
-        }
-
-        .text-success {
-            color: #27ae60;
-        }
-
-        .text-error {
-            color: #e74c3c;
-        }
-
-        /* Alert */
-        .alert {
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-        }
-
-        .alert-error {
-            background: #fee;
-            color: #c33;
-            border: 1px solid #fcc;
-        }
-
-        .alert-success {
-            background: #efe;
-            color: #3c3;
-            border: 1px solid #cfc;
-        }
-
-        body.dark-mode .alert-error {
-            background: #3c2222;
-            border: 1px solid #633;
-            color: #ff9999;
-        }
-
-        body.dark-mode .alert-success {
-            background: #223c22;
-            border: 1px solid #363;
-            color: #99ff99;
-        }
-
-        /* Transfer Modal */
-        .transfer-content {
-            display: grid;
-            gap: 20px;
-        }
-
-        .transfer-field {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .transfer-field label {
-            font-weight: 600;
-            color: #333;
-        }
-
-        body.dark-mode .transfer-field label {
-            color: #fff;
-        }
-
-        .transfer-field select,
-        .transfer-field input {
-            padding: 12px;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            font-size: 14px;
-        }
-
-        body.dark-mode .transfer-field select,
-        body.dark-mode .transfer-field input {
-            background: #444;
-            border: 2px solid #555;
-            color: #fff;
-        }
-
-        .transfer-buttons {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-top: 20px;
         }
     </style>
 </head>
 <body>
 
-<!-- Auth Pages -->
-<div id="loginPage" class="auth-container">
+<!-- Login Page -->
+<div id="loginPage" class="page auth-page">
     <div class="auth-box">
         <h2>CredCrypt</h2>
         <p>Welcome back! Sign in to continue</p>
-        <div id="loginError" class="alert alert-error hidden"></div>
+        <div id="loginError" style="display:none; color: #ef4444; font-size: 13px; margin-bottom: 16px;"></div>
         <form onsubmit="handleLogin(event)">
             <div class="form-group">
                 <label>Email Address</label>
@@ -644,7 +657,7 @@
                 <label>Password</label>
                 <input type="password" id="loginPassword" placeholder="password123" required>
             </div>
-            <button type="submit" style="width: 100%; margin-top: 20px;">Sign In</button>
+            <button type="submit" class="auth-btn">Sign In</button>
         </form>
         <div class="auth-link">
             Don't have an account? <a onclick="switchPage('signup')">Sign Up</a>
@@ -652,12 +665,13 @@
     </div>
 </div>
 
-<div id="signupPage" class="auth-container hidden">
+<!-- Signup Page -->
+<div id="signupPage" class="page auth-page" style="display:none;">
     <div class="auth-box">
         <h2>CredCrypt</h2>
         <p>Create your account</p>
-        <div id="signupError" class="alert alert-error hidden"></div>
-        <form onsubmit="handleSignup(event)">
+        <div id="signupError" style="display:none; color: #ef4444; font-size: 13px; margin-bottom: 16px;"></div>
+        <form onsubmit="handleSignup(event)" style="max-height: 400px; overflow-y: auto;">
             <div class="form-group">
                 <label>First Name</label>
                 <input type="text" id="firstName" placeholder="John" required>
@@ -680,9 +694,9 @@
             </div>
             <div class="form-group">
                 <label>Admin Code (Optional)</label>
-                <input type="password" id="adminCode" placeholder="Leave empty for regular account">
+                <input type="password" id="adminCode" placeholder="CredCrypt2024">
             </div>
-            <button type="submit" style="width: 100%; margin-top: 20px;">Sign Up</button>
+            <button type="submit" class="auth-btn">Sign Up</button>
         </form>
         <div class="auth-link">
             Already have an account? <a onclick="switchPage('login')">Login</a>
@@ -690,38 +704,41 @@
     </div>
 </div>
 
-<!-- Dashboard -->
-<div id="dashboardPage" class="hidden">
-    <div class="container">
-        <div class="header">
-            <h1>CredCrypt</h1>
-            <div class="header-actions">
-                <button class="btn-secondary" onclick="toggleDarkMode()">🌙 Dark Mode</button>
-                <button class="btn-secondary" onclick="handleLogout()">Logout</button>
-            </div>
+<!-- Dashboard Page -->
+<div id="dashboardPage" class="page dashboard-page" style="display:none;">
+    <div class="header">
+        <h1>CredCrypt</h1>
+        <div class="header-actions">
+            <button class="header-btn" onclick="toggleDarkMode()">🌙 Dark Mode</button>
+            <button class="header-btn" onclick="handleLogout()">Logout</button>
         </div>
+    </div>
 
-        <div class="dashboard">
-            <!-- Balance Cards Row -->
-            <div class="balance-row">
-                <!-- Checking Card -->
+    <div class="main-content">
+        <div class="content-grid">
+            <div class="greeting">
+                <h2 id="greeting">Good Morning, Jacob!</h2>
+                <p id="dayName">Tuesday, Nov 25</p>
+            </div>
+
+            <!-- Account Cards -->
+            <div class="account-cards">
                 <div class="account-card">
-                    <h3>Checking Account</h3>
-                    <div class="balance-amount" id="checkingBalance">$0.00</div>
-                    <button onclick="showModal('topup')" style="width: 100%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">Add Funds</button>
+                    <div class="label">Checking Account</div>
+                    <div class="amount" id="checkingAmount">$1,298.00</div>
+                    <button onclick="showModal('topup')">Add Funds</button>
                 </div>
-                <!-- Savings Card -->
                 <div class="account-card">
-                    <h3>Savings Account</h3>
-                    <div class="balance-amount" id="savingsBalance">$0.00</div>
-                    <button onclick="showModal('transfer')" style="width: 100%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">Transfer</button>
+                    <div class="label">Savings Account</div>
+                    <div class="amount" id="savingsAmount">$0.00</div>
+                    <button onclick="showModal('transfer')">Transfer</button>
                 </div>
             </div>
 
-            <!-- Total Balance Card -->
-            <div class="balance-card">
-                <h3>Total Balance</h3>
-                <div class="balance-amount" id="totalBalance">$0.00</div>
+            <!-- Total Balance -->
+            <div class="total-card">
+                <div class="label">Total Balance</div>
+                <div class="amount" id="totalAmount">$1,298.00</div>
             </div>
 
             <!-- Tabs -->
@@ -733,106 +750,68 @@
 
             <!-- Dashboard Tab -->
             <div id="dashboardTab">
-                <!-- Quick Actions -->
-                <div class="card">
-                    <h3>Quick Actions</h3>
-                    <div class="quick-actions">
-                        <div class="action-btn" onclick="showModal('topup')">
-                            <span class="action-icon">💳</span>
-                            <span class="action-label">Top Up</span>
-                        </div>
-                        <div class="action-btn" onclick="showModal('transfer')">
-                            <span class="action-icon">💸</span>
-                            <span class="action-label">Transfer</span>
-                        </div>
-                        <div class="action-btn" onclick="switchTab('crypto')">
-                            <span class="action-icon">₿</span>
-                            <span class="action-label">Crypto</span>
-                        </div>
-                        <div class="action-btn" onclick="alert('Coming soon')">
-                            <span class="action-icon">📊</span>
-                            <span class="action-label">Credit Score</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Recent Transactions -->
-                <div class="card">
-                    <h3>Recent Transactions</h3>
-                    <div class="transaction-list" id="recentTransactions">
-                        <div style="padding: 20px; text-align: center; color: #888;">No transactions yet</div>
-                    </div>
+                <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 16px;">Recent Transactions</h3>
+                <div id="transactionsList" style="background: white; border-radius: 12px; overflow: hidden;">
+                    <div style="padding: 20px; text-align: center; color: #9ca3af;">No transactions yet</div>
                 </div>
             </div>
 
             <!-- Crypto Tab -->
-            <div id="cryptoTab" class="hidden">
-                <div class="card">
-                    <h3>Cryptocurrencies</h3>
-                    <div class="crypto-list" id="cryptoList"></div>
-                </div>
+            <div id="cryptoTab" style="display:none;">
+                <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 16px;">Cryptocurrencies</h3>
+                <div class="card-list" id="cryptoList"></div>
             </div>
 
             <!-- Transactions Tab -->
-            <div id="transactionsTab" class="hidden">
-                <div class="card">
-                    <h3>All Transactions</h3>
-                    <div class="transaction-list" id="allTransactions">
-                        <div style="padding: 20px; text-align: center; color: #888;">No transactions yet</div>
-                    </div>
+            <div id="transactionsTab" style="display:none;">
+                <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 16px;">All Transactions</h3>
+                <div id="allTransactionsList" style="background: white; border-radius: 12px; overflow: hidden;">
+                    <div style="padding: 20px; text-align: center; color: #9ca3af;">No transactions yet</div>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Modals -->
-
 <!-- Top Up Modal -->
 <div id="topupModal" class="modal">
     <div class="modal-content">
-        <button class="close-btn" onclick="closeModal('topup')">×</button>
-        <div class="modal-header">Add Funds to Checking</div>
-        <div id="topupError" class="alert alert-error hidden"></div>
-        <form onsubmit="handleTopUp(event)">
-            <div class="form-group">
-                <label>Amount</label>
-                <input type="number" id="topupAmount" placeholder="100.00" step="0.01" required>
-            </div>
-            <button type="submit" style="width: 100%;">Add Funds</button>
-        </form>
+        <button class="modal-close" onclick="closeModal('topup')">×</button>
+        <div class="modal-header">Add Funds</div>
+        <div class="input-group">
+            <label>Amount (USD)</label>
+            <input type="number" id="topupAmount" placeholder="100.00" step="0.01" min="0">
+        </div>
+        <button class="btn btn-primary" onclick="handleTopUp()">Add Funds</button>
     </div>
 </div>
 
 <!-- Transfer Modal -->
 <div id="transferModal" class="modal">
     <div class="modal-content">
-        <button class="close-btn" onclick="closeModal('transfer')">×</button>
+        <button class="modal-close" onclick="closeModal('transfer')">×</button>
         <div class="modal-header">Transfer Money</div>
-        <div id="transferError" class="alert alert-error hidden"></div>
-        <div class="transfer-content">
-            <div class="transfer-field">
-                <label>From Account</label>
-                <select id="transferFrom">
-                    <option value="checking">Checking</option>
-                    <option value="savings">Savings</option>
-                </select>
-            </div>
-            <div class="transfer-field">
-                <label>To Account</label>
-                <select id="transferTo">
-                    <option value="savings">Savings</option>
-                    <option value="checking">Checking</option>
-                </select>
-            </div>
-            <div class="transfer-field">
-                <label>Amount</label>
-                <input type="number" id="transferAmount" placeholder="0.00" step="0.01" required>
-            </div>
-            <div class="transfer-buttons">
-                <button type="button" class="btn-secondary" onclick="closeModal('transfer')">Cancel</button>
-                <button type="button" onclick="handleTransfer()">Transfer</button>
-            </div>
+        <div class="input-group">
+            <label>From Account</label>
+            <select id="transferFrom">
+                <option value="checking">Checking</option>
+                <option value="savings">Savings</option>
+            </select>
+        </div>
+        <div class="input-group">
+            <label>To Account</label>
+            <select id="transferTo">
+                <option value="savings">Savings</option>
+                <option value="checking">Checking</option>
+            </select>
+        </div>
+        <div class="input-group">
+            <label>Amount</label>
+            <input type="number" id="transferAmount" placeholder="0.00" step="0.01" min="0">
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+            <button class="btn btn-secondary" onclick="closeModal('transfer')">Cancel</button>
+            <button class="btn btn-primary" onclick="handleTransfer()">Transfer</button>
         </div>
     </div>
 </div>
@@ -840,17 +819,15 @@
 <!-- Buy Crypto Modal -->
 <div id="buyCryptoModal" class="modal">
     <div class="modal-content">
-        <button class="close-btn" onclick="closeModal('buyCrypto')">×</button>
-        <div class="modal-header" id="buyCryptoTitle">Buy Crypto</div>
-        <div id="cryptoPriceLabel" style="margin-bottom: 20px; text-align: center;"></div>
-        <form onsubmit="handleCryptoTransaction(event)">
-            <div class="form-group">
-                <label>USD Amount</label>
-                <input type="number" id="cryptoAmount" placeholder="100.00" step="0.01" required>
-            </div>
-            <div id="cryptoCalculation" style="text-align: center; margin: 15px 0; color: #888;"></div>
-            <button type="submit" style="width: 100%;">Proceed to PIN</button>
-        </form>
+        <button class="modal-close" onclick="closeModal('buyCrypto')">×</button>
+        <div class="modal-header" id="cryptoTitle">Buy Bitcoin</div>
+        <div id="cryptoPriceLabel" style="text-align: center; color: #6b7280; margin-bottom: 20px; font-size: 14px;"></div>
+        <div class="input-group">
+            <label>USD Amount</label>
+            <input type="number" id="cryptoAmount" placeholder="100.00" step="0.01" min="0" oninput="updateCryptoCalculation()">
+        </div>
+        <div id="cryptoCalc" style="text-align: center; color: #6b7280; margin: 16px 0; font-size: 13px;"></div>
+        <button class="btn btn-primary" onclick="proceedToPIN()">Proceed to PIN</button>
     </div>
 </div>
 
@@ -858,79 +835,82 @@
 <div id="pinModal" class="modal">
     <div class="modal-content">
         <div class="modal-header">Enter PIN</div>
-        <div id="pinError" class="alert alert-error hidden"></div>
-        <div class="pin-display" id="pinDisplay">○○○○</div>
+        <div id="pinError" style="display:none; color: #ef4444; font-size: 13px; margin-bottom: 16px; text-align: center;"></div>
+        <div class="pin-display" id="pinDisplay">●●●●</div>
         <div class="pin-grid" id="pinGrid"></div>
-        <button onclick="submitPin()" style="width: 100%; margin-top: 20px;">Confirm</button>
+        <button class="btn btn-primary" onclick="submitPIN()">Confirm</button>
     </div>
 </div>
 
 <!-- Receipt Modal -->
 <div id="receiptModal" class="modal">
     <div class="modal-content">
-        <button class="close-btn" onclick="closeModal('receipt')">×</button>
+        <button class="modal-close" onclick="closeModal('receipt')">×</button>
         <div class="modal-header">Transaction Receipt</div>
-        <div id="receiptContent" style="text-align: center; padding: 20px;"></div>
-        <button onclick="closeModal('receipt')" style="width: 100%;">Done</button>
+        <div id="receiptContent" style="text-align: center; padding: 20px; color: #10b981; font-weight: 600;"></div>
+        <button class="btn btn-primary" onclick="closeModal('receipt')">Done</button>
     </div>
 </div>
 
 <script>
+    let auth = null;
+    let db = null;
     let currentUser = null;
     let userData = null;
     let darkMode = localStorage.getItem('darkMode') === 'true';
-    let currentCryptoAction = null;
+    let currentCryptoData = null;
     let pinBuffer = '';
-    let cryptoData = {
+    let cryptoPrices = {
         BTC: 45230,
         ETH: 2850,
         ADA: 1.45,
         SOL: 98
     };
 
-    const users = {};
+    const firebaseConfig = {
+        apiKey: "AIzaSyDl1hgfXs5k_XiGXJh8mN2pQrR_2vZ8K4w",
+        authDomain: "credcrypt-e80c0.firebaseapp.com",
+        projectId: "credcrypt-e80c0",
+        storageBucket: "credcrypt-e80c0.firebasestorage.app",
+        messagingSenderId: "847611883266",
+        appId: "1:847611883266:web:7f3d2d4e8f9g0h1i2j3k"
+    };
 
-    function generateId() {
-        return Math.random().toString(36).substr(2, 9);
-    }
-
-    function saveUsers() {
-        localStorage.setItem('credcryptUsers', JSON.stringify(users));
-    }
-
-    function loadUsers() {
-        const saved = localStorage.getItem('credcryptUsers');
-        if (saved) {
-            Object.assign(users, JSON.parse(saved));
+    function initApp() {
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
         }
+        auth = firebase.auth();
+        db = firebase.firestore();
+        
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                currentUser = user;
+                loadUserData();
+                switchPage('dashboard');
+            } else {
+                switchPage('login');
+            }
+        });
+
+        initPinGrid();
+        updateGreeting();
     }
 
-    function handleLogin(event) {
-        event.preventDefault();
-
+    function handleLogin(e) {
+        e.preventDefault();
         const email = document.getElementById('loginEmail').value;
         const password = document.getElementById('loginPassword').value;
         const errorDiv = document.getElementById('loginError');
 
-        const user = Object.values(users).find(u => u.email === email && u.password === password);
-
-        if (user) {
-            currentUser = user;
-            userData = user;
-            updateUI();
-            showPage('dashboard');
-            errorDiv.classList.add('hidden');
-            document.getElementById('loginEmail').value = '';
-            document.getElementById('loginPassword').value = '';
-        } else {
-            errorDiv.textContent = 'Invalid email or password';
-            errorDiv.classList.remove('hidden');
-        }
+        auth.signInWithEmailAndPassword(email, password).catch(error => {
+            errorDiv.textContent = error.message;
+            errorDiv.style.display = 'block';
+        });
     }
 
-    function handleSignup(event) {
-        event.preventDefault();
-
+    function handleSignup(e) {
+        e.preventDefault();
         const firstName = document.getElementById('firstName').value;
         const lastName = document.getElementById('lastName').value;
         const email = document.getElementById('signupEmail').value;
@@ -941,255 +921,159 @@
 
         if (password !== confirmPassword) {
             errorDiv.textContent = 'Passwords do not match';
-            errorDiv.classList.remove('hidden');
+            errorDiv.style.display = 'block';
             return;
         }
 
-        if (Object.values(users).find(u => u.email === email)) {
-            errorDiv.textContent = 'Email already exists';
-            errorDiv.classList.remove('hidden');
-            return;
-        }
-
-        const newUser = {
-            id: generateId(),
-            firstName,
-            lastName,
-            email,
-            password,
-            checking: 1500,
-            savings: 0,
-            cryptoHoldings: {},
-            transactions: [],
-            pin: '1234',
-            isAdmin: adminCode === 'CredCrypt2024'
-        };
-
-        users[newUser.id] = newUser;
-        saveUsers();
-
-        alert('Account created successfully! Please sign in.');
-        switchPage('login');
-        document.getElementById('firstName').value = '';
-        document.getElementById('lastName').value = '';
-        document.getElementById('signupEmail').value = '';
-        document.getElementById('signupPassword').value = '';
-        document.getElementById('confirmPassword').value = '';
-        document.getElementById('adminCode').value = '';
+        auth.createUserWithEmailAndPassword(email, password).then(result => {
+            const isAdmin = adminCode === 'CredCrypt2024';
+            db.collection('users').doc(result.user.uid).set({
+                firstName,
+                lastName,
+                email,
+                checking: 1500,
+                savings: 0,
+                cryptoHoldings: {},
+                transactions: [],
+                pin: '1234',
+                isAdmin,
+                createdAt: new Date()
+            });
+            alert('Account created! Please sign in.');
+            switchPage('login');
+        }).catch(error => {
+            errorDiv.textContent = error.message;
+            errorDiv.style.display = 'block';
+        });
     }
 
     function handleLogout() {
-        currentUser = null;
-        userData = null;
-        showPage('login');
+        auth.signOut();
+    }
+
+    async function loadUserData() {
+        const doc = await db.collection('users').doc(currentUser.uid).get();
+        if (doc.exists()) {
+            userData = doc.data();
+            updateUI();
+        }
     }
 
     function updateUI() {
-        if (!userData) return;
+        const total = userData.checking + userData.savings;
+        document.getElementById('totalAmount').textContent = `$${total.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
+        document.getElementById('checkingAmount').textContent = `$${userData.checking.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
+        document.getElementById('savingsAmount').textContent = `$${userData.savings.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
 
-        const totalBalance = (userData.checking || 0) + (userData.savings || 0);
-        document.getElementById('totalBalance').textContent = `$${totalBalance.toFixed(2)}`;
-        document.getElementById('checkingBalance').textContent = `$${userData.checking.toFixed(2)}`;
-        document.getElementById('savingsBalance').textContent = `$${userData.savings.toFixed(2)}`;
-
-        updateTransactionsList();
-        updateCryptoList();
-    }
-
-    function updateTransactionsList() {
         const transactions = userData.transactions || [];
-        const html = transactions.length ? transactions.slice(0, 5).map(tx => {
-            let displayAmount = tx.amount;
-            let isNegative = false;
-            
-            if (tx.type === 'transfer' && tx.from) {
-                isNegative = true;
-            } else if (tx.type === 'buy' || tx.type === 'send') {
-                isNegative = true;
-            }
-            
+        const transHTML = transactions.length ? transactions.slice(0, 5).map(t => {
+            const isNeg = ['buy', 'transfer', 'send'].includes(t.type);
             return `
-                <div class="transaction-item" onclick="showReceipt('${tx.id}')">
+                <div class="transaction-item">
                     <div class="transaction-info">
-                        <div class="transaction-type">${tx.type}</div>
-                        <div class="transaction-date">${new Date(tx.timestamp).toLocaleDateString()}</div>
+                        <div class="transaction-type">${t.type}</div>
+                        <div class="transaction-date">${new Date(t.timestamp).toLocaleDateString()}</div>
                     </div>
-                    <div class="transaction-amount ${isNegative ? 'negative' : 'positive'}">
-                        ${isNegative ? '-' : '+'}$${Math.abs(displayAmount).toFixed(2)}
+                    <div class="transaction-amount ${isNeg ? 'transaction-negative' : 'transaction-positive'}">
+                        ${isNeg ? '-' : '+'}$${Math.abs(t.amount).toFixed(2)}
                     </div>
                 </div>
             `;
-        }).join('') : '<div style="padding: 20px; text-align: center; color: #888;">No transactions</div>';
+        }).join('') : '<div style="padding: 20px; text-align: center; color: #9ca3af;">No transactions</div>';
 
-        document.getElementById('recentTransactions').innerHTML = html;
-        document.getElementById('allTransactions').innerHTML = html;
-    }
+        document.getElementById('transactionsList').innerHTML = transHTML;
+        document.getElementById('allTransactionsList').innerHTML = transHTML;
 
-    function updateCryptoList() {
-        const html = Object.entries(cryptoData).map(([symbol, price]) => {
+        const cryptoHTML = Object.entries(cryptoPrices).map(([symbol, price]) => {
             const holding = userData.cryptoHoldings?.[symbol] || 0;
             const value = holding * price;
-            const cryptoNames = {
-                BTC: 'Bitcoin',
-                ETH: 'Ethereum',
-                ADA: 'Cardano',
-                SOL: 'Solana'
-            };
             return `
-                <div class="crypto-card" onclick="buyCrypto('${symbol}', '${cryptoNames[symbol]}', ${price})">
-                    <div class="crypto-header">
-                        <div class="crypto-name">${symbol}</div>
-                        <div class="crypto-change">+2.5%</div>
-                    </div>
-                    <div class="crypto-price">$${price.toFixed(2)}</div>
-                    <div class="crypto-holding">Holdings: ${holding.toFixed(8)} | Value: $${value.toFixed(2)}</div>
+                <div class="card" onclick="buyCrypto('${symbol}', ${price})">
+                    <div class="card-name">${symbol}</div>
+                    <div class="card-price">$${price.toFixed(2)}</div>
+                    <div class="card-info">Holdings: ${holding.toFixed(8)} | $${value.toFixed(2)}</div>
                 </div>
             `;
         }).join('');
-        document.getElementById('cryptoList').innerHTML = html;
+        document.getElementById('cryptoList').innerHTML = cryptoHTML;
     }
 
-    function handleTopUp(e) {
-        e.preventDefault();
+    async function handleTopUp() {
         const amount = parseFloat(document.getElementById('topupAmount').value);
+        if (!amount || amount <= 0) return alert('Enter valid amount');
 
-        try {
-            const newChecking = userData.checking + amount;
-            userData.checking = newChecking;
-            userData.transactions.push({
+        await db.collection('users').doc(currentUser.uid).update({
+            checking: userData.checking + amount,
+            transactions: firebase.firestore.FieldValue.arrayUnion({
                 id: 'topup-' + Date.now(),
                 type: 'top-up',
-                amount: amount,
-                timestamp: new Date().toISOString(),
+                amount,
+                timestamp: new Date(),
                 status: 'completed'
-            });
+            })
+        });
 
-            users[userData.id] = userData;
-            saveUsers();
-
-            updateUI();
-            closeModal('topup');
-            document.getElementById('topupAmount').value = '';
-            alert('Top up successful!');
-        } catch (error) {
-            document.getElementById('topupError').textContent = error.message;
-            document.getElementById('topupError').classList.remove('hidden');
-        }
+        await loadUserData();
+        closeModal('topup');
+        document.getElementById('topupAmount').value = '';
+        alert('Top up successful!');
     }
 
-    function handleTransfer() {
+    async function handleTransfer() {
         const from = document.getElementById('transferFrom').value;
         const to = document.getElementById('transferTo').value;
         const amount = parseFloat(document.getElementById('transferAmount').value);
-        const errorDiv = document.getElementById('transferError');
 
-        errorDiv.classList.add('hidden');
+        if (!amount || amount <= 0) return alert('Enter valid amount');
+        if (userData[from] < amount) return alert('Insufficient balance');
 
-        if (!amount || amount <= 0) {
-            errorDiv.textContent = 'Please enter a valid amount';
-            errorDiv.classList.remove('hidden');
-            return;
-        }
+        const newFrom = userData[from] - amount;
+        const newTo = userData[to] + amount;
 
-        try {
-            const fromBalance = userData[from];
-            if (fromBalance < amount) {
-                throw new Error(`Insufficient ${from} balance`);
-            }
-
-            userData[from] = userData[from] - amount;
-            userData[to] = userData[to] + amount;
-            userData.transactions.push({
+        await db.collection('users').doc(currentUser.uid).update({
+            [from]: newFrom,
+            [to]: newTo,
+            transactions: firebase.firestore.FieldValue.arrayUnion({
                 id: 'transfer-' + Date.now(),
                 type: 'transfer',
-                from: from,
-                to: to,
+                from,
+                to,
                 amount: -amount,
-                timestamp: new Date().toISOString(),
+                timestamp: new Date(),
                 status: 'completed'
-            });
+            })
+        });
 
-            users[userData.id] = userData;
-            saveUsers();
-
-            updateUI();
-            closeModal('transfer');
-            document.getElementById('transferAmount').value = '';
-            alert('Transfer successful!');
-        } catch (error) {
-            errorDiv.textContent = error.message;
-            errorDiv.classList.remove('hidden');
-        }
+        await loadUserData();
+        closeModal('transfer');
+        document.getElementById('transferAmount').value = '';
+        alert('Transfer successful!');
     }
 
-    function buyCrypto(symbol, name, price) {
-        currentCryptoAction = { symbol, name, price, type: 'buy' };
-        document.getElementById('buyCryptoTitle').textContent = `Buy ${name}`;
+    function buyCrypto(symbol, price) {
+        currentCryptoData = { symbol, price };
+        document.getElementById('cryptoTitle').textContent = `Buy ${symbol}`;
         document.getElementById('cryptoPriceLabel').textContent = `Price: $${price.toFixed(2)} per ${symbol}`;
-
-        document.getElementById('cryptoAmount').oninput = () => {
-            const usd = parseFloat(document.getElementById('cryptoAmount').value) || 0;
-            const crypto = usd / price;
-            document.getElementById('cryptoCalculation').textContent = `${crypto.toFixed(8)} ${symbol} for $${usd.toFixed(2)}`;
-        };
-
         showModal('buyCrypto');
     }
 
-    function handleCryptoTransaction(e) {
-        e.preventDefault();
-        pinBuffer = '';
-        updatePinDisplay();
-        document.getElementById('pinError').classList.add('hidden');
-        showModal('pin');
-        showModal('buyCrypto', false);
+    function updateCryptoCalculation() {
+        const usd = parseFloat(document.getElementById('cryptoAmount').value) || 0;
+        const crypto = usd / currentCryptoData.price;
+        document.getElementById('cryptoCalc').textContent = `${crypto.toFixed(8)} ${currentCryptoData.symbol} for $${usd.toFixed(2)}`;
     }
 
-    function submitPin() {
-        if (pinBuffer !== userData.pin) {
-            document.getElementById('pinError').textContent = 'Incorrect PIN';
-            document.getElementById('pinError').classList.remove('hidden');
-            return;
-        }
-
-        const amount = parseFloat(document.getElementById('cryptoAmount').value);
-        const fee = amount * 0.01;
-        const total = amount + fee;
-        const crypto = amount / currentCryptoAction.price;
-
-        try {
-            const newChecking = userData.checking - total;
-            if (newChecking < 0) throw new Error('Insufficient balance');
-
-            userData.checking = newChecking;
-            userData.cryptoHoldings[currentCryptoAction.symbol] = (userData.cryptoHoldings[currentCryptoAction.symbol] || 0) + crypto;
-            userData.transactions.push({
-                id: 'crypto-' + Date.now(),
-                type: 'buy',
-                symbol: currentCryptoAction.symbol,
-                amount: -total,
-                cryptoAmount: crypto,
-                fee: fee,
-                timestamp: new Date().toISOString(),
-                status: 'completed'
-            });
-
-            users[userData.id] = userData;
-            saveUsers();
-
-            updateUI();
-            pinBuffer = '';
-            updatePinDisplay();
-            closeModal('pin');
-            showReceipt();
-        } catch (error) {
-            alert(error.message);
-        }
+    function proceedToPIN() {
+        const amount = document.getElementById('cryptoAmount').value;
+        if (!amount || amount <= 0) return alert('Enter valid amount');
+        pinBuffer = '';
+        updatePinDisplay();
+        showModal('buyCrypto', false);
+        showModal('pin');
     }
 
     function initPinGrid() {
         const grid = document.getElementById('pinGrid');
-        grid.innerHTML = '';
         for (let i = 1; i <= 9; i++) {
             const btn = document.createElement('button');
             btn.className = 'pin-btn';
@@ -1204,7 +1088,7 @@
         clearBtn.textContent = 'Clear';
         clearBtn.style.gridColumn = 'span 2';
         clearBtn.type = 'button';
-        clearBtn.onclick = clearPin;
+        clearBtn.onclick = () => { pinBuffer = ''; updatePinDisplay(); };
         grid.appendChild(clearBtn);
 
         const btn0 = document.createElement('button');
@@ -1222,74 +1106,86 @@
         }
     }
 
-    function clearPin() {
-        pinBuffer = '';
-        updatePinDisplay();
-    }
-
     function updatePinDisplay() {
         const display = '●'.repeat(pinBuffer.length) + '○'.repeat(4 - pinBuffer.length);
         document.getElementById('pinDisplay').textContent = display;
     }
 
-    function showModal(type, show = true) {
-        const modal = document.getElementById(type + 'Modal');
-        if (show) modal.classList.add('active');
-        else modal.classList.remove('active');
-    }
+    async function submitPIN() {
+        if (pinBuffer !== userData.pin) {
+            document.getElementById('pinError').textContent = 'Incorrect PIN';
+            document.getElementById('pinError').style.display = 'block';
+            return;
+        }
 
-    function closeModal(type) {
-        document.getElementById(type + 'Modal').classList.remove('active');
-    }
+        const usd = parseFloat(document.getElementById('cryptoAmount').value);
+        const crypto = usd / currentCryptoData.price;
 
-    function showPage(page) {
-        document.querySelectorAll('[id$="Page"]').forEach(el => el.classList.add('hidden'));
-        document.getElementById(page + 'Page').classList.remove('hidden');
+        if (userData.checking < usd) return alert('Insufficient balance');
+
+        const holdings = userData.cryptoHoldings || {};
+        holdings[currentCryptoData.symbol] = (holdings[currentCryptoData.symbol] || 0) + crypto;
+
+        await db.collection('users').doc(currentUser.uid).update({
+            checking: userData.checking - usd,
+            cryptoHoldings: holdings,
+            transactions: firebase.firestore.FieldValue.arrayUnion({
+                id: 'crypto-' + Date.now(),
+                type: 'buy',
+                symbol: currentCryptoData.symbol,
+                amount: -usd,
+                cryptoAmount: crypto,
+                timestamp: new Date(),
+                status: 'completed'
+            })
+        });
+
+        await loadUserData();
+        closeModal('pin');
+        document.getElementById('receiptContent').textContent = '✓ Transaction successful!';
+        showModal('receipt');
+        pinBuffer = '';
     }
 
     function switchPage(page) {
-        showPage(page);
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.getElementById(page + 'Page').classList.add('active');
     }
 
     function switchTab(tab) {
-        document.querySelectorAll('[id$="Tab"]').forEach(el => el.classList.add('hidden'));
-        document.getElementById(tab + 'Tab').classList.remove('hidden');
+        document.getElementById('dashboardTab').style.display = 'none';
+        document.getElementById('cryptoTab').style.display = 'none';
+        document.getElementById('transactionsTab').style.display = 'none';
+        document.getElementById(tab + 'Tab').style.display = 'block';
 
-        document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
         event.target.classList.add('active');
+    }
+
+    function showModal(id, show = true) {
+        document.getElementById(id + 'Modal').classList.toggle('active', show);
+    }
+
+    function closeModal(id) {
+        document.getElementById(id + 'Modal').classList.remove('active');
     }
 
     function toggleDarkMode() {
         darkMode = !darkMode;
         localStorage.setItem('darkMode', darkMode);
-        document.body.classList.toggle('dark-mode');
+        document.body.classList.toggle('dark-mode', darkMode);
     }
 
-    function showReceipt() {
-        document.getElementById('receiptContent').innerHTML = '<p style="color: #27ae60; font-weight: bold;">Transaction completed successfully!</p>';
-        showModal('receipt');
+    function updateGreeting() {
+        const now = new Date();
+        const hours = now.getHours();
+        const greeting = hours < 12 ? 'Good Morning' : hours < 18 ? 'Good Afternoon' : 'Good Evening';
+        document.getElementById('greeting').textContent = `${greeting}, ${userData?.firstName || 'User'}!`;
+        document.getElementById('dayName').textContent = now.toLocaleDateString('en-US', {weekday: 'long', month: 'short', day: 'numeric'});
     }
 
-    function fetchCryptoPrices() {
-        setInterval(() => {
-            cryptoData = {
-                BTC: 45230 + (Math.random() - 0.5) * 1000,
-                ETH: 2850 + (Math.random() - 0.5) * 100,
-                ADA: 1.45 + (Math.random() - 0.5) * 0.1,
-                SOL: 98 + (Math.random() - 0.5) * 10
-            };
-            if (userData) updateCryptoList();
-        }, 5000);
-    }
-
-    if (darkMode) {
-        document.body.classList.add('dark-mode');
-    }
-
-    loadUsers();
-    initPinGrid();
-    fetchCryptoPrices();
-    showPage('login');
+    if (darkMode) document.body.classList.add('dark-mode');
+    initApp();
 </script>
 
 </body>
