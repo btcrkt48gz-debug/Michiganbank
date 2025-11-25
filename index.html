@@ -4,10 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CredCrypt - Digital Banking</title>
-    <script defer src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js"></script>
-    <script defer src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js"></script>
-    <script defer src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js"></script>
-    <script defer src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -556,21 +552,6 @@
             color: #e74c3c;
         }
 
-        /* Loading */
-        .spinner {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            border-top-color: white;
-            animation: spin 1s ease-in-out infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
         /* Alert */
         .alert {
             padding: 15px;
@@ -895,12 +876,9 @@
 </div>
 
 <script>
-    let auth = null;
-    let db = null;
     let currentUser = null;
     let userData = null;
     let darkMode = localStorage.getItem('darkMode') === 'true';
-    let firebaseReady = false;
     let currentCryptoAction = null;
     let pinBuffer = '';
     let cryptoData = {
@@ -910,85 +888,48 @@
         SOL: 98
     };
 
-    const firebaseConfig = {
-        apiKey: "AIzaSyDl1hgfXs5k_XiGXJh8mN2pQrR_2vZ8K4w",
-        authDomain: "credcrypt-e80c0.firebaseapp.com",
-        projectId: "credcrypt-e80c0",
-        storageBucket: "credcrypt-e80c0.firebasestorage.app",
-        messagingSenderId: "847611883266",
-        appId: "1:847611883266:web:7f3d2d4e8f9g0h1i2j3k"
-    };
+    const users = {};
 
-    function checkFirebaseReady() {
-        if (typeof firebase !== 'undefined' && firebase.auth && firebase.firestore) {
-            initializeFirebase();
-        } else {
-            setTimeout(checkFirebaseReady, 500);
+    function generateId() {
+        return Math.random().toString(36).substr(2, 9);
+    }
+
+    function saveUsers() {
+        localStorage.setItem('credcryptUsers', JSON.stringify(users));
+    }
+
+    function loadUsers() {
+        const saved = localStorage.getItem('credcryptUsers');
+        if (saved) {
+            Object.assign(users, JSON.parse(saved));
         }
     }
 
-    function initializeFirebase() {
-        try {
-            if (firebase.apps.length === 0) {
-                firebase.initializeApp(firebaseConfig);
-            }
-            auth = firebase.auth();
-            db = firebase.firestore();
-            firebaseReady = true;
-            console.log('✓ Firebase initialized');
-            setupAuthListener();
-            initPinGrid();
-            fetchCryptoPrices();
-            showPage('login');
-        } catch (error) {
-            console.error('Firebase init error:', error);
-            setTimeout(initializeFirebase, 1000);
-        }
-    }
-
-    function setupAuthListener() {
-        if (!auth) return;
-        auth.onAuthStateChanged(user => {
-            if (user) {
-                currentUser = user;
-                loadUserData();
-                showPage('dashboard');
-            } else {
-                showPage('login');
-                currentUser = null;
-                userData = null;
-            }
-        });
-    }
-
-    async function handleLogin(event) {
+    function handleLogin(event) {
         event.preventDefault();
-
-        if (!firebaseReady || !auth) {
-            alert('Firebase is initializing... Please wait and try again.');
-            return;
-        }
 
         const email = document.getElementById('loginEmail').value;
         const password = document.getElementById('loginPassword').value;
         const errorDiv = document.getElementById('loginError');
 
-        try {
+        const user = Object.values(users).find(u => u.email === email && u.password === password);
+
+        if (user) {
+            currentUser = user;
+            userData = user;
+            updateUI();
+            showPage('dashboard');
             errorDiv.classList.add('hidden');
-            await auth.signInWithEmailAndPassword(email, password);
-        } catch (error) {
-            errorDiv.textContent = error.message;
+            document.getElementById('loginEmail').value = '';
+            document.getElementById('loginPassword').value = '';
+        } else {
+            errorDiv.textContent = 'Invalid email or password';
             errorDiv.classList.remove('hidden');
         }
     }
 
-    async function handleSignup(event) {
+    function handleSignup(event) {
         event.preventDefault();
-
-        if (!auth || !db) {
-            alert('Firebase is initializing... Please wait and try again.');
-            return;
-        }
 
         const firstName = document.getElementById('firstName').value;
         const lastName = document.getElementById('lastName').value;
@@ -1004,43 +945,43 @@
             return;
         }
 
-        try {
-            errorDiv.classList.add('hidden');
-            const result = await auth.createUserWithEmailAndPassword(email, password);
-
-            await db.collection('users').doc(result.user.uid).set({
-                firstName,
-                lastName,
-                email,
-                checking: 1500,
-                savings: 0,
-                cryptoHoldings: {},
-                transactions: [],
-                pin: '1234',
-                isAdmin: adminCode === 'CredCrypt2024',
-                createdAt: new Date()
-            });
-
-            alert('Account created successfully! Please sign in.');
-            switchPage('login');
-        } catch (error) {
-            errorDiv.textContent = error.message;
+        if (Object.values(users).find(u => u.email === email)) {
+            errorDiv.textContent = 'Email already exists';
             errorDiv.classList.remove('hidden');
+            return;
         }
+
+        const newUser = {
+            id: generateId(),
+            firstName,
+            lastName,
+            email,
+            password,
+            checking: 1500,
+            savings: 0,
+            cryptoHoldings: {},
+            transactions: [],
+            pin: '1234',
+            isAdmin: adminCode === 'CredCrypt2024'
+        };
+
+        users[newUser.id] = newUser;
+        saveUsers();
+
+        alert('Account created successfully! Please sign in.');
+        switchPage('login');
+        document.getElementById('firstName').value = '';
+        document.getElementById('lastName').value = '';
+        document.getElementById('signupEmail').value = '';
+        document.getElementById('signupPassword').value = '';
+        document.getElementById('confirmPassword').value = '';
+        document.getElementById('adminCode').value = '';
     }
 
     function handleLogout() {
-        auth.signOut();
-    }
-
-    async function loadUserData() {
-        if (!currentUser) return;
-
-        const doc = await db.collection('users').doc(currentUser.uid).get();
-        if (doc.exists) {
-            userData = doc.data();
-            updateUI();
-        }
+        currentUser = null;
+        userData = null;
+        showPage('login');
     }
 
     function updateUI() {
@@ -1108,25 +1049,25 @@
         document.getElementById('cryptoList').innerHTML = html;
     }
 
-    async function handleTopUp(e) {
+    function handleTopUp(e) {
         e.preventDefault();
         const amount = parseFloat(document.getElementById('topupAmount').value);
 
         try {
             const newChecking = userData.checking + amount;
-
-            await db.collection('users').doc(currentUser.uid).update({
-                checking: newChecking,
-                transactions: firebase.firestore.FieldValue.arrayUnion({
-                    id: 'topup-' + Date.now(),
-                    type: 'top-up',
-                    amount: amount,
-                    timestamp: new Date(),
-                    status: 'completed'
-                })
+            userData.checking = newChecking;
+            userData.transactions.push({
+                id: 'topup-' + Date.now(),
+                type: 'top-up',
+                amount: amount,
+                timestamp: new Date().toISOString(),
+                status: 'completed'
             });
 
-            await loadUserData();
+            users[userData.id] = userData;
+            saveUsers();
+
+            updateUI();
             closeModal('topup');
             document.getElementById('topupAmount').value = '';
             alert('Top up successful!');
@@ -1136,7 +1077,7 @@
         }
     }
 
-    async function handleTransfer() {
+    function handleTransfer() {
         const from = document.getElementById('transferFrom').value;
         const to = document.getElementById('transferTo').value;
         const amount = parseFloat(document.getElementById('transferAmount').value);
@@ -1156,22 +1097,22 @@
                 throw new Error(`Insufficient ${from} balance`);
             }
 
-            const updates = {
-                [from]: userData[from] - amount,
-                [to]: userData[to] + amount,
-                transactions: firebase.firestore.FieldValue.arrayUnion({
-                    id: 'transfer-' + Date.now(),
-                    type: 'transfer',
-                    from: from,
-                    to: to,
-                    amount: -amount,
-                    timestamp: new Date(),
-                    status: 'completed'
-                })
-            };
+            userData[from] = userData[from] - amount;
+            userData[to] = userData[to] + amount;
+            userData.transactions.push({
+                id: 'transfer-' + Date.now(),
+                type: 'transfer',
+                from: from,
+                to: to,
+                amount: -amount,
+                timestamp: new Date().toISOString(),
+                status: 'completed'
+            });
 
-            await db.collection('users').doc(currentUser.uid).update(updates);
-            await loadUserData();
+            users[userData.id] = userData;
+            saveUsers();
+
+            updateUI();
             closeModal('transfer');
             document.getElementById('transferAmount').value = '';
             alert('Transfer successful!');
@@ -1204,7 +1145,7 @@
         showModal('buyCrypto', false);
     }
 
-    async function submitPin() {
+    function submitPin() {
         if (pinBuffer !== userData.pin) {
             document.getElementById('pinError').textContent = 'Incorrect PIN';
             document.getElementById('pinError').classList.remove('hidden');
@@ -1220,25 +1161,23 @@
             const newChecking = userData.checking - total;
             if (newChecking < 0) throw new Error('Insufficient balance');
 
-            const holdings = userData.cryptoHoldings || {};
-            holdings[currentCryptoAction.symbol] = (holdings[currentCryptoAction.symbol] || 0) + crypto;
-
-            await db.collection('users').doc(currentUser.uid).update({
-                checking: newChecking,
-                cryptoHoldings: holdings,
-                transactions: firebase.firestore.FieldValue.arrayUnion({
-                    id: 'crypto-' + Date.now(),
-                    type: 'buy',
-                    symbol: currentCryptoAction.symbol,
-                    amount: -total,
-                    cryptoAmount: crypto,
-                    fee: fee,
-                    timestamp: new Date(),
-                    status: 'completed'
-                })
+            userData.checking = newChecking;
+            userData.cryptoHoldings[currentCryptoAction.symbol] = (userData.cryptoHoldings[currentCryptoAction.symbol] || 0) + crypto;
+            userData.transactions.push({
+                id: 'crypto-' + Date.now(),
+                type: 'buy',
+                symbol: currentCryptoAction.symbol,
+                amount: -total,
+                cryptoAmount: crypto,
+                fee: fee,
+                timestamp: new Date().toISOString(),
+                status: 'completed'
             });
 
-            await loadUserData();
+            users[userData.id] = userData;
+            saveUsers();
+
+            updateUI();
             pinBuffer = '';
             updatePinDisplay();
             closeModal('pin');
@@ -1347,11 +1286,10 @@
         document.body.classList.add('dark-mode');
     }
 
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', checkFirebaseReady);
-    } else {
-        checkFirebaseReady();
-    }
+    loadUsers();
+    initPinGrid();
+    fetchCryptoPrices();
+    showPage('login');
 </script>
 
 </body>
